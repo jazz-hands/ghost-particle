@@ -23,13 +23,21 @@ How to use:
 | D-009 | Build budget and cut order | accepted | 5 hours; cut L7, then L4 photo, then L3 dodging, then L5 ring count. |
 | D-010 | Input scheme | open | Recommend keyboard only for v1. |
 | D-011 | Flavor tints | open | Three tints plus base color; disclose as a design choice. |
-| D-012 | Dodging has no consequence | open | Recommend pure lesson, no fail state. |
-| D-013 | Mini-game feedback timing | open | Recommend reveal after each ring. |
+| D-012 | Dodging has no consequence | accepted | Superseded by D-020: nothing can be hit, no fail state. |
+| D-013 | Mini-game feedback timing | accepted | Reveal answer and one-line reason after each ring. |
 | D-014 | Hosting | open | Static site; pick host. |
 | D-015 | Text policy | accepted | Level 1 is wordless; captions are cards of at most 25 words. |
 | D-016 | HUD is DOM, not 3D text | accepted | Captions, meters, and buttons are HTML overlays. |
 | D-017 | Debug tools gated by URL flag | accepted | lil-gui and Stats mount only with `?debug`. |
 | D-018 | Level module contract | accepted | Each level exports `enter`, `update`, `exit`, and disposes its own objects. |
+| D-019 | Level 2 is three cards | accepted | No level is pure reading; level 2 is capped at three cards. |
+| D-020 | Level 3 is "try to hit something" | accepted | Player steers into obstacles and passes through every one; no collision, no fail state. |
+| D-021 | Level 4 find-yourself click | accepted | Family photo is a grid; the player clicks their own tile. |
+| D-022 | Level 5 opens with the hero's own hit | accepted | The climax: the neutrino hits an electron and makes the first ring. Never cut. |
+| D-023 | Build order: spine, ending, middle | accepted | Spine, L1, L5, L6, L3, L4, L2, tests. |
+| D-024 | Through-line counter | accepted | Neutrinos through the player since pressing start, per F-32. |
+| D-025 | Sound is Web Audio synthesis | accepted | Named synth cues, no audio files. Soundtrack only if time remains. |
+| D-026 | BEATS.md is the script | accepted | If a moment isn't in the beat sheet, it isn't built. |
 
 ## Entries
 
@@ -86,13 +94,13 @@ Recommend keyboard only for v1: Space to hold/advance, arrow keys to steer in L3
 
 Three tints for electron, muon, tau flavor plus the character's base color. These are design choices with no physical meaning; the credits say so.
 
-### D-012 Dodging has no consequence — open
+### D-012 Dodging has no consequence — accepted
 
-Recommend: in level 3 the player can steer, but obstacles never stop the neutrino and there is no fail state. The lesson is that nothing stops it. Steering exists only to make the pass-through feel like the player's discovery.
+Superseded by D-020. Obstacles never stop the neutrino and there is no fail state.
 
-### D-013 Mini-game feedback timing — open
+### D-013 Mini-game feedback timing — accepted
 
-Recommend: reveal the correct answer after each ring, with a one-line reason, rather than a summary at the end. Keeps the teaching close to the choice.
+Reveal the correct answer after each ring, with a one-line reason, rather than a summary at the end. Keeps the teaching close to the choice. The fifth ring is deliberately ambiguous and revealed as such (F-22).
 
 ### D-014 Hosting — open
 
@@ -113,3 +121,35 @@ lil-gui and Stats mount only when the URL contains `?debug`. Production builds s
 ### D-018 Level module contract — accepted
 
 Each level is one file exporting an object with `enter()`, `update(dt)`, `exit()`. Levels create their own three.js objects and dispose them in `exit()`. The level manager owns ordering and transitions. Levels never reach into each other.
+
+### D-019 Level 2 is three cards — accepted
+
+Level 2 is capped at exactly three caption cards (F-03; F-04 with the seesaw gag; F-06 and F-02). The remaining introductory facts are delivered inside levels 3 and 4 where the player is doing something. Rationale: a run of passive cards is where players leave.
+
+### D-020 Level 3 is "try to hit something" — accepted
+
+The player is told to try to hit things and can steer into every obstacle. The neutrino passes through all of them; a tally counts the pass-throughs. There is no collision and no fail state. The failure to collide is both the joke and the lesson (F-10). Supersedes D-012.
+
+### D-021 Level 4 find-yourself click — accepted
+
+The Standard Model family photo is a grid of 17 tiles with plain one-line labels (F-16). The player clicks the tile that is them. Any of the three neutrino tiles counts as correct. Wrong tiles wiggle and show their label; no penalty.
+
+### D-022 Level 5 opens with the hero's own hit — accepted
+
+The first thing that happens in the detector is the hero hitting an electron and making a ring (beats 5.3–5.5). This is the climax of the whole game's arc (touch nothing, then finally touch one thing) and is never cut. The mini-game follows it.
+
+### D-023 Build order: spine, ending, middle — accepted
+
+Build in this order: spine (scaffold, character, HUD, counter, rail scene, audio), level 1, level 5, level 6 with credits, level 3, level 4, level 2, tests. Rationale: if time runs out, the middle collapses to captions but the climax and ending exist. Time table in `SPEC.md`.
+
+### D-024 Through-line counter — accepted
+
+One counter runs from the moment the player presses start in level 1, appears in the HUD from level 2, and is frozen and shown large in level 6: solar neutrinos that have passed through the player's body since starting. Computed per F-32. The body-area assumption must be sourced before it ships.
+
+### D-025 Sound is Web Audio synthesis — accepted
+
+All sound is generated with the Web Audio API from a small set of named cues listed in `BEATS.md`. No audio files are shipped or committed. A cinematic soundtrack is an add-if-time item at the bottom of the build order, never a reason to cut a level.
+
+### D-026 BEATS.md is the script — accepted
+
+`docs/BEATS.md` is the moment-by-moment script: what the player sees, does, the neutrino's reaction, caption text, fact IDs, and sound cue. Captions in `src/content/facts.ts` are copied from it verbatim. If a moment isn't in the beat sheet, it isn't built; if it needs to change, change the beat sheet first.

@@ -231,6 +231,16 @@ Each entry: plain-language wording (what the player reads), precise statement (f
 
 ---
 
+## Through-line counter
+
+### F-32 Neutrinos through the player since pressing start
+- Player wording: "Neutrinos through you since you started: about N trillion."
+- Precise: N(t) = Φ × A × t, where Φ is the total solar neutrino flux at Earth (F-07, ≈ 6 × 10¹⁰ cm⁻² s⁻¹), A is an assumed cross-sectional area of an adult body as seen from the Sun, and t is seconds since start. Displayed to two significant figures with the word "about". The flux is the same day or night; at night the neutrinos arrive through the Earth (F-25).
+- Assumption to source: A. Candidates: published adult frontal silhouette area from ergonomics or radiation-dosimetry literature. Until sourced, the counter must not ship.
+- Sources: F-07 for Φ; A pending.
+- Status: check (A needs a citation; Φ inherits F-07's status).
+- Used: HUD from L2 onward, L6 finale.
+
 ## Formulas used in code
 
 ### F-30 Light travel time

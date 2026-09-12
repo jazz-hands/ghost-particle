@@ -7,8 +7,8 @@ Everything to settle or produce before the first line of app code. Check items o
 - [x] D-001 Which neutrino is the hero: boron-8 neutrino. Accepted.
 - [ ] D-010 Input scheme: keyboard only for v1, or keyboard plus touch.
 - [ ] D-011 Flavor colors (three tints) and the character's base color.
-- [ ] D-012 Whether level 3 dodging has any consequence at all, or is pure lesson (recommend: pure lesson).
-- [ ] D-013 Mini-game feedback: per-ring reveal vs end-of-round summary.
+- [x] D-012 / D-020 Level 3 has no collision and no fail state. Accepted.
+- [x] D-013 Mini-game reveals after each ring. Accepted.
 - [ ] D-014 Hosting target (static site; Vercel, GitHub Pages, or other).
 
 ## 2. Facts to verify and pin (see status column in FACTS.md)
@@ -21,12 +21,15 @@ Everything to settle or produce before the first line of app code. Check items o
 - [ ] F-24: find the official URL of the public 5-day solar flux dataset on the SK site.
 - [ ] F-25 / A-01: confirm usage rights for the Super-K "Sun in neutrinos" image (contact Super-K public relations or LSU). If unavailable, plan a fallback: render the public 5-day dataset as a plot instead.
 - [ ] F-11: decide to drop the "light-year of lead" line unless a primary source appears.
+- [ ] F-32: source an adult body cross-sectional area (as seen from the Sun) for the through-line counter. The counter cannot ship until this has a citation.
 
 ## 3. Content to write (plain language, each line tagged with an F-ID)
 
-- [ ] Caption script for levels 2–6: 5–7 cards per level, max 25 words per card, every card lists its fact IDs.
-- [ ] A reaction name per card (nod, wiggle, blush, shrug, spin, peek) so the character's expression set is known before modelling.
-- [ ] Level 4 family photo: one-line plain description per Standard Model row.
+- [x] Caption script for levels 1–6: written in BEATS.md, every card tagged with fact IDs and under 25 words.
+- [ ] Review BEATS.md captions for plain-language compliance (D-005) with someone outside physics.
+- [x] Reaction set and sound cue set: defined in BEATS.md.
+- [ ] Level 4 family photo: one-line plain label for each of the 17 tiles (F-16), written in BEATS.md or facts.ts.
+- [ ] Level 5 mini-game: the one-line reveal reason for each of the five rings (beat 5.9).
 - [ ] Level 5 final card: the honesty note on simulated rings.
 - [ ] Level 7 side-panel text (only after everything else).
 - [ ] Credits page copy: sources, image credits, "made with" list, tint disclaimer.
@@ -45,6 +48,7 @@ Everything to settle or produce before the first line of app code. Check items o
 - [ ] Playwright with Chromium headless renders WebGL in CI (may need `--use-gl=swiftshader` or similar flag).
 - [ ] Node and npm/pnpm are on PATH in the build environment (npx was missing in this session, which is why Context7 and Playwright MCP servers failed to connect).
 - [ ] Bloom approach: three.js UnrealBloomPass via EffectComposer, or skip post-processing and fake glow with sprites.
+- [ ] Web Audio: confirm the autoplay policy needs a user gesture first (the level 1 Space hold can be that gesture).
 
 ## 6. Scaffold (first coding step, after the above)
 
