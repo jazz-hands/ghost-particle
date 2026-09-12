@@ -38,6 +38,7 @@ How to use:
 | D-024 | Through-line counter | accepted | Neutrinos through the player since pressing start, per F-32. |
 | D-025 | Sound is Web Audio synthesis | accepted | Named synth cues, no audio files. Soundtrack only if time remains. |
 | D-026 | BEATS.md is the script | accepted | If a moment isn't in the beat sheet, it isn't built. |
+| D-027 | Cheap rendering for level 5 | accepted | Sensors are one instanced mesh; rings are drawn on a canvas texture on the cylinder wall. |
 
 ## Entries
 
@@ -153,3 +154,7 @@ All sound is generated with the Web Audio API from a small set of named cues lis
 ### D-026 BEATS.md is the script — accepted
 
 `docs/BEATS.md` is the moment-by-moment script: what the player sees, does, the neutrino's reaction, caption text, fact IDs, and sound cue. Captions in `src/content/facts.ts` are copied from it verbatim. If a moment isn't in the beat sheet, it isn't built; if it needs to change, change the beat sheet first.
+
+### D-027 Cheap rendering for level 5 — accepted
+
+The 11,129 inner sensors (F-18) are a single `InstancedMesh` of a low-poly disc or sphere. The 1,885 outer sensors are not rendered; the player is inside the tank. Rings, the hero's cone hit, and the "sensors lighting up" effect are drawn on a 2D canvas texture mapped to the inside of the cylinder, not by lighting individual instances. Ring radius comes from F-31. The character stays two spheres plus eye sprites with no custom shaders. Rationale: keeps level 5 inside its 1h 30 budget and well under the draw-call ceiling.
