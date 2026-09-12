@@ -22,7 +22,7 @@ How to use:
 | D-008 | Detector events are simulated | accepted | Rings are generated from published geometry, labelled as simulation. |
 | D-009 | Build budget and cut order | accepted | 5 hours; cut L7, then L4 photo, then L3 dodging, then L5 ring count. |
 | D-010 | Input scheme | accepted | Keyboard only for v1. |
-| D-011 | Flavor tints | open | Proposed: electron sky-blue, muon violet, tau coral; base white-blue. Disclosed as a design choice. |
+| D-011 | Flavor tints | accepted | Electron sky-blue, muon violet, tau coral; base white with blue glow. Disclosed as a design choice. |
 | D-012 | Dodging has no consequence | accepted | Superseded by D-020: nothing can be hit, no fail state. |
 | D-013 | Mini-game feedback timing | accepted | Reveal answer and one-line reason after each ring. |
 | D-014 | Hosting | accepted | Static build hosted on exe.dev. |
@@ -91,11 +91,9 @@ Five hours of build time, allocated per the table in `SPEC.md`. If behind, cut i
 
 Keyboard only for v1: Space to hold and to advance, arrow keys to steer in level 3, click or number keys for the level 4 tile and the level 5 buttons. Touch is an add-if-time item.
 
-### D-011 Flavor tints — open
+### D-011 Flavor tints — accepted
 
-Three tints for electron, muon, tau flavor plus the character's base color. These are design choices with no physical meaning; the credits say so.
-
-Proposal, awaiting a yes: base body white with a cool blue glow (matching the reference board); electron flavor sky-blue `#4FC3F7`; muon flavor violet `#B388FF`; tau flavor coral `#FF8A65`. The three are far apart in hue and readable against the navy background, and the flavor icon under the counter repeats the tint so colour alone is not the only cue.
+Base body white with a cool blue glow. Electron flavor sky-blue `#4FC3F7`, muon flavor violet `#B388FF`, tau flavor coral `#FF8A65`. These are design choices with no physical meaning; the credits say so. The three are far apart in hue and readable against the navy background, and the flavor icon under the counter repeats the tint so colour alone is not the only cue.
 
 ### D-012 Dodging has no consequence — accepted
 

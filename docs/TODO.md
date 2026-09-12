@@ -6,7 +6,7 @@ Everything to settle or produce before the first line of app code. Check items o
 
 - [x] D-001 Which neutrino is the hero: boron-8 neutrino. Accepted.
 - [x] D-010 Keyboard only for v1. Accepted.
-- [ ] D-011 Flavor colors (three tints) and the character's base color.
+- [x] D-011 Flavor tints and base color. Accepted, values in DECISIONS.md.
 - [x] D-012 / D-020 Level 3 has no collision and no fail state. Accepted.
 - [x] D-013 Mini-game reveals after each ring. Accepted.
 - [x] D-014 Hosting on exe.dev. Accepted.
@@ -39,7 +39,7 @@ Most entries are now verified. Remaining "check" items, none of which change on-
 ## 4. Art and reference (no external assets shipped)
 
 - [ ] Character sketch: silhouette, eye shapes for each reaction, opacity and glow target.
-- [ ] Palette: background gradient stops, three flavor tints, UI accent, plasma color in L3, sensor "eye" gold in L5.
+- [ ] Palette: background gradient stops, UI accent, plasma color in L3, sensor "eye" gold in L5 (flavor tints and base are settled in D-011).
 - [ ] Reference board from the Astro Bot screenshots (private, not committed).
 - [ ] Rough layout for the HUD: caption card position, key prompt, meters, mini-game buttons.
 

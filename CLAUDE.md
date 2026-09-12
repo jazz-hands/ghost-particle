@@ -9,4 +9,4 @@ Read in this order before doing anything:
 4. `docs/BEATS.md` — the moment-by-moment script. If it isn't there, it isn't built.
 5. `docs/TODO.md` — what must be settled before coding.
 
-No code exists yet. Do not scaffold until the open items in `docs/TODO.md` section 1 are decided.
+No code exists yet. All decisions in `docs/TODO.md` section 1 are settled; scaffolding may begin per section 6, in the build order given in `docs/SPEC.md`.
