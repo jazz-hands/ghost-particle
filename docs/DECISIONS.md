@@ -22,7 +22,7 @@ How to use:
 | D-008 | Detector events are simulated | accepted | Rings are generated from published geometry, labelled as simulation. |
 | D-009 | Build budget and cut order | accepted | 5 hours; cut L7, then L4 photo, then L3 dodging, then L5 ring count. |
 | D-010 | Input scheme | accepted | Keyboard only for v1. |
-| D-011 | Flavor tints | open | Three tints plus base color; disclose as a design choice. |
+| D-011 | Flavor tints | open | Proposed: electron sky-blue, muon violet, tau coral; base white-blue. Disclosed as a design choice. |
 | D-012 | Dodging has no consequence | accepted | Superseded by D-020: nothing can be hit, no fail state. |
 | D-013 | Mini-game feedback timing | accepted | Reveal answer and one-line reason after each ring. |
 | D-014 | Hosting | accepted | Static build hosted on exe.dev. |
@@ -95,6 +95,8 @@ Keyboard only for v1: Space to hold and to advance, arrow keys to steer in level
 
 Three tints for electron, muon, tau flavor plus the character's base color. These are design choices with no physical meaning; the credits say so.
 
+Proposal, awaiting a yes: base body white with a cool blue glow (matching the reference board); electron flavor sky-blue `#4FC3F7`; muon flavor violet `#B388FF`; tau flavor coral `#FF8A65`. The three are far apart in hue and readable against the navy background, and the flavor icon under the counter repeats the tint so colour alone is not the only cue.
+
 ### D-012 Dodging has no consequence — accepted
 
 Superseded by D-020. Obstacles never stop the neutrino and there is no fail state.
@@ -105,7 +107,16 @@ Reveal the correct answer after each ring, with a one-line reason, rather than a
 
 ### D-014 Hosting — accepted
 
-Static build output hosted on exe.dev. No server component. Deployment steps are settled when the scaffold exists.
+Static build output hosted on an exe.dev VM. No server component.
+
+What this means in practice:
+- A VM gets `https://<vm>.exe.xyz/` with TLS. The URL is private by default: unauthenticated requests get a 307 to a login page whether or not anything is running. Make it public with `ssh exe.dev share set-public <vm>`, or hand out a revocable link with `share add-link`.
+- The proxy forwards one port, 8000 by default (`ssh exe.dev share port <vm> <port>`). Serve `dist/` on that port with nginx, which the image ships, or any static server.
+- The current image does not ship Node; if the build runs on the VM, install Node from NodeSource and say so, since that is network egress the project did not otherwise declare.
+- If the Vite dev server is ever exposed through the proxy, it needs `server: { host: true, allowedHosts: ['.exe.xyz'] }` or it answers 403.
+- Git on the VM reaches GitHub through `github.int.exe.xyz`, not github.com, and needs an exe.dev GitHub integration if the repo is ever pushed there.
+
+Source: the `using-exe-dev` and `exe-dev-gotchas` skills in `~/.claude/skills/`. Verify against live output; the platform moves.
 
 ### D-015 Text policy — accepted
 

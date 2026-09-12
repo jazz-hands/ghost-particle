@@ -45,9 +45,10 @@ Most entries are now verified. Remaining "check" items, none of which change on-
 
 ## 5. Tech verification (Context7 was unreachable this session; confirm at start of build)
 
-- [ ] three.js version to pin, and that `three/addons/libs/lil-gui.module.min.js` and `three/addons/libs/stats.module.js` resolve under Vite with the `three` package.
-- [ ] GSAP is free for commercial use since 3.13 (April 2025); confirm current license text and pin version.
-- [ ] Playwright with Chromium headless renders WebGL in CI (may need `--use-gl=swiftshader` or similar flag).
+- [x] three.js 0.186.0 (MIT). Its `package.json` exports map `three/addons/*` to `examples/jsm/*`, and the tarball contains `examples/jsm/libs/lil-gui.module.min.js` and `examples/jsm/libs/stats.module.js`, so the `three/addons/libs/...` imports resolve under Vite.
+- [x] GSAP 3.15.0, licence field reads "Standard 'no charge' license" (https://gsap.com/standard-license), zero runtime dependencies.
+- [x] Vite 8.3.0. @playwright/test 1.63.0 pulls in `playwright` and `playwright-core` plus a browser download on install.
+- [ ] Playwright with Chromium headless renders WebGL (may need `--use-angle=swiftshader` or `--enable-unsafe-swiftshader`; confirm at scaffold with a one-line canvas test).
 - [ ] Node v26.8.2 and npm are installed at `/opt/homebrew/bin` but that directory is not on PATH in non-interactive shells, which is why `npx` was missing and the Context7 and Playwright MCP servers failed to connect. Fix: add `/opt/homebrew/bin` to PATH in `~/.zshenv` (not only `~/.zshrc`).
 - [ ] Install `poppler` (`brew install poppler`) so PDFs can be read for the remaining fact checks.
 - [ ] Bloom approach: three.js UnrealBloomPass via EffectComposer, or skip post-processing and fake glow with sprites.
@@ -55,7 +56,7 @@ Most entries are now verified. Remaining "check" items, none of which change on-
 
 ## 6. Scaffold (first coding step, after the above)
 
-- [ ] `npm create vite@latest` with the vanilla TypeScript template.
+- [ ] `npm create vite@latest` with the vanilla TypeScript template. Add `server: { host: true, allowedHosts: ['.exe.xyz'] }` to `vite.config.ts` so the dev server answers through the exe.dev proxy (D-014).
 - [ ] Add three, gsap, @playwright/test. Record what each pulls in.
 - [ ] Folder layout per SPEC.md architecture.
 - [ ] `src/content/facts.ts` generated or hand-mirrored from FACTS.md with the same IDs.
