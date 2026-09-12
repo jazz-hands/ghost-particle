@@ -199,11 +199,18 @@ Each entry: plain-language wording (what the player reads), precise statement (f
 - Precise: Super-Kamiokande solar neutrino sky map, 503 days exposure, 90° × 90° field centered on the Sun.
 - Sources: NASA APOD 1998 June 5, https://science.nasa.gov/image-article/apod-1998-june-05-neutrinos-in-the-sun/ ; HEASARC, https://heasarc.gsfc.nasa.gov/docs/objects/heapow/archive/solar_system/superk_sun.html
 - Image credit: R. Svoboda and K. Gordan (Louisiana State University), Super-Kamiokande Collaboration.
-- Rights: the Kamioka Observatory site states unauthorized reproduction of its materials is prohibited, educational use is possible by application, and commercial use is generally refused. This image is not in the observatory's own gallery; APOD credits LSU. Route: ask the Kamioka Observatory public relations contact and the LSU credit holders. Until answered, plan for the F-24 fallback.
-- Status: verified (credit and exposure); usage rights pending.
-- Used: L6.
+- Rights: the Kamioka Observatory site states unauthorized reproduction of its materials is prohibited and educational use needs an application. No request is being made (D-028). The image is not shipped; the game only mentions in text that neutrinos arrive at night through the Earth.
+- Status: verified (credit and exposure).
+- Used: L6 text only, L7.
 
 ---
+
+### F-33 The only pattern is Earth's orbit
+- Player wording: "The only pattern in all those years is a gentle yearly wobble, because Earth's orbit is slightly oval."
+- Precise: a search for periodic modulations in the 5,804-day, 5-day-binned ⁸B flux found the only significant modulation to be the annual one from the eccentricity of Earth's orbit (the 1/r² change in flux with Sun–Earth distance). The public file includes a distance-corrected flux column.
+- Sources: Super-Kamiokande Collaboration, "Search for Periodic Time Variations of the Solar ⁸B Neutrino Flux between 1996 and 2018 in Super-Kamiokande", *Phys. Rev. Lett.* 132, 241803 (2024), arXiv:2311.01159 (abstract).
+- Status: verified (abstract); check (read the paper for the amplitude before quoting any percentage; none is quoted on screen).
+- Used: L6.
 
 ## History (side panels)
 
@@ -269,8 +276,8 @@ Each entry: plain-language wording (what the player reads), precise statement (f
 
 | ID | Asset | Credit | Rights | Status |
 |---|---|---|---|---|
-| A-01 | Super-K neutrino image of the Sun | R. Svoboda and K. Gordan (LSU), Super-Kamiokande Collaboration | pending: Kamioka Observatory requires application for educational use; ask LSU credit holders too | check |
-| A-02 | Super-K 5-day solar flux dataset (plot, fallback for A-01) | Super-Kamiokande Collaboration, PRL 132, 241803 (2024) | public download, no licence stated, cite paper | verified |
+| A-01 | Super-K neutrino image of the Sun | R. Svoboda and K. Gordan (LSU), Super-Kamiokande Collaboration | not shipped (D-028); mentioned in text only | n/a |
+| A-02 | Super-K 5-day solar flux dataset, plotted in level 6 | Super-Kamiokande Collaboration, *Phys. Rev. Lett.* 132, 241803 (2024); file `sksolartimevariation5804d.txt` | public download, no licence stated; cite the collaboration and paper in credits | verified |
 | A-03 | Astro Bot screenshots | Sony Interactive Entertainment / Team Asobi | reference only, never shipped | n/a |
 
 Everything else on screen is drawn procedurally by the app and needs no external credit.

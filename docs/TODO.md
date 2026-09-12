@@ -22,7 +22,8 @@ Most entries are now verified. Remaining "check" items, none of which change on-
 - [ ] F-22: read the particle-identification section of Ashie et al. 2005 to confirm misidentification wording (same PDF issue).
 - [ ] F-29: open the 1988 Nobel summary page.
 - [ ] F-32: read the standing projected-area factor off Fanger 1970 or Kubaha et al. 2004 (planning value 0.3). If it cannot be opened, switch the counter to the per-square-centimetre fallback.
-- [ ] F-25 / A-01: apply to Kamioka Observatory for educational use of the Sun image and contact the LSU credit holders. Fallback is ready: plot the public 5-day dataset (A-02).
+- [x] F-25 / A-01: no rights request. Level 6 plots the public dataset instead (D-028).
+- [ ] A-02: download `sksolartimevariation5804d.txt` into `public/data/` at scaffold time, keep the original header, and record the download date in FACTS.md F-24.
 - [ ] F-11: dropped unless a primary source appears (no change needed).
 
 ## 3. Content to write (plain language, each line tagged with an F-ID)
@@ -34,7 +35,7 @@ Most entries are now verified. Remaining "check" items, none of which change on-
 - [x] Level 5 mini-game: five ring answers and reveal lines written in BEATS.md.
 - [ ] Level 5 final card: the honesty note on simulated rings.
 - [ ] Level 7 side-panel text (only after everything else).
-- [ ] Credits page copy: sources, image credits, "made with" list, tint disclaimer.
+- [ ] Credits page copy: sources, dataset credit, "made with" list, tint disclaimer, counter reference-person disclosure.
 
 ## 4. Art and reference (no external assets shipped)
 

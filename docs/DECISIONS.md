@@ -39,6 +39,7 @@ How to use:
 | D-025 | Sound is Web Audio synthesis | accepted | Named synth cues, no audio files. Soundtrack only if time remains. |
 | D-026 | BEATS.md is the script | accepted | If a moment isn't in the beat sheet, it isn't built. |
 | D-027 | Cheap rendering for level 5 | accepted | Sensors are one instanced mesh; rings are drawn on a canvas texture on the cylinder wall. |
+| D-028 | Level 6 plots the public dataset | accepted | No rights request for the Sun image; the ending is a chart of Super-K's 22-year public record. |
 
 ## Entries
 
@@ -167,3 +168,7 @@ All sound is generated with the Web Audio API from a small set of named cues lis
 ### D-027 Cheap rendering for level 5 — accepted
 
 The 11,129 inner sensors (F-18) are a single `InstancedMesh` of a low-poly disc or sphere. The 1,885 outer sensors are not rendered; the player is inside the tank. Rings, the hero's cone hit, and the "sensors lighting up" effect are drawn on a 2D canvas texture mapped to the inside of the cylinder, not by lighting individual instances. Ring radius comes from F-31. The character stays two spheres plus eye sprites with no custom shaders. Rationale: keeps level 5 inside its 1h 30 budget and well under the draw-call ceiling.
+
+### D-028 Level 6 plots the public dataset — accepted
+
+The ending uses Super-Kamiokande's public 5-day solar neutrino record, 1996 to 2018 (F-24, A-02), drawn as a chart from the real data file at build time. The famous neutrino image of the Sun (A-01) is not shipped and no usage request is made; the game mentions it only in words. Rationale: no time for a rights request, and the dataset is public, citable, and tells the same story (neutrinos arrive day and night, through the Earth). The chart follows the `dataviz` skill when built.

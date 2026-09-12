@@ -159,17 +159,18 @@ Inside the tank. Dark water, gold sensor grid on every wall. Camera floats near 
 
 ---
 
-## Level 6 — The Sun at night
+## Level 6 — Twenty-two years of watching
 
 | # | Player sees | Player does | Neutrino | Caption | Facts | Cue |
 |---|---|---|---|---|---|---|
-| 6.1 | The tank fades to black. The Super-K neutrino image of the Sun (A-01) fades in, credit line beneath. The neutrino floats beside it. | | look toward the image | none | F-25 | hum (soft) |
-| 6.2 | Card. | Space | proud | "This is the Sun, seen in neutrinos. 503 days of Super-K watching, one flash at a time." | F-25 | |
-| 6.3 | Card. | Space | nod | "Some of these arrived at night, through the whole Earth. Nothing stopped them. Nothing stopped you." | F-25, F-10 | |
-| 6.4 | The through-line counter stops, moves to center, grows large. | | peek | "And through you, since you pressed start:" (the number) | F-32 | tick, then chime |
-| 6.5 | Credits roll, generated from FACTS.md: facts and sources, image credits, "made with" list, the tint disclaimer. "Play again" at the end. | scrolls, or waits | wave | none | all | ta-da |
+| 6.1 | The tank fades to black. A chart draws itself left to right over ~6 s: Super-K's public solar neutrino record, one point with error bars for every five days, 1996 to 2018 (A-02). Axis labels in plain words: "Year" and "Neutrinos from the Sun caught per second, per square centimetre (millions)". Credit line beneath. The neutrino floats beside it. | | peek at the chart as it draws | none | F-24 | hum (soft), tick per year |
+| 6.2 | Card. | Space | proud | "This is 22 years of Super-Kamiokande watching the Sun, one dot for every five days. Each dot counts neutrinos like you." | F-24 | |
+| 6.3 | Card. | Space | nod | "Many of those arrived at night, through the whole Earth. Nothing stopped them. Nothing stopped you." | F-25, F-10 | |
+| 6.4 | Card. A faint yearly wave is highlighted on the chart. | Space | look-at-self | "The only pattern in all those years is a gentle yearly wobble, because Earth's orbit is slightly oval." | F-33 | |
+| 6.5 | The through-line counter stops, moves to center, grows large. | | peek | "And through you, since you pressed start:" (the number) | F-32 | tick, then chime |
+| 6.6 | Credits roll, generated from FACTS.md: facts and sources, the dataset credit, "made with" list, the tint disclaimer, the counter's reference-person disclosure. "Play again" at the end. | scrolls, or waits | wave | none | all | ta-da |
 
-Fallback if A-01 cannot be licensed: 6.1 shows a plot of the public 5-day flux dataset instead (F-24), and 6.2–6.3 are rewritten to describe it.
+The chart is generated from the real data file (F-24) at build time. Consult the `dataviz` skill before writing the chart code.
 
 ---
 
