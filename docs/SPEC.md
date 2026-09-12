@@ -35,13 +35,13 @@ Each level is one scene with one mechanic and a handful of captions. The player 
 - Scene: black, quiet, a faint warm glow. Two soft glowing blobs drift toward the center.
 - Mechanic: hold a key. A meter fills while held. Release at full: a flash, then a wobbling unstable nucleus that pops, and the neutrino blinks into existence.
 - Learn (by doing, no text except the key prompt): the Sun makes neutrinos by squeezing nuclei together.
-- Which reaction the two blobs represent is open decision D-001 in `DECISIONS.md`. This affects the captions in level 2 and whether the hero can be detected in level 5.
+- The two blobs are a proton and a beryllium-7 nucleus; the squeeze makes boron-8, which pops and releases the hero (D-001, F-02).
 
 ### 2. Meet the neutrino (captions on)
 
 - Scene: same dark core, camera pulls back to reveal the neutrino floating in a warm haze.
 - Mechanic: press to advance through 5–7 caption cards. Each card triggers a reaction from the neutrino.
-- Facts: F-01 (and F-02 if D-001 = boron-8), F-03, F-04, F-06, F-07, F-10.
+- Facts: F-01, F-02, F-03, F-04, F-06, F-07, F-10.
 - Optional side panel ("Want more?"): F-26, F-27.
 
 ### 3. Escaping the Sun
@@ -49,7 +49,7 @@ Each level is one scene with one mechanic and a handful of captions. The player 
 - Scene: rushing outward through layers of dense, bright plasma toward the surface.
 - Mechanic: dodge. Walls of plasma and heavy nuclei come at the player. The player can steer left/right. Whether or not they dodge, the neutrino passes straight through. After the first pass-through a caption says why. Later obstacles become optional to dodge so the lesson lands.
 - Flavor change: as it climbs, the tint shifts between electron, muon, and tau flavor. Caption explains the three flavors and that a neutrino born as one kind can be found later as another.
-- Facts: F-08, F-09, F-10, F-12, F-13, F-05. F-14 only if D-001 = boron-8.
+- Facts: F-08, F-09, F-10, F-12, F-13, F-05, F-14.
 
 ### 4. The trip to Earth
 

@@ -12,7 +12,7 @@ How to use:
 
 | ID | Title | Status | One line |
 |---|---|---|---|
-| D-001 | Which neutrino is the hero | open | Recommend a boron-8 neutrino so Super-K can see it. |
+| D-001 | Which neutrino is the hero | accepted | A boron-8 neutrino, so Super-K can honestly detect it. |
 | D-002 | Factual accuracy | accepted | Nothing on screen without an entry in FACTS.md. |
 | D-003 | Single source for facts | accepted | FACTS.md is the only place numbers live. |
 | D-004 | One character, no humans | accepted | The neutrino is the only character. |
@@ -33,12 +33,14 @@ How to use:
 
 ## Entries
 
-### D-001 Which neutrino is the hero — open
+### D-001 Which neutrino is the hero — accepted
 
 Problem: the birth scene squeezes two protons (the pp reaction, F-01). Neutrinos from that step have at most 0.42 MeV of energy, and Super-Kamiokande cannot detect them (F-02, F-23). If the hero is a pp neutrino, the level 5 detection is not honest.
 
-Options:
-1. **Hero is a boron-8 neutrino (recommended).** The birth mechanic stays identical (hold to squeeze, release to pop) but the blobs are a proton and a beryllium-7 nucleus; the result is boron-8, which wobbles and pops out the neutrino. Level 2 captions add one line: "Most of the Sun's neutrinos come from the simplest squeeze, two protons. You come from a rarer branch, and you carry more energy, which is what lets a detector catch you." Level 5 is fully honest, and level 3's flavor-change fact (F-14) is the one Super-K actually measures.
+Decision: option 1.
+
+Options considered:
+1. **Hero is a boron-8 neutrino (chosen).** The birth mechanic stays identical (hold to squeeze, release to pop) but the blobs are a proton and a beryllium-7 nucleus; the result is boron-8, which wobbles and pops out the neutrino. Level 2 captions add one line: "Most of the Sun's neutrinos come from the simplest squeeze, two protons. You come from a rarer branch, and you carry more energy, which is what lets a detector catch you." Level 5 is fully honest, and level 3's flavor-change fact (F-14) is the one Super-K actually measures.
 2. Hero is a pp neutrino. Birth is the iconic two-proton squeeze. At level 5 the caption admits Super-K can't see the hero and the mini-game is about its "cousins". Weaker ending.
 3. Hero is a pp neutrino and the detector is Borexino (which did detect pp neutrinos, F-01). Loses Super-K, which the brief wants.
 

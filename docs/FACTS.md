@@ -25,7 +25,7 @@ Each entry: plain-language wording (what the player reads), precise statement (f
 - Precise: ppIII branch: ⁷Be + p → ⁸B + γ; ⁸B → ⁸Be* + e⁺ + νₑ. ⁸B neutrinos have a continuous spectrum up to roughly 15 MeV. pp neutrinos have a maximum energy of 0.42 MeV, below Super-Kamiokande's analysis threshold.
 - Sources: Bahcall (1989); Super-Kamiokande Collaboration, "Solar neutrino measurements in Super-Kamiokande-IV", *Phys. Rev. D* 94, 052010 (2016), arXiv:1606.07538.
 - Status: check (endpoint values).
-- Used: L1, L2, L5 (depends on D-001).
+- Used: L1, L2, L5.
 
 ### F-03 Core temperature
 - Player wording: "The Sun's core is about 15 million degrees."
@@ -110,7 +110,7 @@ Each entry: plain-language wording (what the player reads), precise statement (f
 - Precise: νₑ survival probability for ⁸B neutrinos ≈ 0.3 (matter-enhanced conversion in the Sun, the MSW effect). Super-K measures a data/unoscillated ratio ≈ 0.3.
 - Sources: Super-Kamiokande Collaboration, arXiv:1606.07538; arXiv:2512.19887 (ratio 0.307 in 2.99–3.49 MeV bin).
 - Status: verified (ratio); check (the general ≈0.3 statement).
-- Used: L3 (only if D-001 = boron-8).
+- Used: L3.
 
 ---
 

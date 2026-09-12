@@ -4,7 +4,7 @@ Everything to settle or produce before the first line of app code. Check items o
 
 ## 1. Decisions to settle (each has an entry in DECISIONS.md)
 
-- [ ] D-001 Which neutrino is the hero: a plain proton-proton neutrino, or a boron-8 neutrino that Super-K can actually see. Recommendation in DECISIONS.md.
+- [x] D-001 Which neutrino is the hero: boron-8 neutrino. Accepted.
 - [ ] D-010 Input scheme: keyboard only for v1, or keyboard plus touch.
 - [ ] D-011 Flavor colors (three tints) and the character's base color.
 - [ ] D-012 Whether level 3 dodging has any consequence at all, or is pure lesson (recommend: pure lesson).
