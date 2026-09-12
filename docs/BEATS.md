@@ -96,11 +96,35 @@ Open space. Sun shrinking behind, Earth a dot ahead. Travel meter shows kilomete
 |---|---|---|---|---|---|---|
 | 4.1 | Meter appears: "0 km · 0 light-seconds". Card. | Space | nod | "150 million kilometers to Earth. Light takes about 8 minutes 20 seconds. So do you. Hold Space to fast-forward." | F-15 | tick |
 | 4.2 | Meter ticks. Holding Space speeds the meter and the star streaks. Sun shrinks. | holds Space at will | wiggle faster when fast-forwarding | none | F-30 | tick rate follows speed |
-| 4.3 | At ~40% of the trip the meter pauses. A "family photo" card slides in: a grid of 17 tiles in four rows (6 quarks, 6 leptons, 4 force carriers, Higgs), each with a name and a plain one-line label. The neutrino's tile is blank. | reads | peek at the card | "This is the Standard Model, the list of everything matter is made of. Find yourself." | F-16 | blip |
+| 4.3 | At ~40% of the trip the meter pauses. A "family photo" card slides in: a grid of 17 tiles in four rows (6 quarks, 6 leptons, 4 force carriers, Higgs), each with a name and a plain one-line label (table below). The three neutrino tiles show only a question mark. | reads | peek at the card | "This is the Standard Model, the list of everything matter is made of. Find yourself." | F-16 | blip |
 | 4.4 | Wrong tile clicked: it wiggles and its one-line label enlarges for 2 s. | clicks | shrug | (the tile's own label) | F-16 | buzz |
 | 4.5 | Right tile clicked (any of the three neutrino tiles counts): the neutrino jumps into the tile. | clicks | cheer | "Found you. You're one of the three neutrinos, in the lepton family, next to the electron." | F-16 | ta-da |
 | 4.6 | Card slides out. Meter resumes. Earth grows to fill the view. | Space or wait | proud | none | | tick |
 | 4.7 | Dive: through clouds, over Japan, into a mountainside. Card. | | brace (playfully, then surprised, it passes through rock too) | "Arriving: Kamioka mine, Japan. 1,000 meters underground. Rock doesn't stop you either." | F-19 | whoosh, thwip |
+
+### Level 4 tile labels (F-16)
+
+| Row | Tile | Label |
+|---|---|---|
+| Quarks | Up | Found inside every proton and neutron |
+| Quarks | Down | Found inside every proton and neutron too |
+| Quarks | Charm | A heavier cousin of Up |
+| Quarks | Strange | A heavier cousin of Down |
+| Quarks | Top | The heaviest particle known |
+| Quarks | Bottom | A heavier cousin of Strange |
+| Leptons | Electron | Orbits atoms and carries electricity |
+| Leptons | Muon | A heavy electron that lives a few millionths of a second |
+| Leptons | Tau | An even heavier electron, gone even faster |
+| Leptons | Electron neutrino | ? |
+| Leptons | Muon neutrino | ? |
+| Leptons | Tau neutrino | ? |
+| Force carriers | Photon | Carries light and the electric force |
+| Force carriers | Gluon | Glues quarks together |
+| Force carriers | W | Carries the weak force, which lets the Sun's fusion happen |
+| Force carriers | Z | Carries the weak force too, the only force a neutrino feels besides gravity |
+| Higgs | Higgs | Its field is what gives the other particles their mass |
+
+After a correct click the three question marks are replaced with: "Ghost particles. Almost no mass, no charge, three flavors."
 
 ---
 
@@ -118,10 +142,20 @@ Inside the tank. Dark water, gold sensor grid on every wall. Camera floats near 
 | 5.6 | Card. Beside the hero's fuzzy ring, a sharp ring is drawn for comparison. | Space | look-at-self | "Your ring is fuzzy, because the electron scatters and showers. A muon would punch straight through and leave a sharp ring." | F-22 | |
 | 5.7 | Mini-game intro. Two buttons appear: "Electron" and "Muon". Card. | Space | nod | "Now you're the physicist. Five more rings are coming. Sharp or fuzzy? Sort them." | F-22 | blip |
 | 5.8 | Rings 1–5, one at a time. Fixed set, in order: fuzzy, sharp, fuzzy, sharp, fuzzy-but-ambiguous. | clicks Electron or Muon | peek at each ring | none until answered | F-22, F-31 | blip |
-| 5.9 | After each answer: the ring is labeled, a one-line reason shows for 3 s. Ring 5 is revealed as "Hard to call. Physicists flag these too." | | nod on correct, shrug on wrong | (one line each, e.g. "Sharp edge: a muon.") | F-22 | chime / buzz |
+| 5.9 | After each answer: the ring is labeled, a one-line reason shows for 3 s (table below). | | nod on correct, shrug on wrong | (one line each, table below) | F-22 | chime / buzz |
 | 5.10 | Card, after ring 5. | Space | nod | "Solar neutrinos show up as electron rings pointing away from the Sun. That's how Super-K knows they came from the Sun." | F-23 | |
 | 5.11 | Card. Smaller type. | Space | | "These rings are simulated from Super-K's published shape and physics. They are not real recordings." | F-24, F-17, F-18 | |
 | 5.12 | Corner button "Want more?" (level 7). | | | | F-28 | |
+
+### Level 5 ring answers and reveal lines (F-22)
+
+| Ring | Drawn as | Answer | Reveal line |
+|---|---|---|---|
+| 1 | soft, wide edge | Electron | "Blurry edge: an electron, scattering as it goes." |
+| 2 | crisp thin edge | Muon | "Crisp edge: a muon, punching straight through." |
+| 3 | soft, slightly smeared | Electron | "Soft, smeared ring: an electron shower." |
+| 4 | crisp, partly cut by the tank edge | Muon | "Clean circle: a muon." |
+| 5 | in between, deliberately ambiguous | Either counts | "Hard to call. Physicists flag these too, and some get sorted wrong." |
 
 ---
 

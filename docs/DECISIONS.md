@@ -21,11 +21,11 @@ How to use:
 | D-007 | Tech stack | accepted | TypeScript, Vite, three.js WebGLRenderer, lil-gui + Stats, GSAP, Playwright. |
 | D-008 | Detector events are simulated | accepted | Rings are generated from published geometry, labelled as simulation. |
 | D-009 | Build budget and cut order | accepted | 5 hours; cut L7, then L4 photo, then L3 dodging, then L5 ring count. |
-| D-010 | Input scheme | open | Recommend keyboard only for v1. |
+| D-010 | Input scheme | accepted | Keyboard only for v1. |
 | D-011 | Flavor tints | open | Three tints plus base color; disclose as a design choice. |
 | D-012 | Dodging has no consequence | accepted | Superseded by D-020: nothing can be hit, no fail state. |
 | D-013 | Mini-game feedback timing | accepted | Reveal answer and one-line reason after each ring. |
-| D-014 | Hosting | open | Static site; pick host. |
+| D-014 | Hosting | accepted | Static build hosted on exe.dev. |
 | D-015 | Text policy | accepted | Level 1 is wordless; captions are cards of at most 25 words. |
 | D-016 | HUD is DOM, not 3D text | accepted | Captions, meters, and buttons are HTML overlays. |
 | D-017 | Debug tools gated by URL flag | accepted | lil-gui and Stats mount only with `?debug`. |
@@ -87,9 +87,9 @@ Super-K raw per-event data is not public (F-24). Level 5 rings are generated fro
 
 Five hours of build time, allocated per the table in `SPEC.md`. If behind, cut in this order: level 7 panels, level 4 family photo (to one static card), level 3 dodging (to auto-scroll), level 5 ring count (to three).
 
-### D-010 Input scheme — open
+### D-010 Input scheme — accepted
 
-Recommend keyboard only for v1: Space to hold/advance, arrow keys to steer in L3, number keys or click for mini-game answers. Touch later if time remains.
+Keyboard only for v1: Space to hold and to advance, arrow keys to steer in level 3, click or number keys for the level 4 tile and the level 5 buttons. Touch is an add-if-time item.
 
 ### D-011 Flavor tints — open
 
@@ -103,9 +103,9 @@ Superseded by D-020. Obstacles never stop the neutrino and there is no fail stat
 
 Reveal the correct answer after each ring, with a one-line reason, rather than a summary at the end. Keeps the teaching close to the choice. The fifth ring is deliberately ambiguous and revealed as such (F-22).
 
-### D-014 Hosting — open
+### D-014 Hosting — accepted
 
-Static build output. Candidates: Vercel, GitHub Pages. No server component is needed.
+Static build output hosted on exe.dev. No server component. Deployment steps are settled when the scaffold exists.
 
 ### D-015 Text policy — accepted
 
@@ -145,7 +145,7 @@ Build in this order: spine (scaffold, character, HUD, counter, rail scene, audio
 
 ### D-024 Through-line counter — accepted
 
-One counter runs from the moment the player presses start in level 1, appears in the HUD from level 2, and is frozen and shown large in level 6: solar neutrinos that have passed through the player's body since starting. Computed per F-32. The body-area assumption must be sourced before it ships.
+One counter runs from the moment the player presses start in level 1, appears in the HUD from level 2, and is frozen and shown large in level 6: solar neutrinos that have passed through the player's body since starting. Computed per F-32 for a reference adult of 150 lb and 5 ft 7 in, standing and facing the Sun; the credits disclose this. The projected-area factor must be read off its source before the counter ships; the fallback is a per-square-centimetre count.
 
 ### D-025 Sound is Web Audio synthesis — accepted
 
