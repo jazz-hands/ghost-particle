@@ -65,6 +65,7 @@ export class Counter {
 
   setVisible(v: boolean): void {
     this.el.hidden = !v;
+    this.el.style.display = v ? '' : 'none';
     if (v) this.paint(true);
   }
 

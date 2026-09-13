@@ -482,7 +482,7 @@ export class Hud {
     };
   }
 
-  credits(lines: string[], onPlayAgain: () => void): { close(): void } {
+  credits(lines: string[], onPlayAgain: () => void, byline?: string): { close(): void } {
     // A line marked with a leading '## ' is a section heading, not a credit.
     const HEAD = '## ';
     // The roll, in pixels a second: slow enough to read. It only nudges a real scroll box
@@ -501,6 +501,7 @@ export class Hud {
     button.textContent = 'Play again';
     button.addEventListener('click', onPlayAgain);
     box.append(button);
+    if (byline) div('hud-credits-byline', box).textContent = byline;
 
     let raf = 0;
     let carry = 0;

@@ -25,6 +25,8 @@ const GOODBYE_DEPTH = 7;
 const CHARACTER_SCALE = 0.22;
 const WAVE_EVERY = 4;
 
+const BYLINE = 'Designed and created by Jasmine Quintana, 2026';
+
 function creditLines(): string[] {
   const facts = Object.values(FACTS).flatMap((fact) => [`${fact.id} ${fact.title}`, ...fact.sources]);
   return [
@@ -86,7 +88,7 @@ export const createLevel6 = scriptedLevel(6, async (s) => {
   // 6.5: credits, Play again reloads.
   hud.counter.setVisible(false);
   cues.tada();
-  hud.credits(creditLines(), () => { location.assign(location.pathname); });
+  hud.credits(creditLines(), () => { location.assign(location.pathname); }, BYLINE);
   goodbye(s);
   await b.key('Space');
 });
