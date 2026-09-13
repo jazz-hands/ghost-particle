@@ -4,6 +4,7 @@ import { cycleFlavor } from '../content/flavors.ts';
 import type { Flavor } from '../content/flavors.ts';
 import { GREY, box, disposeGroup, plane, sphere } from '../render/prims.ts';
 import { scriptedLevel } from './scripted.ts';
+import { cardSeconds } from './beats.ts';
 import { createNeutrino } from '../character/neutrino.ts';
 import { setCurrentNeutrino } from '../character/current.ts';
 import { CONFIG } from '../character/config.ts';
@@ -23,6 +24,8 @@ const CHARACTER_SCALE = 0.5;
 const BRACE_Z = -10;
 // The two-part reactions (3.3, 3.6) read as one beat at this spacing.
 const BEAT_GAP = 0.8;
+
+const FLAVOR_CARD = "Neutrinos come in three flavors: electron, muon, and tau. You were born electron-flavor. But look. You're changing. A neutrino can only change flavor if it has some mass. That's how we know you aren't weightless.";
 
 interface Obstacle {
   object: Object3D;
@@ -149,6 +152,7 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
       if (!o.passed && o.object.position.z >= 0) {
         o.passed = true;
         tally += 1;
+        s.cues.thwip(tally);
         ghost.react(o.braced ? 'surprised' : 'wiggle');
       }
       if (o.object.position.z > 8) {
@@ -176,6 +180,7 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   await s.hud.fade(0, 0.5);
 
   // 3.1
+  s.cues.whoosh();
   ghost.react('nod');
   await s.b.card("You're leaving the Sun. Everything in here is packed tight. Try to hit something. Arrow keys to steer.");
 
@@ -209,7 +214,8 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   rising = true;
   ghost.react('look-at-self');
   after(BEAT_GAP, () => ghost.react('shrug'));
-  await s.b.card("Neutrinos come in three flavors: electron, muon, and tau. You were born electron-flavor. But look. You're changing. A neutrino can only change flavor if it has some mass. That's how we know you aren't weightless.", ['F-12', 'F-05']);
+  s.cues.risingTone(cardSeconds(FLAVOR_CARD));
+  await s.b.card(FLAVOR_CARD, ['F-12', 'F-05']);
 
   // 3.7: out of the surface into black space, the Sun glaring behind.
   s.scene.fog = null;
@@ -218,6 +224,8 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   sun.position.set(0, 0, 30);
   s.group.add(sun);
   follow = false;
+  s.cues.whoosh();
+  s.cues.tada();
   ghost.react('cheer');
   await s.rig.moveTo({ x: 0, y: 0.8, z: 2 }, { x: 0, y: 0, z: 30 }, 1.5);
 });

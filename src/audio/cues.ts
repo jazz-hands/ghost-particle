@@ -7,6 +7,21 @@ const NOISE_SECONDS = 1;
 const TICK_BASE_SECONDS = 0.5;
 const TICK_MIN_SECONDS = 0.06;
 const WHOOSH_SECONDS = 0.9;
+// The pass-through blip: high and short, stepping through a few pitches so a run of
+// obstacles does not read as one repeated sample.
+const THWIP_HZ = 2400;
+const THWIP_STEPS = [1, 1.122, 1.26, 1.122];
+const THWIP_SECONDS = 0.045;
+// The flavor card's climb (3.6): a low pad walking up an octave and a half.
+const RISE_LOW_HZ = 180;
+const RISE_HIGH_HZ = 900;
+const RISING_SECONDS = 4;
+// Three ascending notes, the last left to ring (3.7).
+const TADA_NOTES = [
+  { hz: 523.25, delay: 0, decay: 0.22 },
+  { hz: 659.25, delay: 0.12, decay: 0.22 },
+  { hz: 783.99, delay: 0.24, decay: 0.9 },
+] as const;
 
 const clamp01 = (v: number): number => Math.min(Math.max(v, 0), 1);
 
@@ -25,6 +40,23 @@ export function humVolume(level: number): number {
 export function tickSeconds(rate: number): number {
   const r = Number.isFinite(rate) && rate > 0 ? rate : 1;
   return Math.max(TICK_BASE_SECONDS / r, TICK_MIN_SECONDS);
+}
+
+/** The pass-through blip's pitch for the nth pass; the cycle keeps a run of them alive. */
+export function thwipPitch(n: number): number {
+  const i = Number.isFinite(n) ? Math.floor(n) : 0;
+  const step = THWIP_STEPS[((i % THWIP_STEPS.length) + THWIP_STEPS.length) % THWIP_STEPS.length]!;
+  return THWIP_HZ * step;
+}
+
+/** The rising tone's pitch a fraction u through its climb; geometric, so it reads as steady. */
+export function risingToneFrequency(u: number): number {
+  return RISE_LOW_HZ * (RISE_HIGH_HZ / RISE_LOW_HZ) ** clamp01(u);
+}
+
+/** The fanfare: three ascending notes, staggered, the last one ringing on. */
+export function tadaNotes(): readonly { hz: number; delay: number; decay: number }[] {
+  return TADA_NOTES;
 }
 
 export class Cues {
@@ -172,7 +204,57 @@ export class Cues {
     src.stop(t + seconds + 0.05);
   }
 
-  private bell(hz: number, delay: number, peak: number): void {
+  /** A tiny high blip, played on every pass-through. */
+  thwip(n = 0): void {
+    const ctx = this.ctx;
+    const out = this.out;
+    if (!ctx || !out) return;
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    osc.type = 'triangle';
+    const hz = thwipPitch(n);
+    osc.frequency.setValueAtTime(hz, t);
+    osc.frequency.exponentialRampToValueAtTime(hz * 0.6, t + THWIP_SECONDS);
+    const gain = ctx.createGain();
+    envelope(gain, t, 0.09, 0.002, THWIP_SECONDS);
+    osc.connect(gain).connect(out);
+    osc.start(t);
+    osc.stop(t + THWIP_SECONDS + 0.05);
+  }
+
+  /** A pad that climbs for the length of a card: the flavor change at 3.6. */
+  risingTone(seconds = RISING_SECONDS): void {
+    const ctx = this.ctx;
+    const out = this.out;
+    if (!ctx || !out) return;
+    const t = ctx.currentTime;
+    const gain = ctx.createGain();
+    envelope(gain, t, 0.1, seconds * 0.35, seconds * 0.65);
+    gain.connect(out);
+    for (const [partial, detune] of [[1, 0], [2, 6]] as const) {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.detune.value = detune;
+      // The ramp is sampled from the same curve the unit tests pin down.
+      const steps = 24;
+      for (let i = 0; i <= steps; i += 1) {
+        const at = t + (seconds * i) / steps;
+        const hz = risingToneFrequency(i / steps) * partial;
+        if (i === 0) osc.frequency.setValueAtTime(hz, at);
+        else osc.frequency.exponentialRampToValueAtTime(hz, at);
+      }
+      osc.connect(gain);
+      osc.start(t);
+      osc.stop(t + seconds + 0.1);
+    }
+  }
+
+  /** Three ascending bell notes: the burst out of the Sun. */
+  tada(): void {
+    for (const note of tadaNotes()) this.bell(note.hz, note.delay, 0.2, note.decay);
+  }
+
+  private bell(hz: number, delay: number, peak: number, decay = 1.1): void {
     const ctx = this.ctx;
     const out = this.out;
     if (!ctx || !out) return;
@@ -182,10 +264,10 @@ export class Cues {
       osc.type = 'sine';
       osc.frequency.setValueAtTime(hz * partial, t);
       const gain = ctx.createGain();
-      envelope(gain, t, peak * share, 0.005, 1.1 / partial);
+      envelope(gain, t, peak * share, 0.005, decay / partial);
       osc.connect(gain).connect(out);
       osc.start(t);
-      osc.stop(t + 1.3);
+      osc.stop(t + decay + 0.2);
     }
   }
 
