@@ -36,7 +36,15 @@ test('hold presses the code on pointerdown and releases on pointerup', () => {
   s.root.emit('pointerdown', { pointerId: 7 });
   s.root.emit('pointerup', { pointerId: 7 });
   assert.deepEqual(s.log, ['down Space', 'up Space']);
-  assert.equal(s.gestures, 1);
+  assert.equal(s.gestures, 2);
+});
+
+test('down and up each count as an activating gesture, for audio unlock on pointerup', () => {
+  const s = setup();
+  s.touch.hold('Space');
+  s.root.emit('pointerdown', { pointerId: 9 });
+  s.root.emit('pointerup', { pointerId: 9 });
+  assert.equal(s.gestures, 2);
 });
 
 test('hold ignores pointers that start on a card, tile or button', () => {

@@ -32,6 +32,8 @@ export class Touch {
   };
 
   private readonly up = (e: PointerLike): void => {
+    // Touch pointers only count as an activating gesture on pointerup, not pointerdown.
+    this.onGesture();
     const code = this.held.get(e.pointerId);
     if (code === undefined) return;
     this.held.delete(e.pointerId);
