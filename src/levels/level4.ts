@@ -15,8 +15,8 @@ import { CONFIG } from '../character/config.ts';
 import type { CharacterConfig } from '../character/config.ts';
 import { prefersReducedMotion } from '../render/rig.ts';
 
-// Four flavor shifts (1.5 s each) of travel before the grid at 40%, then a 3 s dash to Earth.
-const TRIP_SECONDS = 15;
+// Two flavor shifts (1.5 s each) of travel before the grid at 40%, then a 3 s dash to Earth.
+const TRIP_SECONDS = 7.5;
 const GRID_AT = 0.4;
 const DASH_SECONDS = 3;
 const KM = 149_597_870.7;
