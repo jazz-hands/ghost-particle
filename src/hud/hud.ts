@@ -18,6 +18,8 @@ export interface ChartPoint { x: number; y: number; err: number }
 export interface SkyMapHandle {
   drop(points: { x: number; y: number; color: string }[]): void;   // events in field degrees, centre (0, 0)
   glow(seconds: number): Promise<void>;                           // brightens the field into one light
+  notes(visible: boolean): void;                                  // the simulated/credit lines under the field
+  clearing(ndcX: number, ndcY: number, radius: number): void;     // soft hole so a 3D object shows through; radius as a fraction of height
   close(): void;
 }
 
@@ -292,21 +294,73 @@ export class Hud {
     })).then(() => el.remove());
   }
 
-  // A 90° × 90° field: every event is one tiny tinted dot on black; additive drawing lets the
-  // Sun build out of density, and glow() brightens the whole field into one light at the end.
+  // A 90° × 90° field: every event is one tiny tinted dot, drawn additively so the Sun builds
+  // out of density (D-028). Landed dots accumulate on the back canvas; the front canvas is
+  // cleared on every drop and carries only the newest arrivals' flare and the centre's wash,
+  // so a dot flares as it lands and is at its tint by the next drop. glow() takes the whole
+  // field up into one light.
   skymap(opts: { degrees: number; note: string; credit: string }): SkyMapHandle {
+    // A dot at rest, and the wider, brighter stamp it lands as for one frame.
+    const DOT_RADIUS = 1.5;
+    const DOT_ALPHA = 0.62;
+    const FLARE_RADIUS = 3.6;
+    const FLARE_ALPHA = 0.85;
+    // The centre's bloom: warm, wide and soft-edged, strengthening as arrivals pile up. The
+    // curve is asymptotic, so it needs no total to aim at: 3000 arrivals reach two thirds.
+    const WASH_DEGREES = 30;
+    const WASH_RGB = '255, 206, 138';
+    const WASH_PEAK = 0.3;
+    const WASH_ARRIVALS = 3000;
+    // The glow-up: the settled dots are lifted and pulled toward white, so the crowded centre
+    // reads as gold-white while the sparse edges keep their tints.
+    const GLOW_BRIGHTNESS = 2.2;
+    const GLOW_SATURATE = 0.75;
+
     const box = div('hud-skymap', this.layer);
-    const canvas = document.createElement('canvas');
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
-    box.append(canvas);
-    div('hud-chart-note', box).textContent = opts.note;
-    div('hud-chart-credit', box).textContent = opts.credit;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
+    const settled = document.createElement('canvas');
+    const fresh = document.createElement('canvas');
+    settled.className = 'hud-skymap-settled';
+    fresh.className = 'hud-skymap-fresh';
+    settled.width = fresh.width = innerWidth;
+    settled.height = fresh.height = innerHeight;
+    box.append(settled, fresh);
+    const noteEl = div('hud-chart-note', box);
+    noteEl.textContent = opts.note;
+    const creditEl = div('hud-chart-credit', box);
+    creditEl.textContent = opts.credit;
+
+    const back = settled.getContext('2d');
+    const front = fresh.getContext('2d');
+    const scale = settled.width / opts.degrees;
+    const half = opts.degrees / 2;
+    const midX = settled.width / 2;
+    const midY = settled.height / 2;
+    // The beat sheet's reduced-motion rule, read the way render/rig.ts reads it: the arrival
+    // flare goes, the fill itself is unchanged.
+    const flares = !(typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+    const washRadius = WASH_DEGREES * scale;
+    const wash = front?.createRadialGradient(midX, midY, 0, midX, midY, washRadius);
+    wash?.addColorStop(0, `rgba(${WASH_RGB}, 1)`);
+    wash?.addColorStop(0.35, `rgba(${WASH_RGB}, 0.42)`);
+    wash?.addColorStop(1, `rgba(${WASH_RGB}, 0)`);
+    let landed = 0;
+
+    const stamp = (ctx: CanvasRenderingContext2D, points: { x: number; y: number; color: string }[], radius: number, alpha: number): void => {
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = alpha;
+      for (const p of points) {
+        const y = midY - p.y * scale;
+        if (y < 0 || y > settled.height) continue;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc((p.x + half) * scale, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+    };
+
     const close = (): void => {
       box.remove();
       this.closers.delete(close);
@@ -314,26 +368,48 @@ export class Hud {
     this.closers.add(close);
     return {
       drop(points) {
-        if (!ctx) return;
-        const scale = canvas.width / opts.degrees;
-        const half = opts.degrees / 2;
-        const midY = canvas.height / 2;
-        ctx.globalCompositeOperation = 'lighter';
-        ctx.globalAlpha = 0.55;
-        for (const p of points) {
-          const y = midY - p.y * scale;
-          if (y < 0 || y > canvas.height) continue;
-          ctx.fillStyle = p.color;
-          ctx.beginPath();
-          ctx.arc((p.x + half) * scale, y, 1.6, 0, Math.PI * 2);
-          ctx.fill();
+        if (!back) return;
+        landed += points.length;
+        stamp(back, points, DOT_RADIUS, DOT_ALPHA);
+        if (!front) return;
+        front.clearRect(0, 0, fresh.width, fresh.height);
+        if (wash) {
+          front.globalCompositeOperation = 'lighter';
+          front.globalAlpha = WASH_PEAK * (1 - Math.exp(-landed / WASH_ARRIVALS));
+          front.fillStyle = wash;
+          front.fillRect(midX - washRadius, midY - washRadius, washRadius * 2, washRadius * 2);
+          front.globalAlpha = 1;
+          front.globalCompositeOperation = 'source-over';
         }
-        ctx.globalAlpha = 1;
-        ctx.globalCompositeOperation = 'source-over';
+        if (flares) stamp(front, points, FLARE_RADIUS, FLARE_ALPHA);
+      },
+      notes(visible) {
+        noteEl.hidden = !visible;
+        creditEl.hidden = !visible;
+      },
+      clearing(ndcX, ndcY, radius) {
+        const cx = ((ndcX + 1) / 2) * settled.width;
+        const cy = ((1 - ndcY) / 2) * settled.height;
+        const r = radius * settled.height;
+        for (const ctx of [back, front]) {
+          if (!ctx) continue;
+          const hole = ctx.createRadialGradient(cx, cy, r * 0.7, cx, cy, r);
+          hole.addColorStop(0, 'rgba(0, 0, 0, 1)');
+          hole.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.globalCompositeOperation = 'destination-out';
+          ctx.fillStyle = hole;
+          ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+          ctx.globalCompositeOperation = 'source-over';
+        }
       },
       glow(seconds) {
-        const halo = div('hud-skymap-glow', box);
-        return ended(halo.animate([{ opacity: 0 }, { opacity: 1 }], { duration: Math.max(seconds, 0) * 1000, fill: 'forwards' }));
+        const light = div('hud-skymap-glow', box);
+        const ms = Math.max(seconds, 0) * 1000;
+        const lift = { duration: ms, fill: 'forwards' as const, easing: 'ease-in-out' };
+        const up = [{ filter: 'none' }, { filter: `brightness(${GLOW_BRIGHTNESS}) saturate(${GLOW_SATURATE})` }];
+        settled.animate(up, lift);
+        fresh.animate(up, lift);
+        return ended(light.animate([{ opacity: 0 }, { opacity: 1 }], lift));
       },
       close,
     };
@@ -429,21 +505,44 @@ export class Hud {
     };
   }
 
-  credits(lines: string[], onPlayAgain: () => void): { close(): void } {
+  credits(lines: string[], onPlayAgain: () => void, byline?: string): { close(): void } {
+    // A line marked with a leading '## ' is a section heading, not a credit.
+    const HEAD = '## ';
+    // The roll, in pixels a second: slow enough to read. It only nudges a real scroll box
+    // along, so the wheel can take it over or run ahead of it at any point.
+    const ROLL_PER_SECOND = 26;
+
     const box = div('hud-credits', this.layer);
     const scroll = div('hud-credits-scroll', box);
-    for (const line of lines) div('hud-credits-line', scroll).textContent = line;
-    scroll.animate(
-      [{ transform: 'translateY(0)' }, { transform: `translateY(-${Math.max(lines.length - 6, 0) * 1.8}em)` }],
-      { duration: Math.max(lines.length, 1) * 2000, fill: 'forwards', easing: 'linear' },
-    );
+    for (const line of lines) {
+      const head = line.startsWith(HEAD);
+      div(head ? 'hud-credits-head' : 'hud-credits-line', scroll).textContent = head ? line.slice(HEAD.length) : line;
+    }
     const button = document.createElement('button');
-    button.className = 'hud-button hud-play-again';
+    button.className = 'hud-button hud-play-again hud-credits-play';
     button.type = 'button';
     button.textContent = 'Play again';
     button.addEventListener('click', onPlayAgain);
     box.append(button);
+    if (byline) div('hud-credits-byline', box).textContent = byline;
+
+    let raf = 0;
+    let carry = 0;
+    let last = performance.now();
+    const roll = (now: number): void => {
+      carry += Math.min((now - last) / 1000, 0.25) * ROLL_PER_SECOND;
+      last = now;
+      const step = Math.floor(carry);
+      if (step >= 1) {
+        carry -= step;
+        scroll.scrollTop += step;
+      }
+      raf = scroll.scrollTop < scroll.scrollHeight - scroll.clientHeight ? requestAnimationFrame(roll) : 0;
+    };
+    raf = requestAnimationFrame(roll);
+
     const close = (): void => {
+      if (raf !== 0) cancelAnimationFrame(raf);
       box.remove();
       this.closers.delete(close);
     };

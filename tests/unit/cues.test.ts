@@ -2,8 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   BLIP_HZ, BLIP_PEAK, BUZZ_HZ, BUZZ_PEAK, THWIP_HZ, THWIP_PEAK,
-  buzzNotes, deepHumLevel, humFrequency, humVolume, risingToneFrequency, sweepOffsets, swellFrequency,
-  thwipPitch, tadaNotes, tickSeconds,
+  batchTickSpacing, bloomFrequency, bloomGain, buzzNotes, deepHumLevel, fieldHumLevel, humFrequency, humVolume,
+  risingToneFrequency, sweepOffsets, swellFrequency, thwipPitch, tadaNotes, tickSeconds,
 } from '../../src/audio/cues.ts';
 
 test('the hum rises in pitch across the hold', () => {
@@ -128,4 +128,32 @@ test('the wrong answer falls rather than rises', () => {
   const [first, second] = buzzNotes();
   assert.ok(second < first);
   assert.ok(second > first * 0.5);
+});
+
+test('the field hum stays a bed: audible from the first dot, never near the charge hum', () => {
+  assert.ok(fieldHumLevel(0) > 0);
+  assert.ok(fieldHumLevel(0) < fieldHumLevel(1));
+  assert.ok(fieldHumLevel(1) < 0.25);
+});
+
+test('the field hum clamps outside 0..1', () => {
+  assert.equal(fieldHumLevel(-1), fieldHumLevel(0));
+  assert.equal(fieldHumLevel(2), fieldHumLevel(1));
+});
+
+test('batch ticks tighten through the rush but never become a loop', () => {
+  assert.ok(batchTickSpacing(0) > batchTickSpacing(1));
+  for (const u of [-1, 0, 0.5, 1, 2]) assert.ok(batchTickSpacing(u) >= 0.25);
+});
+
+test('the bloom climbs an octave and a fifth', () => {
+  assert.ok(bloomFrequency(0) < bloomFrequency(0.5));
+  assert.ok(bloomFrequency(0.5) < bloomFrequency(1));
+  assert.ok(Math.abs(bloomFrequency(1) / bloomFrequency(0) - 3) < 0.01);
+});
+
+test('the bloom holds back early and peaks with the light', () => {
+  assert.ok(bloomGain(0) === 0);
+  assert.ok(bloomGain(0.5) < bloomGain(1) * 0.3);
+  assert.equal(bloomGain(2), bloomGain(1));
 });

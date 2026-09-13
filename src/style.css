@@ -146,13 +146,44 @@ html, body {
   font-variant-numeric: tabular-nums;
 }
 
+/* 6.4: the through-line number takes the middle of the screen and grows into it. */
 .hud-counter-large {
   right: auto;
   left: 50%;
   top: 45%;
   transform: translate(-50%, -50%);
   text-align: center;
-  font-size: 2rem;
+  font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: #dfe7f0;
+  /* Sits on the glowing field: a dark plate keeps both lines readable. */
+  padding: 1.2rem 2.2rem 1.5rem;
+  border-radius: 0.8rem;
+  background: rgba(7, 11, 26, 0.72);
+  backdrop-filter: blur(6px);
+  animation: hud-counter-grow 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hud-counter-large .hud-counter-value {
+  display: block;
+  margin-top: 0.5em;
+  font-size: clamp(1.8rem, 5vw, 3.6rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #ffe6bd;
+  text-shadow: 0 0 2rem rgba(255, 190, 110, 0.45);
+}
+
+@keyframes hud-counter-grow {
+  from { transform: translate(-50%, -50%) scale(0.86); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* The beat sheet's reduced-motion rule: the number arrives at its size instead of growing
+   into it. The fill and the glow-up are unchanged. */
+@media (prefers-reduced-motion: reduce) {
+  .hud-counter-large { animation: none; }
 }
 
 .hud-sub {
@@ -269,21 +300,38 @@ html, body {
 .hud-skymap {
   position: absolute;
   inset: 0;
-  background: #000000;
 }
 
-.hud-skymap canvas { display: block; width: 100%; height: 100%; }
+/* The field is transparent over a black stage, so the level's own lit objects (the character
+   beside the credits) sit in it instead of behind it. */
+.hud-skymap canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .hud-skymap .hud-chart-note, .hud-skymap .hud-chart-credit { position: absolute; left: 2vw; }
 .hud-skymap .hud-chart-note { bottom: 4.5vh; }
 .hud-skymap .hud-chart-credit { bottom: 2vh; }
 
+/* The glow-up's last layer: a gold-white centre that screens over the field, so the dense
+   middle goes to one light while the sparse edges keep their tints. */
 .hud-skymap-glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 50%, #fff4d6 0%, #ffcf7a 18%, rgba(255, 180, 84, 0.55) 40%, rgba(255, 180, 84, 0) 70%);
+  background: radial-gradient(circle at 50% 50%,
+    rgba(255, 250, 238, 0.95) 0%,
+    rgba(255, 228, 168, 0.78) 9%,
+    rgba(255, 196, 112, 0.4) 22%,
+    rgba(255, 166, 78, 0.15) 40%,
+    rgba(255, 158, 74, 0) 64%);
+  mix-blend-mode: screen;
   opacity: 0;
   pointer-events: none;
 }
+
 .hud-chart-axis { fill: none; stroke: #6b7a89; }
 .hud-chart-point { fill: #cfd8dc; stroke: #cfd8dc; }
 .hud-chart-curve { fill: none; stroke: #cfd8dc; stroke-width: 1.5; }
@@ -301,18 +349,55 @@ html, body {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: min(34rem, 80vw);
+  width: min(36rem, 60vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  padding: 1.6rem 1.8rem;
+  border-radius: 0.6rem;
+  background: rgba(4, 7, 18, 0.66);
+}
+
+.hud-credits-byline {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: #9fb0c1;
   text-align: center;
 }
 
 .hud-credits-scroll {
-  height: 11em;
-  overflow: hidden;
+  width: 100%;
+  height: 16em;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  text-align: center;
+  /* The roll fades at both ends instead of cutting off at the box edge. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 2.2em, #000 calc(100% - 2.2em), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 2.2em, #000 calc(100% - 2.2em), transparent 100%);
+}
+
+.hud-credits-head {
+  margin: 1.6em 0 0.5em;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #ffd9a0;
 }
 
 .hud-credits-line {
-  line-height: 1.8;
-  font-size: 0.9rem;
+  line-height: 1.75;
+  font-size: 0.85rem;
+  color: #b9c6d4;
+  overflow-wrap: anywhere;
 }
 
-.hud-play-again { margin-top: 1rem; }
+.hud-credits-play {
+  padding: 0.55rem 1.4rem;
+  border-color: #6b5a3a;
+  background: rgba(255, 206, 138, 0.12);
+  color: #ffe6bd;
+}
+
+.hud-credits-play:hover { background: rgba(255, 206, 138, 0.22); }
