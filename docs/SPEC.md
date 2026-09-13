@@ -38,7 +38,7 @@ One small counter runs from the first key hold in level 1: how many solar neutri
 
 ## Level progression
 
-Each level is one scene with one mechanic and a handful of captions (at most 25 words each). The player advances on rails; interaction is limited to the level's mechanic plus "continue".
+Each level is one scene with one mechanic and a handful of captions (at most 40 words each). The player advances on rails; interaction is limited to the level's mechanic plus "continue".
 
 ### 1. Birth (wordless)
 
