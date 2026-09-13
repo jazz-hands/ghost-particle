@@ -15,6 +15,10 @@ export interface GridHandle {
 }
 
 export interface ChartPoint { x: number; y: number; err: number }
+export interface SkyMapHandle {
+  drop(points: { x: number; y: number }[]): void;   // adds events in field degrees, centre (0, 0)
+  close(): void;
+}
 
 export interface ChartHandle {
   draw(seconds: number): Promise<void>;
@@ -285,6 +289,54 @@ export class Hud {
       duration: Math.max(seconds, 0) * 1000,
       easing: 'linear',
     })).then(() => el.remove());
+  }
+
+  // A 90° × 90° field of binned event directions; brightness follows the count in each bin.
+  skymap(opts: { degrees: number; bins: number; note: string; credit: string }): SkyMapHandle {
+    const box = div('hud-skymap', this.layer);
+    const canvas = document.createElement('canvas');
+    canvas.width = 480;
+    canvas.height = 480;
+    box.append(canvas);
+    div('hud-chart-note', box).textContent = opts.note;
+    div('hud-chart-credit', box).textContent = opts.credit;
+    const ctx = canvas.getContext('2d');
+    const counts = new Uint32Array(opts.bins * opts.bins);
+    let peak = 1;
+    const cell = canvas.width / opts.bins;
+    const paint = (): void => {
+      if (!ctx) return;
+      ctx.fillStyle = '#05070f';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < counts.length; i += 1) {
+        const c = counts[i]!;
+        if (c === 0) continue;
+        const v = Math.min(1, Math.sqrt(c / peak));
+        const g = Math.round(40 + 215 * v);
+        ctx.fillStyle = `rgb(${g}, ${g}, ${g})`;
+        ctx.fillRect((i % opts.bins) * cell, Math.floor(i / opts.bins) * cell, cell, cell);
+      }
+    };
+    paint();
+    const close = (): void => {
+      box.remove();
+      this.closers.delete(close);
+    };
+    this.closers.add(close);
+    return {
+      drop(points) {
+        const half = opts.degrees / 2;
+        for (const p of points) {
+          const bx = Math.min(opts.bins - 1, Math.max(0, Math.floor(((p.x + half) / opts.degrees) * opts.bins)));
+          const by = Math.min(opts.bins - 1, Math.max(0, Math.floor(((half - p.y) / opts.degrees) * opts.bins)));
+          const i = by * opts.bins + bx;
+          counts[i] = counts[i]! + 1;
+          if (counts[i]! > peak) peak = counts[i]!;
+        }
+        paint();
+      },
+      close,
+    };
   }
 
   chart(points: ChartPoint[], opts: { xLabel: string; yLabel: string; credit: string; note: string }): ChartHandle {

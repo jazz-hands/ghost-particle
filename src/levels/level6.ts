@@ -1,50 +1,12 @@
 import { scriptedLevel } from './scripted.ts';
 import { neutrino } from '../render/prims.ts';
 import { FACTS } from '../content/facts.ts';
-import type { ChartPoint } from '../hud/hud.ts';
+import { FIELD_DEGREES, sampleEvent, seeded } from '../content/skymap.ts';
 
-const DAY = 86_400_000;
-const START = Date.UTC(1996, 3, 1);
-const END = Date.UTC(2018, 4, 30);
-const STEP_DAYS = 5;
-const YEAR = 365.25;
-// Placeholder stand-in for A-02: mean flux in millions per square centimetre per second,
-// modulated by the yearly 1/r² wobble (F-33). The real file is not loaded in the blockout.
-const MEAN = 2.3;
-const WOBBLE = 0.034;
-const PEAK_DAY = 3;
-const SIGMA = 0.25;
-const ERR = 0.25;
-const X0 = 1996 + (START - Date.UTC(1996, 0, 1)) / (YEAR * DAY);
-
-function flux(day: number): number {
-  return MEAN * (1 + WOBBLE * Math.cos((2 * Math.PI * (day - PEAK_DAY)) / YEAR));
-}
-
-// Seeded so the placeholder chart is the same on every run.
-function random(seed: number): () => number {
-  let a = seed;
-  return () => {
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function gaussian(rand: () => number): number {
-  return Math.sqrt(-2 * Math.log(1 - rand())) * Math.cos(2 * Math.PI * rand());
-}
-
-function series(): ChartPoint[] {
-  const rand = random(1996);
-  const days = (END - START) / DAY;
-  const out: ChartPoint[] = [];
-  for (let day = 0; day <= days; day += STEP_DAYS) {
-    out.push({ x: X0 + day / YEAR, y: flux(day) + SIGMA * gaussian(rand), err: ERR });
-  }
-  return out;
-}
+// The map fills over MAP_SECONDS, slowly at first and faster as it goes, to EVENTS in total (F-34).
+const EVENTS = 6000;
+const MAP_SECONDS = 9;
+const BINS = 48;
 
 function creditLines(): string[] {
   const facts = Object.values(FACTS).flatMap((fact) => [`${fact.id} ${fact.title}`, ...fact.sources]);
@@ -52,10 +14,9 @@ function creditLines(): string[] {
     'Ghost Particle',
     'Facts and sources',
     ...facts,
-    'Data',
-    'Super-Kamiokande Collaboration, Phys. Rev. Lett. 132, 241803 (2024), file sksolartimevariation5804d.txt (A-02)',
     'Made with three.js, Vite, TypeScript, Playwright',
     'The flavor colours are a design choice with no physical meaning (D-011).',
+    'The Sun-in-neutrinos map is simulated from the scattering physics (F-34); it is not the 1998 Super-Kamiokande image.',
     'Assumes an adult of 150 lb and 5 ft 7 in standing and facing the Sun. Turn sideways and the number drops; it is a rough figure.',
   ];
 }
@@ -66,35 +27,46 @@ export const createLevel6 = scriptedLevel(6, async (s) => {
   hud.counter.setVisible(true);
 
   await hud.fade(1, 1);
-
   const nu = neutrino();
   nu.position.set(2.8, 0, 0);
   group.add(nu);
   rig.set([0, 0, 8], [0.6, 0, 0]);
 
-  const chart = hud.chart(series(), {
-    xLabel: 'Year',
-    yLabel: "Super-K's measurement (millions per square centimetre per second)",
-    credit: 'Super-Kamiokande Collaboration, Phys. Rev. Lett. 132, 241803 (2024), file sksolartimevariation5804d.txt (A-02)',
-    note: 'Placeholder data in the blockout; the real file is not loaded yet.',
+  // 6.1: the field fills with event directions until the Sun stands out.
+  const map = hud.skymap({
+    degrees: FIELD_DEGREES,
+    bins: BINS,
+    note: 'Simulated from the scattering physics (F-34); not the real 503-day map.',
+    credit: 'After the Super-Kamiokande solar neutrino sky map (F-25).',
   });
-
+  const rand = seeded(503);
+  let dropped = 0;
+  let elapsed = 0;
+  s.onUpdate((dt) => {
+    if (dropped >= EVENTS) return;
+    elapsed = Math.min(elapsed + dt, MAP_SECONDS);
+    const u = elapsed / MAP_SECONDS;
+    const target = Math.round(EVENTS * u * u);
+    const batch = [];
+    for (; dropped < target; dropped += 1) batch.push(sampleEvent(rand));
+    if (batch.length > 0) map.drop(batch);
+  });
   await hud.fade(0, 1);
-  await chart.draw(6);
+  await b.until(() => dropped >= EVENTS);
+  await b.wait(1);
 
-  await b.card('This is 22 years of Super-Kamiokande watching the Sun, one dot for every five days. Each dot measures how many neutrinos like you reach Earth.', ['F-24']);
-  await b.card('Many of those arrived at night, through the whole Earth. Nothing stopped them. Nothing stopped you.', ['F-25', 'F-10']);
-  await b.card("The only pattern in all those years is a gentle yearly wobble, because Earth's orbit is slightly oval.", ['F-33']);
-  await chart.curve((x) => flux((x - X0) * YEAR), 2);
+  // 6.2, 6.3
+  await b.card('This is the Sun, seen in neutrinos. It took 503 days of watching. Some of these neutrinos arrived at night, after passing through the entire Earth.', ['F-25']);
+  await b.card('Nothing stopped them. Nothing stopped you.', ['F-10']);
 
-  // 6.5 the through-line stops and takes the centre of the screen.
+  // 6.4: the through-line counter stops and grows.
   hud.counter.freezeLarge();
   hud.note('And through you, since you pressed start:', ['F-32']);
   await b.wait(4);
 
-  // 6.6 credits, and the last level ends when the player leaves them.
+  // 6.5: credits, Play again reloads.
   hud.note(null);
-  chart.close();
+  map.close();
   hud.counter.setVisible(false);
   hud.credits(creditLines(), () => { location.assign(location.pathname); });
   await b.key('Space');

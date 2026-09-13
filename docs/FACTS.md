@@ -213,6 +213,13 @@ Each entry: plain-language wording (what the player reads), precise statement (f
 - Status: verified (abstract); check (read the paper for the amplitude before quoting any percentage; none is quoted on screen).
 - Used: L6.
 
+### F-34 Where solar neutrino events point
+- Player wording: none; drives the level 6 sky map.
+- Precise: Super-K detects solar neutrinos through elastic scattering on electrons, which throws the electron forward, so reconstructed event directions cluster around the Sun's direction above a flat background of other events; the electron's angle to the neutrino is limited by the kinematics and the reconstruction adds a smear of tens of degrees. The level 6 map draws simulated events from that shape: a fraction of events Gaussian about the Sun's position, the rest uniform over a 90° × 90° field. Planning values in code: 40% signal, 14° spread.
+- Sources: as F-21 and F-23; the sky-map description in F-25's sources.
+- Status: check (confirm the signal fraction and angular spread against the Super-K solar papers before quoting any number; none is quoted on screen).
+- Used: L6.
+
 ## History (side panels)
 
 ### F-26 Prediction and naming
