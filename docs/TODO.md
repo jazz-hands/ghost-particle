@@ -41,7 +41,7 @@ Most entries are now verified. Remaining "check" items, none of which change on-
 - [x] Character: bubble with ink eyes, no antenna (D-029).
 - [ ] Final character values: tune in `docs/mockups/character-tuner.html`, paste the JSON into D-029.
 - [ ] Eye shapes per reaction: define lid, tilt, spacing and highlight values for each of the eleven reactions in BEATS.md, using the tuner's eye controls. The tuner has upper and lower lid controls, so "cheer" (upward arcs) is expressible.
-- [ ] Palette: background gradient stops, UI accent, plasma color in L3, sensor "eye" gold in L5 (flavor tints and base are settled in D-011).
+- [ ] Palette: background gradient stops, UI accent, plasma color in L3, sensor "eye" gold in L5 (flavor tints and base are settled in D-011). Note: `scene.background` passes through ACES tone mapping and exposure, so the current `#070b1a` renders near black on screen; pick the on-screen value inside that pipeline, or paint the background in CSS behind a transparent renderer.
 - [ ] Reference board from the Astro Bot screenshots (private, not committed).
 - [ ] Rough layout for the HUD: caption card position, key prompt, meters, mini-game buttons.
 

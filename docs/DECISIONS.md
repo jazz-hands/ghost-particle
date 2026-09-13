@@ -176,7 +176,7 @@ The ending uses Super-Kamiokande's public 5-day solar neutrino record, 1996 to 2
 
 ### D-029 Character is a bubble with ink eyes — accepted
 
-Chosen from `docs/mockups/character.html` (shape) and `docs/mockups/character-eyes.html` (eyes). The body is a slightly squashed sphere with a glossy translucent material; no antenna. The eyes are matte dark ovals with a painted highlight, drawn into the sphere's own skin texture so they follow the surface and deform with squash and stretch. All reactions in `BEATS.md` are redraws of that texture (lids, tilt, spacing, highlight), not extra geometry. Exact material, eye, light and bloom values were set with `docs/mockups/character-tuner.html`. The tuner's JSON output, the final record and the content of `src/character/config.json`:
+Chosen from `docs/mockups/character.html` (shape) and `docs/mockups/character-eyes.html` (eyes). The body is a slightly squashed sphere with a glossy translucent material; no antenna. The eyes are matte dark ovals with a painted highlight, drawn into the sphere's own skin texture so they follow the surface and deform with squash and stretch. All reactions in `BEATS.md` are redraws of that texture (lids, tilt, spacing, highlight), not extra geometry. Exact material, eye, light and bloom values were set with `docs/mockups/character-tuner.html`. The tuner's JSON output is the final record and the content of `src/character/config.json`:
 
 ```json
 {
