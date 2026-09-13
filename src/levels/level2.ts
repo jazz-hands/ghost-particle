@@ -28,7 +28,7 @@ export const createLevel2 = scriptedLevel(2, async (s) => {
   const ghost = neutrino();
   s.group.add(ghost);
   s.rig.set({ x: 0, y: 0.3, z: 6.5 }, { x: 0, y: 0, z: 0 });
-  void s.rig.moveTo({ x: 0, y: 0.3, z: 9 }, { x: 0, y: 0, z: 0 }, 2);
+  void s.rig.moveTo({ x: 0, y: 0.3, z: 11 }, { x: 0, y: -0.6, z: 0 }, 2);
 
   // 2.1
   s.hud.counter.start();
