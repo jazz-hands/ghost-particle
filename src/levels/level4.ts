@@ -42,8 +42,8 @@ const FAMILIES: [string, string][] = [
   ['Higgs', 'The Higgs: where mass comes from.'],
 ];
 // Screen-right of the camera at (4, 1.5, 5): where the neutrino sits, smaller, to watch the grid.
-const ASIDE = new Vector3(1.7, 0.1, -1.4);
-const ASIDE_SCALE = 0.6;
+const ASIDE = new Vector3(1.1, -0.3, -0.9);
+const ASIDE_SCALE = 0.5;
 const REVEALED = 'Ghost particles. Almost no mass, no charge, three flavors.';
 
 export const createLevel4 = scriptedLevel(4, async (s) => {
