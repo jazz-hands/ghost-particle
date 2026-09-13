@@ -279,8 +279,8 @@ export class Hud {
 
     const xs = points.map((p) => p.x);
     const ys = points.flatMap((p) => [p.y - p.err, p.y + p.err]);
-    const xMin = Math.min(...xs, 0);
-    const xMax = Math.max(...xs, 1);
+    const xMin = Math.min(...xs);
+    const xMax = Math.max(...xs);
     const yMin = Math.min(...ys, 0);
     const yMax = Math.max(...ys, 1);
     const px = (x: number): number => 50 + ((x - xMin) / (xMax - xMin || 1)) * 320;
@@ -311,7 +311,10 @@ export class Hud {
       t.setAttribute('class', cls);
       t.setAttribute('x', String(x));
       t.setAttribute('y', String(y));
-      if (rotate) t.setAttribute('transform', `rotate(-90 ${x} ${y})`);
+      if (rotate) {
+        t.setAttribute('transform', `rotate(-90 ${x} ${y})`);
+        t.setAttribute('text-anchor', 'middle');
+      }
       t.textContent = text;
     };
     label(opts.xLabel, 210, 240, 'hud-chart-label');
