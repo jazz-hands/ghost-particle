@@ -1,4 +1,7 @@
-import { Color, Group, MeshPhysicalMaterial, MeshStandardMaterial } from 'three';
+import {
+  AdditiveBlending, CanvasTexture, Color, Group, MeshPhysicalMaterial, MeshStandardMaterial,
+  SRGBColorSpace, Sprite, SpriteMaterial,
+} from 'three';
 import type { Mesh, Object3D } from 'three';
 import { box, disposeGroup, setOpacity, sphere } from '../render/prims.ts';
 import { scriptedLevel } from './scripted.ts';
@@ -22,13 +25,14 @@ const SLAM_AT = 0.92;
 const GLOW_PEAK = 2.6;
 const GLOW_SECONDS = 1;
 
-// The warm haze the beat sheet floats the neutrino in: level 1's amber family, two faint
-// shells behind the character so the wash has some falloff. Level-owned; Stage is untouched.
+// The warm haze the beat sheet floats the neutrino in: level 1's amber family, two soft
+// additive shells behind the character. Level-owned; Stage's background and bloom are untouched.
 const HAZE_AMBER = '#ff9f45';
+const HAZE_Y = -0.3;
 const HAZE_Z = -2.2;
-const HAZE_SHELLS: [radius: number, opacity: number, emissive: number][] = [
-  [2.4, 0.08, 0.5],
-  [4.2, 0.04, 0.35],
+const HAZE_SHELLS: [size: number, opacity: number][] = [
+  [5, 0.3],
+  [10, 0.2],
 ];
 // Furniture, not a character: a muted cool grey-blue, smooth and a little glossy.
 const PLANK_BLUE = '#8ea6c4';
@@ -54,9 +58,10 @@ export const createLevel2 = scriptedLevel(2, async (s) => {
     });
   };
 
-  for (const [radius, opacity, emissive] of HAZE_SHELLS) {
-    s.group.add(haze(radius, opacity, emissive));
-  }
+  const hazeTex = hazeTexture();
+  for (const [size, opacity] of HAZE_SHELLS) s.group.add(haze(hazeTex, size, opacity));
+  // Sprite materials are disposed with the level group; the shared texture is not.
+  s.group.children[0]!.addEventListener('removed', () => hazeTex.dispose());
 
   const ghost = createNeutrino(characterConfig());
   ghost.group.scale.setScalar(CHARACTER_SCALE);
@@ -153,16 +158,34 @@ function characterConfig(): CharacterConfig {
   return { ...CONFIG, view: { ...CONFIG.view, idleBob: false } };
 }
 
-function haze(radius: number, opacity: number, emissive: number): Mesh {
-  const mesh = sphere(radius, { color: HAZE_AMBER, opacity });
-  const material = mesh.material as MeshStandardMaterial;
-  material.emissive = new Color(HAZE_AMBER);
-  material.emissiveIntensity = emissive;
-  material.roughness = 1;
-  material.depthWrite = false;
-  mesh.position.z = HAZE_Z;
-  mesh.renderOrder = -1;
-  return mesh;
+function hazeTexture(): CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 256;
+  const g = canvas.getContext('2d')!;
+  const gradient = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+  gradient.addColorStop(0, 'rgba(255,255,255,1)');
+  gradient.addColorStop(0.4, 'rgba(255,255,255,0.3)');
+  gradient.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gradient;
+  g.fillRect(0, 0, 256, 256);
+  const tex = new CanvasTexture(canvas);
+  tex.colorSpace = SRGBColorSpace;
+  return tex;
+}
+
+function haze(map: CanvasTexture, size: number, opacity: number): Sprite {
+  const sprite = new Sprite(new SpriteMaterial({
+    map,
+    color: new Color(HAZE_AMBER),
+    transparent: true,
+    opacity,
+    blending: AdditiveBlending,
+    depthWrite: false,
+  }));
+  sprite.scale.setScalar(size);
+  sprite.position.set(0, HAZE_Y, HAZE_Z);
+  sprite.renderOrder = -1;
+  return sprite;
 }
 
 // Toy-like: smooth, slightly glossy (SPEC "Look and feel").
