@@ -2,6 +2,7 @@ import './style.css';
 import { Stage } from './render/stage.ts';
 import { CONFIG } from './character/config.ts';
 import { LevelManager } from './levels/manager.ts';
+import { ping } from './telemetry/ping.ts';
 import { Hud } from './hud/hud.ts';
 import { Keys } from './input/keys.ts';
 import { CameraRig } from './render/rig.ts';
@@ -24,7 +25,11 @@ const rig = new CameraRig(stage.camera);
 const cues = new Cues();
 keys.onPress('Space', () => cues.unlock());
 
-const manager = new LevelManager(LEVELS, { scene: stage.scene, camera: stage.camera, hud, keys, rig, cues });
+const manager = new LevelManager(
+  LEVELS,
+  { scene: stage.scene, camera: stage.camera, hud, keys, rig, cues },
+  (level) => ping(`level/${level}`),
+);
 installGhostHook(manager);
 installCurrentReactHook();
 const debug = flags.debug ? mountDebug(manager) : null;

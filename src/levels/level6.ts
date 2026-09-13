@@ -9,6 +9,7 @@ import { prefersReducedMotion } from '../render/rig.ts';
 import { FACTS } from '../content/facts.ts';
 import { FIELD_DEGREES } from '../content/skymap.ts';
 import { GLOW_SECONDS, createFill } from './level6-field.ts';
+import { ping } from '../telemetry/ping.ts';
 
 // 6.1: the tank fades to black and stays there, so the field's transparent canvas has nothing
 // but the level's own objects behind it. scripted.ts hands the stage colour back on exit.
@@ -94,6 +95,7 @@ export const createLevel6 = scriptedLevel(6, async (s) => {
   map.notes(false);
   map.clearing(GOODBYE_NDC.x, GOODBYE_NDC.y, GOODBYE_CLEARING);
   hud.credits(creditLines(), () => { location.assign(location.pathname); }, BYLINE);
+  ping('finished');
   goodbye(s);
   // The credits are the end: nothing waits on a key, Play again reloads, and the debug hook's
   // next() or skip() is the only other way past this point.
