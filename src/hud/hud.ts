@@ -292,21 +292,71 @@ export class Hud {
     })).then(() => el.remove());
   }
 
-  // A 90° × 90° field: every event is one tiny tinted dot on black; additive drawing lets the
-  // Sun build out of density, and glow() brightens the whole field into one light at the end.
+  // A 90° × 90° field: every event is one tiny tinted dot, drawn additively so the Sun builds
+  // out of density (D-028). Landed dots accumulate on the back canvas; the front canvas is
+  // cleared on every drop and carries only the newest arrivals' flare and the centre's wash,
+  // so a dot flares as it lands and is at its tint by the next drop. glow() takes the whole
+  // field up into one light.
   skymap(opts: { degrees: number; note: string; credit: string }): SkyMapHandle {
+    // A dot at rest, and the wider, brighter stamp it lands as for one frame.
+    const DOT_RADIUS = 1.5;
+    const DOT_ALPHA = 0.5;
+    const FLARE_RADIUS = 3.6;
+    const FLARE_ALPHA = 0.85;
+    // The centre's bloom: warm, wide and soft-edged, strengthening as arrivals pile up. The
+    // curve is asymptotic, so it needs no total to aim at: 3000 arrivals reach two thirds.
+    const WASH_DEGREES = 30;
+    const WASH_RGB = '255, 206, 138';
+    const WASH_PEAK = 0.24;
+    const WASH_ARRIVALS = 3000;
+    // The glow-up: the settled dots are lifted and pulled toward white, so the crowded centre
+    // reads as gold-white while the sparse edges keep their tints.
+    const GLOW_BRIGHTNESS = 2.2;
+    const GLOW_SATURATE = 0.75;
+
     const box = div('hud-skymap', this.layer);
-    const canvas = document.createElement('canvas');
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
-    box.append(canvas);
+    const settled = document.createElement('canvas');
+    const fresh = document.createElement('canvas');
+    settled.className = 'hud-skymap-settled';
+    fresh.className = 'hud-skymap-fresh';
+    settled.width = fresh.width = innerWidth;
+    settled.height = fresh.height = innerHeight;
+    box.append(settled, fresh);
     div('hud-chart-note', box).textContent = opts.note;
     div('hud-chart-credit', box).textContent = opts.credit;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
+
+    const back = settled.getContext('2d');
+    const front = fresh.getContext('2d');
+    const scale = settled.width / opts.degrees;
+    const half = opts.degrees / 2;
+    const midX = settled.width / 2;
+    const midY = settled.height / 2;
+    // The beat sheet's reduced-motion rule, read the way render/rig.ts reads it: the arrival
+    // flare goes, the fill itself is unchanged.
+    const flares = !(typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+    const washRadius = WASH_DEGREES * scale;
+    const wash = front?.createRadialGradient(midX, midY, 0, midX, midY, washRadius);
+    wash?.addColorStop(0, `rgba(${WASH_RGB}, 1)`);
+    wash?.addColorStop(0.35, `rgba(${WASH_RGB}, 0.42)`);
+    wash?.addColorStop(1, `rgba(${WASH_RGB}, 0)`);
+    let landed = 0;
+
+    const stamp = (ctx: CanvasRenderingContext2D, points: { x: number; y: number; color: string }[], radius: number, alpha: number): void => {
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = alpha;
+      for (const p of points) {
+        const y = midY - p.y * scale;
+        if (y < 0 || y > settled.height) continue;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc((p.x + half) * scale, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+    };
+
     const close = (): void => {
       box.remove();
       this.closers.delete(close);
@@ -314,26 +364,29 @@ export class Hud {
     this.closers.add(close);
     return {
       drop(points) {
-        if (!ctx) return;
-        const scale = canvas.width / opts.degrees;
-        const half = opts.degrees / 2;
-        const midY = canvas.height / 2;
-        ctx.globalCompositeOperation = 'lighter';
-        ctx.globalAlpha = 0.55;
-        for (const p of points) {
-          const y = midY - p.y * scale;
-          if (y < 0 || y > canvas.height) continue;
-          ctx.fillStyle = p.color;
-          ctx.beginPath();
-          ctx.arc((p.x + half) * scale, y, 1.6, 0, Math.PI * 2);
-          ctx.fill();
+        if (!back) return;
+        landed += points.length;
+        stamp(back, points, DOT_RADIUS, DOT_ALPHA);
+        if (!front) return;
+        front.clearRect(0, 0, fresh.width, fresh.height);
+        if (wash) {
+          front.globalCompositeOperation = 'lighter';
+          front.globalAlpha = WASH_PEAK * (1 - Math.exp(-landed / WASH_ARRIVALS));
+          front.fillStyle = wash;
+          front.fillRect(midX - washRadius, midY - washRadius, washRadius * 2, washRadius * 2);
+          front.globalAlpha = 1;
+          front.globalCompositeOperation = 'source-over';
         }
-        ctx.globalAlpha = 1;
-        ctx.globalCompositeOperation = 'source-over';
+        if (flares) stamp(front, points, FLARE_RADIUS, FLARE_ALPHA);
       },
       glow(seconds) {
-        const halo = div('hud-skymap-glow', box);
-        return ended(halo.animate([{ opacity: 0 }, { opacity: 1 }], { duration: Math.max(seconds, 0) * 1000, fill: 'forwards' }));
+        const light = div('hud-skymap-glow', box);
+        const ms = Math.max(seconds, 0) * 1000;
+        const lift = { duration: ms, fill: 'forwards' as const, easing: 'ease-in-out' };
+        const up = [{ filter: 'none' }, { filter: `brightness(${GLOW_BRIGHTNESS}) saturate(${GLOW_SATURATE})` }];
+        settled.animate(up, lift);
+        fresh.animate(up, lift);
+        return ended(light.animate([{ opacity: 0 }, { opacity: 1 }], lift));
       },
       close,
     };
