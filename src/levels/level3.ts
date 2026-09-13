@@ -25,7 +25,9 @@ const TRY_Z = -20;
 // so obstacles fade into the haze instead of ending at a silhouette; the climb lands on an
 // orange-white surface. Emissive values are set against the stage's bloom threshold of 0.71.
 const CORE_ORANGE = '#7d1c03';
-const SURFACE_GOLD = '#ffd8a0';
+// The surface glow stays a mid amber: the flavor change has to read against it.
+const SURFACE_GOLD = '#b8641c';
+const DAWN_MAX = 0.55;
 const FOG_DENSITY = 0.055;
 // 3.5: the haze thins.
 const FOG_THIN = 0.032;
@@ -253,7 +255,7 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
 
     if (rising && dawn < 1) {
       dawn = Math.min(dawn + dt / 6, 1);
-      s.scene.background = sky.copy(base).lerp(surface, dawn);
+      s.scene.background = sky.copy(base).lerp(surface, dawn * DAWN_MAX);
       fog.color.copy(sky);
       fog.density = FOG_THIN + (FOG_SURFACE - FOG_THIN) * dawn;
     }
