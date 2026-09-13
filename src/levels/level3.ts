@@ -9,11 +9,13 @@ const LANE = 2;
 const STEER = 3;
 const RAIL = 12;
 const SPAWN_Z = -60;
+const HALT_Z = -5;
 const SURFACE = '#c9d2da';
 
 interface Obstacle {
   object: Object3D;
   passed: boolean;
+  halts: boolean;
 }
 
 export const createLevel3 = scriptedLevel(3, async (s) => {
@@ -37,11 +39,12 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   let shown: Flavor | null = null;
   let dawn = 0;
   let rising = false;
+  let steered = false;
 
-  const add = (object: Object3D): void => {
+  const add = (object: Object3D, halts = false): void => {
     object.position.z = SPAWN_Z;
     s.group.add(object);
-    obstacles.push({ object, passed: false });
+    obstacles.push({ object, passed: false, halts });
   };
 
   const plasmaWall = (gap: boolean): Object3D => {
@@ -78,8 +81,8 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   };
 
   s.onUpdate((dt) => {
-    if (s.keys.isDown('ArrowLeft')) lane -= STEER * dt;
-    if (s.keys.isDown('ArrowRight')) lane += STEER * dt;
+    if (s.keys.isDown('ArrowLeft')) { lane -= STEER * dt; steered = true; }
+    if (s.keys.isDown('ArrowRight')) { lane += STEER * dt; steered = true; }
     lane = Math.min(Math.max(lane, -LANE), LANE);
     ghost.position.x = lane;
     if (follow) s.rig.set({ x: lane * 0.5, y: 0.5, z: 6 }, { x: ghost.position.x, y: ghost.position.y - 0.6, z: 0 });
@@ -93,6 +96,12 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
     }
 
     for (const o of [...obstacles]) {
+      // The first two obstacles wait just ahead until the player steers (3.2), then autoplay.
+      if (o.halts && !steered && o.object.position.z + RAIL * dt >= HALT_Z) {
+        o.object.position.z = HALT_Z;
+        s.hud.prompt('Arrow keys to steer');
+        continue;
+      }
       o.object.position.z += RAIL * dt;
       if (!o.passed && o.object.position.z >= 0) {
         o.passed = true;
@@ -125,8 +134,13 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
 
   await s.b.card("You're leaving the Sun. Everything in here is packed tight. Try to hit something. Arrow keys to steer.");
 
-  add(plasmaWall(false));
-  await s.b.until(() => tally >= 1);
+  for (const gap of [false, true]) {
+    steered = false;
+    add(plasmaWall(gap), true);
+    const before = tally;
+    await s.b.until(() => tally > before);
+    s.hud.prompt(null);
+  }
 
   await s.b.card('Nothing happened. The Sun is opaque to light, but almost transparent to you. Almost nothing can stop a neutrino.', ['F-10']);
 
