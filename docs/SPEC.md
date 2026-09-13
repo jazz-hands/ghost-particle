@@ -11,7 +11,7 @@ The moment-by-moment script for every level is `BEATS.md`. This file says what w
 - Audience: any adult with no physics background. Curious kids welcome.
 - Goal 1: the player finishes knowing five things: what a neutrino is, where the Sun's neutrinos come from, why almost nothing stops them, that they come in three "flavors" and can switch, and how a real detector catches them.
 - Goal 2: it feels like a playful space toy (Astro Bot energy), not a slideshow. No level is pure reading.
-- Non-goals: no human characters, no free roaming, no scoring or leaderboards, no mobile-first layout (desktop keyboard first; touch is a stretch goal).
+- Non-goals: no human characters, no free roaming, no scoring or leaderboards. Desktop keyboard first; touch and phone layouts are supported (D-030).
 
 ## Rules that shape everything
 
@@ -131,7 +131,7 @@ Build the spine, then the ending, then the middle (D-023). If time runs out the 
 | 7 | Level 2 | 0h 15 |
 | 8 | Playwright smoke test, polish | 0h 20 |
 
-Add if time remains, in this order: level 7 panels, cinematic soundtrack, touch input.
+Add if time remains, in this order: level 7 panels, cinematic soundtrack.
 
 The character's material and skin code already exists in the tuner, so step 1's character work is porting plus the reaction redraws, not design.
 

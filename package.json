@@ -13,7 +13,8 @@
     "test:unit": "node --test \"tests/unit/*.test.ts\"",
     "test:e2e": "playwright test",
     "shots": "node scripts/shots.mjs",
-    "deploy": "npm run build && rsync -az --delete dist/ ghost-particle.exe.xyz:~/ghost-particle-dist/ && ssh ghost-particle.exe.xyz 'sudo rsync -a --delete ~/ghost-particle-dist/ /var/www/ghost-particle/'"
+    "deploy": "npm run build && rsync -az --delete dist/ ghost-particle.exe.xyz:~/ghost-particle-dist/ && ssh ghost-particle.exe.xyz 'sudo rsync -a --delete ~/ghost-particle-dist/ /var/www/ghost-particle/'",
+    "deploy:mobile": "npm run build && rsync -az --delete dist/ ghost-particle-mobile.exe.xyz:~/ghost-particle-dist/ && ssh ghost-particle-mobile.exe.xyz 'sudo rsync -a --delete ~/ghost-particle-dist/ /var/www/ghost-particle/'"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",

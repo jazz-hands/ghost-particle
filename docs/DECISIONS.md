@@ -41,6 +41,7 @@ How to use:
 | D-027 | Cheap rendering for level 5 | accepted | Sensors are one instanced mesh; rings are drawn on a canvas texture on the cylinder wall. |
 | D-028 | Level 6 draws a simulated neutrino sky map | accepted | No rights request for the Sun image; the ending is a chart of Super-K's 22-year public record. |
 | D-029 | Character is a bubble with ink eyes | accepted | Squashed translucent sphere, no antenna, matte dark oval eyes painted into the skin. Final values come from the tuner. |
+| D-030 | Touch and small screens | accepted | One build; a capability-detected touch layer, hold-anywhere and screen-halves controls, both orientations; own site until merged. |
 
 ## Entries
 
@@ -91,7 +92,7 @@ Five hours of build time, allocated per the table in `SPEC.md`. If behind, cut i
 
 ### D-010 Input scheme — accepted
 
-Keyboard only for v1: Space to hold and to advance, arrow keys to steer in level 3, click or number keys for the level 4 tile and the level 5 buttons. Touch is an add-if-time item.
+Keyboard is the primary input: Space to hold and to advance, arrow keys to steer in level 3, click or number keys for the level 4 tile and the level 5 buttons. Touch is supported per D-030.
 
 ### D-011 Flavor tints — accepted
 
@@ -245,3 +246,9 @@ Chosen from `docs/mockups/character.html` (shape) and `docs/mockups/character-ey
   }
 }
 ```
+
+### D-030 Touch and small screens — accepted
+
+The same build plays on phones. `src/input/touch.ts` turns pointer gestures on the HUD layer into the key codes levels already listen for, installed only where `(pointer: coarse)` matches: hold anywhere for level 1's charge and level 5's hit, hold a screen half to steer in level 3, tap cards, tiles and the E/M buttons. Control wording comes from `src/hud/hints.ts` and swaps per input; fact text does not change. Both orientations are supported: `src/render/fov.ts` widens the vertical field of view on narrow screens so portrait shows what 3:2 shows, and `src/style.css` media queries at 720 px fit the HUD with safe-area insets. Phones render at a pixel ratio of at most 1.5 with bloom at half size. Desktop is unchanged. Rationale: one code path keeps the facts, beats and tests single-sourced; hold and halves need no on-screen controls over the scene.
+
+Deployment: the branch `mobile` deploys with `npm run deploy:mobile` to the VM `ghost-particle-mobile`, public at https://ghost-particle-mobile.exe.xyz/, so the main site is untouched until the branch is merged.
