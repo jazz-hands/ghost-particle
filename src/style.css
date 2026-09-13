@@ -246,6 +246,11 @@ html, body {
   bottom: 30vh;
   transform: translateX(-50%);
   font-size: 1.1rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #3b4756;
+  border-radius: 0.5rem;
+  background: rgba(7, 11, 26, 0.85);
+  white-space: nowrap;
 }
 
 /* Chart, on the left of the screen. */
