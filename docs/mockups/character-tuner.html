@@ -212,7 +212,7 @@ function eyesWithPose(base, p) {
 
 // ---- end mirror ----
 
-const TINTS = { electron: '#00E5FF', muon: '#B026FF', tau: '#FF5C00' };
+const TINTS = { electron: '#5ee3ff', muon: '#b58cff', tau: '#ff9f6b' };
 
 const defaults = {
   flavor: 'electron',
@@ -222,7 +222,8 @@ const defaults = {
   post: { bloom: true, bloomThreshold: 0.8, bloomStrength: 0.35, bloomRadius: 0.4, eyeGlow: 0.0, rimShell: false, rimOpacity: 0.3, rimScale: 1.035, halo: false, haloSize: 3.5, haloOpacity: 0.3 },
   view: { turn: false, idleBob: false },
 };
-const saved = localStorage.getItem('ghost-particle-tuner');
+const store = (() => { try { return localStorage; } catch { return null; } })();
+const saved = store?.getItem('ghost-particle-tuner');
 const S = saved ? deepMerge(structuredClone(defaults), JSON.parse(saved)) : structuredClone(defaults);
 function deepMerge(a, b) { for (const k in b) { if (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k])) a[k] = deepMerge(a[k] || {}, b[k]); else a[k] = b[k]; } return a; }
 
@@ -332,7 +333,7 @@ function apply() {
   renderer.toneMappingExposure = l.exposure;
   const out = document.getElementById('out');
   out.value = JSON.stringify(S, null, 2);
-  localStorage.setItem('ghost-particle-tuner', JSON.stringify(S));
+  store?.setItem('ghost-particle-tuner', JSON.stringify(S));
 }
 
 const gui = new GUI({ title: 'Ghost Particle tuner' });
@@ -394,7 +395,15 @@ fp.add(S.post, 'haloOpacity', 0, 1, 0.01).name('halo opacity').onChange(apply);
 const fv = gui.addFolder('View');
 fv.add(S.view, 'turn').name('slow turn');
 fv.add(S.view, 'idleBob').name('idle bob');
-gui.add({ reset() { localStorage.removeItem('ghost-particle-tuner'); location.reload(); } }, 'reset').name('reset to defaults');
+gui.add({ reset() {
+  store?.removeItem('ghost-particle-tuner');
+  for (const k in defaults) {
+    if (typeof defaults[k] === 'object') Object.assign(S[k], structuredClone(defaults[k]));
+    else S[k] = defaults[k];
+  }
+  gui.controllersRecursive().forEach((c) => c.updateDisplay());
+  apply();
+} }, 'reset').name('reset to defaults');
 gui.add({ copy() { navigator.clipboard?.writeText(document.getElementById('out').value); } }, 'copy').name('copy settings');
 apply();
 
