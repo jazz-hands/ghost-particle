@@ -30,6 +30,14 @@ const EASES: Record<Ease, (x: number) => number> = {
 };
 
 export const REACTIONS: Record<string, Keyframe[]> = {
+  // Squash flat and squeeze the eyes shut, expecting an impact that never comes.
+  brace: [
+    { t: 0 },
+    { t: 0.12, scaleX: 1.2, scaleY: 0.7, offsetY: -0.11, squint: 0.86, eyeWidth: 1.12, ease: 'out' },
+    { t: 0.44, scaleX: 1.22, scaleY: 0.68, offsetY: -0.12, squint: 0.9, eyeWidth: 1.12, ease: 'inOut' },
+    { t: 0.78, scaleX: 1, scaleY: 1, offsetY: 0, squint: 0.2, ease: 'out' },
+    { t: 0.95, ease: 'back' },
+  ],
 };
 
 export const NAMES = [
