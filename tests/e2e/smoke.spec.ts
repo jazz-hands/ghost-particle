@@ -59,8 +59,10 @@ test('every level renders and the run steps to the end', async ({ page }, testIn
 });
 
 test('debug tools mount only with ?debug (D-017)', async ({ page }) => {
+  const errors = collectErrors(page);
   await page.goto('/');
   await expect(page.locator('.lil-gui')).toHaveCount(0);
   await page.goto('/?debug');
   await expect(page.locator('.lil-gui')).toHaveCount(1);
+  expect(errors).toEqual([]);
 });

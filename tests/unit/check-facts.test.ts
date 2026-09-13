@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -17,8 +17,12 @@ function fixture(opts: { docIds: string[]; mirrorIds: string[]; refs: string[] }
 }
 
 function run(root: string) {
-  const r = spawnSync('node', [script, join(root, 'src'), join(root, 'FACTS.md'), join(root, 'src/content/facts.ts')], { encoding: 'utf8' });
-  return { code: r.status, out: r.stdout + r.stderr };
+  try {
+    const r = spawnSync('node', [script, join(root, 'src'), join(root, 'FACTS.md'), join(root, 'src/content/facts.ts')], { encoding: 'utf8' });
+    return { code: r.status, out: r.stdout + r.stderr };
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 }
 
 test('passes when every reference is documented and the mirror is in sync', () => {
