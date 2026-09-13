@@ -24,7 +24,7 @@ Caption rules: at most 40 words, plain language, every card that states a fact i
 
 Rail rule (levels 3 and 4): the rail never slows for a card; steering stays live while a card is up.
 
-Input map (D-010): Space = hold in level 1, continue elsewhere. Left/Right = steer in level 3, move the grid highlight in level 4. Hold Right = fast-forward in level 4. M = measure in level 4. E / M = electron / muon in level 5. Escape = close a side panel. Mouse clicks also work on every DOM control, but nothing requires them.
+Input map (D-010): Space = hold in level 1, continue elsewhere. Left/Right = steer in level 3, move the grid highlight in level 4. Hold Right = fast-forward in level 4. E / M = electron / muon in level 5. Escape = close a side panel. Mouse clicks also work on every DOM control, but nothing requires them.
 
 Reduced motion: if the browser reports a reduced-motion preference, screen shake, idle bob and the level 3 rush blur are disabled; everything else is unchanged.
 
@@ -120,8 +120,8 @@ Open space. Sun shrinking behind, Earth a dot ahead. Travel meter shows kilomete
 |---|---|---|---|---|---|---|
 | 4.1 | Meter appears: "0 km, 0 light-seconds". Card. | Space | nod | "150 million kilometers to Earth. Light takes about 8 minutes 20 seconds. So do you. Hold the right arrow to fast-forward." | F-15 | tick |
 | 4.2 | Meter ticks. Holding Right speeds the meter and the star streaks. Sun shrinks. | holds Right at will | wiggle faster when fast-forwarding | none | F-30 | tick rate follows speed |
-| 4.3 | At ~15% of the trip a tally appears under the counter: "electron 0 · muon 0 · tau 0". The tint is still cycling (3.6). Card. Each press of M collapses the cycling tint into one flavor for a moment and adds it to the tally; the cycling then resumes. After a bunch of presses the electron share lands near a third. | presses M repeatedly, then Space | look-at-self on each press | "Press M to measure your flavor. Keep going. Notice the pattern." | F-12, F-14 | blip per press |
-| 4.4 | At ~40% of the trip the meter pauses. A "family photo" card slides in: a grid of 17 tiles in four rows (6 quarks, 6 leptons, 4 force carriers, Higgs), each with a name and a plain one-line label (table below). The three neutrino tiles show only a question mark. A highlight sits on the first tile; arrows move it, Space picks. Clicking a tile also works. | reads | peek at the card | "This is the Standard Model, the list of everything matter is made of. Find yourself." | F-16 | blip |
+| 4.3 | At ~40% of the trip the meter pauses. Card. | reads | nod | "Halfway to Earth. Before you arrive, meet the family: every particle matter is made of, on one chart." | F-16 | blip |
+| 4.4 | After the card, a "family photo" card slides in: a grid of 17 tiles in four rows (6 quarks, 6 leptons, 4 force carriers, Higgs), each with a name and a plain one-line label (table below). The three neutrino tiles show only a question mark. A highlight sits on the first tile; arrows move it, Space picks. Clicking a tile also works. | reads | peek at the card | "This is the Standard Model, the list of everything matter is made of. Find yourself." | F-16 | blip |
 | 4.5 | Wrong tile picked: it wiggles and its one-line label enlarges for 2 s. | picks | shrug | (the tile's own label) | F-16 | buzz |
 | 4.6 | Right tile picked (any of the three neutrino tiles counts): the neutrino jumps into the tile. | picks | cheer | "Found you. You're one of the three neutrinos, in the lepton family, next to the electron." | F-16 | ta-da |
 | 4.7 | Card slides out. Meter resumes. Earth grows to fill the view. | Space or wait | proud | none | | tick |

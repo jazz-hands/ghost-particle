@@ -1,6 +1,6 @@
 import { Group, Vector3 } from 'three';
 import type { Mesh } from 'three';
-import { FLAVORS, cycleFlavor } from '../content/flavors.ts';
+import { cycleFlavor } from '../content/flavors.ts';
 import type { Flavor } from '../content/flavors.ts';
 import { box, cone, neutrino, plane, sphere, tint } from '../render/prims.ts';
 import type { GridTile } from '../hud/hud.ts';
@@ -10,7 +10,6 @@ const TRIP_SECONDS = 30;
 const KM = 149_597_870.7;
 const LIGHT_SECONDS = 499;
 const STREAKS = 200;
-const HOLD = 0.6;
 const HOP = 0.5;
 
 // F-16: the Standard Model, four rows of six columns; the three neutrinos hide behind a "?".
@@ -66,16 +65,10 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   let paused = false;
   let rushing = false;
   let shown: Flavor | null = null;
-  let holding: Flavor | null = null;
-  let holdLeft = 0;
   let hopLeft = 0;
-  const tally: Record<Flavor, number> = { electron: 0, muon: 0, tau: 0 };
 
   const readout = (): void => {
     s.hud.readout(`${Math.round(p * KM).toLocaleString()} km, ${(p * LIGHT_SECONDS).toFixed(0)} light-seconds`);
-  };
-  const tallyLine = (): void => {
-    s.hud.sub([`electron ${tally.electron} · muon ${tally.muon} · tau ${tally.tau}`]);
   };
 
   s.onUpdate((dt) => {
@@ -97,11 +90,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
       if (bar.position.z > 10) bar.position.z -= 70;
     }
 
-    if (holdLeft > 0) {
-      holdLeft -= dt;
-      if (holdLeft <= 0) holding = null;
-    }
-    const f = holding ?? cycleFlavor(s.time);
+    const f = cycleFlavor(s.time);
     if (f !== shown) {
       shown = f;
       tint(ghost, f);
@@ -118,19 +107,9 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   readout();
   await s.b.card('150 million kilometers to Earth. Light takes about 8 minutes 20 seconds. So do you. Hold the right arrow to fast-forward.', ['F-15']);
 
-  await s.b.until(() => p >= 0.15);
-  tallyLine();
-  s.keys.onPress('KeyM', () => {
-    const picked = FLAVORS[Math.floor(Math.random() * FLAVORS.length)]!;
-    tally[picked] += 1;
-    holding = picked;
-    holdLeft = HOLD;
-    tallyLine();
-  });
-  await s.b.card('Press M to measure your flavor. Keep going. Notice the pattern.', ['F-12', 'F-14']);
-
   await s.b.until(() => p >= 0.4);
   paused = true;
+  await s.b.card('Halfway to Earth. Before you arrive, meet the family: every particle matter is made of, on one chart.', ['F-16']);
   const grid = s.hud.grid(TILES, 6);
   s.hud.note('This is the Standard Model, the list of everything matter is made of. Find yourself.', ['F-16']);
   let found = false;
