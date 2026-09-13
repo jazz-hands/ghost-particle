@@ -3,9 +3,12 @@ import type { Mesh } from 'three';
 import { cycleFlavor } from '../content/flavors.ts';
 import { cardSeconds } from './beats.ts';
 import type { Flavor } from '../content/flavors.ts';
-import { box, cone, neutrino, plane, sphere, tint } from '../render/prims.ts';
+import { box, cone, plane, sphere } from '../render/prims.ts';
 import type { GridTile } from '../hud/hud.ts';
 import { scriptedLevel } from './scripted.ts';
+import { createNeutrino } from '../character/neutrino.ts';
+import { setCurrentNeutrino } from '../character/current.ts';
+import { CONFIG } from '../character/config.ts';
 
 // Four flavor shifts (1.5 s each) of travel before the grid at 40%, then a 3 s dash to Earth.
 const TRIP_SECONDS = 15;
@@ -15,6 +18,8 @@ const KM = 149_597_870.7;
 const LIGHT_SECONDS = 499;
 const STREAKS = 200;
 const HOP = 0.5;
+// The character's body sphere has radius 1; the blockout's ghost was half that.
+const CHARACTER_SCALE = 0.5;
 
 // F-16: the Standard Model, four rows of six columns; the three neutrinos hide behind a "?".
 const TILES: GridTile[] = [
@@ -52,10 +57,21 @@ const REVEALED = 'Ghost particles. Almost no mass, no charge, three flavors.';
 const FOUND = "Found you. You're one of the three neutrinos, in the lepton family, next to the electron.";
 // Family cards get a second over the reading time: the new tiles are read alongside them.
 const FAMILY_EXTRA = 1;
+// Halfway down the plunge, where the mountain takes over from the clouds.
+const ROCK_AT = 1.8;
 
 export const createLevel4 = scriptedLevel(4, async (s) => {
-  const ghost = neutrino();
-  s.group.add(ghost);
+  const ghost = createNeutrino(CONFIG);
+  ghost.group.scale.setScalar(CHARACTER_SCALE);
+  setCurrentNeutrino(ghost);
+  s.group.add(ghost.group);
+  // exit() clears the level group, and three.js announces that to each child: the only
+  // teardown hook a scripted level gets.
+  ghost.group.addEventListener('removed', () => {
+    setCurrentNeutrino(null);
+    ghost.dispose();
+  });
+  s.onUpdate((dt) => ghost.update(dt));
   s.rig.set({ x: 4, y: 1.5, z: 5 }, { x: 0, y: 0, z: 0 });
 
   const sun = sphere(4);
@@ -109,22 +125,25 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
     const f = cycleFlavor(s.time);
     if (f !== shown) {
       shown = f;
-      tint(ghost, f);
+      ghost.setFlavor(f);
       s.hud.flavor(f);
     }
 
     if (hopLeft > 0) {
       hopLeft = Math.max(hopLeft - dt, 0);
-      ghost.position.y = ASIDE.y + Math.sin((1 - hopLeft / HOP) * Math.PI) * 0.5;
+      ghost.group.position.y = ASIDE.y + Math.sin((1 - hopLeft / HOP) * Math.PI) * 0.5;
     }
   });
 
   // F-15, F-30: the travel meter reads kilometres and light-seconds.
   readout();
+  ghost.react('nod');
   await s.b.card('150 million kilometers to Earth. Light takes about 8 minutes 20 seconds. So do you.', ['F-15']);
 
+  ghost.react('wiggle');
   await s.b.until(() => p >= GRID_AT);
   paused = true;
+  ghost.react('nod');
   await s.b.card('Halfway to Earth. Before you arrive, meet the family: every particle matter is made of, on one chart.', ['F-16']);
 
   let aside = 0;
@@ -132,29 +151,33 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
     if (aside >= 1) return;
     aside = Math.min(aside + dt / 0.6, 1);
     const u = aside * aside * (3 - 2 * aside);
-    ghost.position.lerpVectors(new Vector3(0, 0, 0), ASIDE, u);
-    ghost.scale.setScalar(1 - (1 - ASIDE_SCALE) * u);
+    ghost.group.position.lerpVectors(new Vector3(0, 0, 0), ASIDE, u);
+    ghost.group.scale.setScalar(CHARACTER_SCALE * (1 - (1 - ASIDE_SCALE) * u));
   });
 
   const grid = s.hud.grid(TILES, 6, { reveal: true });
   let hunting = false;
   for (const [row, line] of FAMILIES) {
     grid.show(row);
+    ghost.react('peek');
     await s.b.card(line, ['F-16'], { seconds: cardSeconds(line) + FAMILY_EXTRA });
   }
   hunting = true;
+  ghost.react('wave');
   s.hud.note('This is the Standard Model, the list of everything matter is made of. Find yourself.', ['F-16']);
   let found = false;
   grid.onPick((i) => {
     if (found || !hunting) return;
     if (!NEUTRINO_TILES.includes(i)) {
       grid.wiggle(i, 2);
+      ghost.react('shrug');
       s.hud.note(TILES[i]!.label, ['F-16']);
       return;
     }
     found = true;
     grid.mark(i);
     hopLeft = HOP;
+    ghost.react('cheer');
     s.hud.note(null);
     for (const n of NEUTRINO_TILES) grid.setLabel(n, REVEALED);
   });
@@ -165,6 +188,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   paused = false;
 
   rushing = true;
+  ghost.react('proud');
   await s.b.until(() => p >= 1);
 
   // 4.8: down through cloud layers, over the ground, into the mountain.
@@ -182,6 +206,10 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   s.group.add(mountain);
 
   s.hud.readout(null);
-  await s.rig.moveTo({ x: 0, y: -0.5, z: -18 }, { x: 0, y: -2, z: -24 }, 3);
+  ghost.react('brace');
+  const dive = s.rig.moveTo({ x: 0, y: -0.5, z: -18 }, { x: 0, y: -2, z: -24 }, 3);
+  await s.b.wait(ROCK_AT);
+  ghost.react('surprised');
+  await dive;
   await s.b.card("Arriving: Kamioka mine, Japan. 1,000 meters underground. Rock doesn't stop you either.", ['F-19']);
 });
