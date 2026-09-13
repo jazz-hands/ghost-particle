@@ -313,6 +313,7 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   s.cues.tada();
   ghost.react('cheer');
   await s.rig.moveTo({ x: 0, y: 0.8, z: 2 }, { x: 0, y: 0, z: 30 }, 1.5);
+  await s.hud.fade(1, 0.6);
 });
 
 interface RushBlur { mesh: InstancedMesh; update(dt: number): void }
