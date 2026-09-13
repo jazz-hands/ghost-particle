@@ -1,8 +1,11 @@
-import { Color, FogExp2, Group } from 'three';
-import type { Object3D } from 'three';
+import {
+  AdditiveBlending, CanvasTexture, CircleGeometry, Color, DoubleSide, FogExp2, Group,
+  InstancedMesh, Mesh, MeshStandardMaterial, Object3D, PlaneGeometry, SphereGeometry,
+  SRGBColorSpace, Sprite, SpriteMaterial,
+} from 'three';
 import { cycleFlavor } from '../content/flavors.ts';
 import type { Flavor } from '../content/flavors.ts';
-import { GREY, box, disposeGroup, plane, sphere } from '../render/prims.ts';
+import { disposeGroup } from '../render/prims.ts';
 import { scriptedLevel } from './scripted.ts';
 import { cardSeconds } from './beats.ts';
 import { createNeutrino } from '../character/neutrino.ts';
@@ -17,7 +20,43 @@ const RAIL = 12;
 const SPAWN_Z = -60;
 const HALT_Z = -5;
 const TRY_Z = -20;
-const SURFACE = '#c9d2da';
+
+// Inside a star, in one warm family. The deep core orange is both the background and the fog,
+// so obstacles fade into the haze instead of ending at a silhouette; the climb lands on an
+// orange-white surface. Emissive values are set against the stage's bloom threshold of 0.71.
+const CORE_ORANGE = '#c9350a';
+const SURFACE_GOLD = '#ffd8a0';
+const FOG_DENSITY = 0.055;
+// 3.5: the haze thins.
+const FOG_THIN = 0.032;
+// 3.6: it keeps thinning as the surface brightens.
+const FOG_SURFACE = 0.012;
+// The star's own glare, one unfogged sprite behind every obstacle.
+const GLARE_AMBER = '#ff9a3c';
+const GLARE_SIZE = 70;
+const GLARE_Z = -56;
+const GLARE_OPACITY = 0.75;
+// Plasma walls are glowing translucent sheets; the wall of light is brighter and whiter.
+const PLASMA_ORANGE = '#ff8f37';
+const PLASMA_OPACITY = 0.34;
+const PLASMA_EMISSIVE = 1.15;
+const LIGHT_WALL = '#fff4de';
+const LIGHT_WALL_OPACITY = 0.6;
+const LIGHT_WALL_EMISSIVE = 1.9;
+const WALL_W = 12;
+const WALL_H = 8;
+const GAP_HALF_W = 5;
+const GAP_HALF_X = 3.5;
+// A knot of nuclei: small white-hot spheres, one InstancedMesh per knot.
+const NUCLEI_WHITE = '#ffeec6';
+const NUCLEI_EMISSIVE = 2.1;
+const KNOT_BEADS = 12;
+const KNOT_RADIUS = 0.22;
+const KNOT_SPREAD = 1.2;
+// 3.7: a large emissive disc; the bloom pass makes the glare.
+const SUN_GOLD = '#ffdc9b';
+const SUN_EMISSIVE = 2.6;
+const SUN_RADIUS = 8;
 // The character's body sphere has radius 1; the blockout's ghost was half that.
 const CHARACTER_SCALE = 0.5;
 // Far enough out that the squash lands before the obstacle arrives.
@@ -53,11 +92,28 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   const after = (seconds: number, fn: () => void): void => { timers.push({ left: seconds, fn }); };
 
   const stageBackground = s.scene.background;
-  const base = stageBackground instanceof Color ? stageBackground.clone() : new Color('#000000');
-  const surface = new Color(SURFACE);
+  const base = new Color(CORE_ORANGE);
+  const surface = new Color(SURFACE_GOLD);
   const sky = new Color().copy(base);
-  const fog = new FogExp2(GREY, 0.05);
+  const fog = new FogExp2(CORE_ORANGE, FOG_DENSITY);
   s.scene.fog = fog;
+  s.scene.background = sky;
+
+  const glareTex = glareTexture();
+  const glare = new Sprite(new SpriteMaterial({
+    map: glareTex,
+    color: new Color(GLARE_AMBER),
+    transparent: true,
+    opacity: GLARE_OPACITY,
+    blending: AdditiveBlending,
+    depthWrite: false,
+    fog: false,
+  }));
+  glare.scale.setScalar(GLARE_SIZE);
+  glare.position.z = GLARE_Z;
+  glare.renderOrder = -1;
+  s.group.add(glare);
+  glare.addEventListener('removed', () => glareTex.dispose());
 
   const obstacles: Obstacle[] = [];
   let lane = 0;
@@ -79,28 +135,36 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   };
 
   const plasmaWall = (gap: boolean): Object3D => {
-    if (!gap) return plane(12, 8, { opacity: 0.5 });
+    if (!gap) return sheet(WALL_W, WALL_H, PLASMA_ORANGE, PLASMA_OPACITY, PLASMA_EMISSIVE);
     const wall = new Group();
     for (const side of [-1, 1]) {
-      const half = box(5, 8, 0.2, { opacity: 0.5 });
-      half.position.x = side * 3.5;
+      const half = sheet(GAP_HALF_W, WALL_H, PLASMA_ORANGE, PLASMA_OPACITY, PLASMA_EMISSIVE);
+      half.position.x = side * GAP_HALF_X;
       wall.add(half);
     }
     return wall;
   };
 
   const knot = (): Object3D => {
-    const cluster = new Group();
-    for (let i = 0; i < 8; i += 1) {
-      const bead = sphere(0.25);
-      bead.position.set((Math.random() * 2 - 1) * 1.2, (Math.random() * 2 - 1) * 1.2, (Math.random() * 2 - 1) * 1.2);
-      cluster.add(bead);
+    const cluster = new InstancedMesh(
+      new SphereGeometry(KNOT_RADIUS, 12, 8),
+      glowMaterial(NUCLEI_WHITE, NUCLEI_EMISSIVE),
+      KNOT_BEADS,
+    );
+    const bead = new Object3D();
+    for (let i = 0; i < KNOT_BEADS; i += 1) {
+      bead.position.set(spread(KNOT_SPREAD), spread(KNOT_SPREAD), spread(KNOT_SPREAD));
+      bead.scale.setScalar(0.7 + Math.random() * 0.6);
+      bead.updateMatrix();
+      cluster.setMatrixAt(i, bead.matrix);
     }
-    cluster.position.x = (Math.random() * 2 - 1) * LANE;
+    cluster.instanceMatrix.needsUpdate = true;
+    cluster.position.x = spread(LANE);
     return cluster;
   };
 
-  const wallOfLight = (): Object3D => plane(12, 8, { opacity: 0.9, color: '#d0d6dc' });
+  const wallOfLight = (): Object3D =>
+    sheet(WALL_W, WALL_H, LIGHT_WALL, LIGHT_WALL_OPACITY, LIGHT_WALL_EMISSIVE);
 
   // Some have gaps, most don't (3.4).
   const nextObstacle = (): Object3D => {
@@ -174,6 +238,7 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
       dawn = Math.min(dawn + dt / 6, 1);
       s.scene.background = sky.copy(base).lerp(surface, dawn);
       fog.color.copy(sky);
+      fog.density = FOG_THIN + (FOG_SURFACE - FOG_THIN) * dawn;
     }
   });
 
@@ -204,7 +269,7 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   await s.b.wait(3);
 
   // 3.5
-  fog.density = 0.03;
+  fog.density = FOG_THIN;
   ghost.react('nod');
   await s.b.card('Light from the core takes tens of thousands of years or more to get out. It keeps bumping into things. You take about 2 seconds.', ['F-08', 'F-09']);
 
@@ -220,7 +285,8 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   // 3.7: out of the surface into black space, the Sun glaring behind.
   s.scene.fog = null;
   s.scene.background = stageBackground;
-  const sun = sphere(8);
+  const sun = new Mesh(new CircleGeometry(SUN_RADIUS, 64), glowMaterial(SUN_GOLD, SUN_EMISSIVE));
+  sun.material.side = DoubleSide;
   sun.position.set(0, 0, 30);
   s.group.add(sun);
   follow = false;
@@ -229,6 +295,46 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   ghost.react('cheer');
   await s.rig.moveTo({ x: 0, y: 0.8, z: 2 }, { x: 0, y: 0, z: 30 }, 1.5);
 });
+
+function glowMaterial(color: string, emissive: number, opacity = 1): MeshStandardMaterial {
+  return new MeshStandardMaterial({
+    color,
+    emissive: new Color(color),
+    emissiveIntensity: emissive,
+    roughness: 0.4,
+    metalness: 0,
+    transparent: opacity < 1,
+    opacity,
+    depthWrite: opacity >= 1,
+  });
+}
+
+// A plasma wall is a sheet, not a slab: no thickness, lit from inside, seen from either face.
+function sheet(w: number, h: number, color: string, opacity: number, emissive: number): Mesh {
+  const mesh = new Mesh(new PlaneGeometry(w, h), glowMaterial(color, emissive, opacity));
+  mesh.material.side = DoubleSide;
+  return mesh;
+}
+
+function spread(half: number): number {
+  return (Math.random() * 2 - 1) * half;
+}
+
+// The star's glare: one soft radial fill that the obstacles pass in front of.
+function glareTexture(): CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 256;
+  const g = canvas.getContext('2d')!;
+  const gradient = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+  gradient.addColorStop(0, 'rgba(255,255,255,1)');
+  gradient.addColorStop(0.45, 'rgba(255,255,255,0.34)');
+  gradient.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gradient;
+  g.fillRect(0, 0, 256, 256);
+  const tex = new CanvasTexture(canvas);
+  tex.colorSpace = SRGBColorSpace;
+  return tex;
+}
 
 // The beat sheet's reduced-motion rule: the idle bob goes, nothing else changes.
 function characterConfig(): CharacterConfig {
