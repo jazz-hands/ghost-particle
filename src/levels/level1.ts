@@ -1,6 +1,8 @@
-import { disposeGroup, neutrino, setOpacity, sphere } from '../render/prims.ts';
-import type { Mesh } from 'three';
+import { disposeGroup, setOpacity, sphere } from '../render/prims.ts';
+import type { Material, Mesh, Object3D } from 'three';
 import { scriptedLevel } from './scripted.ts';
+import { createNeutrino } from '../character/neutrino.ts';
+import { setCurrentNeutrino } from '../character/current.ts';
 
 const CHARGE_SECONDS = 2.5;
 const DRAIN_SECONDS = 0.8;
@@ -9,6 +11,8 @@ const SPARK_COUNT = 12;
 const SPARK_SECONDS = 0.8;
 const APART = 3;
 const TOGETHER = 0.25;
+// The character's body sphere has radius 1; the blockout's ghost was half that.
+const CHARACTER_SCALE = 0.5;
 
 export const createLevel1 = scriptedLevel(1, async (s) => {
   const glow = sphere(0.35, { opacity: 0.25 });
@@ -85,9 +89,21 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
     sparks.push(spark);
     s.group.add(spark);
   }
-  const ghost = neutrino();
-  setOpacity(ghost, 0);
-  s.group.add(ghost);
+
+  const ghost = createNeutrino();
+  ghost.group.scale.setScalar(CHARACTER_SCALE);
+  const skin = fadeTargets(ghost.group);
+  fadeTo(skin, 0);
+  setCurrentNeutrino(ghost);
+  s.group.add(ghost.group);
+  // exit() clears the level group, and three.js announces that to each child: the only
+  // teardown hook a scripted level gets.
+  ghost.group.addEventListener('removed', () => {
+    setCurrentNeutrino(null);
+    ghost.dispose();
+  });
+  ghost.react('wake');
+  s.onUpdate((dt) => ghost.update(dt));
 
   let born = 0;
   s.onUpdate((dt) => {
@@ -99,19 +115,38 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
       spark.position.set(dir[0]! * u * 1.8, dir[1]! * u * 1.8, dir[2]! * u * 1.8);
       setOpacity(spark, 0.6 * (1 - u));
     }
-    setOpacity(ghost, 0.45 * born);
+    fadeTo(skin, born);
   });
   await s.b.wait(1);
   for (const spark of sparks) disposeGroup(spark);
-  setOpacity(ghost, 0.45);
+  fadeTo(skin, 1);
 
   // 1.7
   s.hud.title('GHOST PARTICLE');
   s.hud.prompt('Press Space');
   await s.b.key('Space');
+  ghost.react('wiggle');
   s.hud.title(null);
   s.hud.prompt(null);
+  await s.b.wait(0.7);
 });
+
+interface FadeTarget { material: Material; opacity: number }
+
+// The character fades in to its own translucency (config.body.opacity and the rim and halo
+// values beneath it), not to a flat prims opacity.
+function fadeTargets(root: Object3D): FadeTarget[] {
+  const targets: FadeTarget[] = [];
+  root.traverse((child) => {
+    const material = (child as Partial<Mesh>).material;
+    if (material && !Array.isArray(material)) targets.push({ material, opacity: material.opacity });
+  });
+  return targets;
+}
+
+function fadeTo(targets: FadeTarget[], u: number): void {
+  for (const t of targets) t.material.opacity = t.opacity * u;
+}
 
 function jitter(): number {
   return (Math.random() * 2 - 1) * 0.03;
