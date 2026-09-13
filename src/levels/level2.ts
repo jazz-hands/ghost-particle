@@ -86,7 +86,6 @@ export const createLevel2 = scriptedLevel(2, async (s) => {
   s.hud.counter.setVisible(true);
   ghost.react('wiggle');
   s.cues.blip();
-  s.cues.startTicking();
   await s.b.card(
     'Meet a neutrino. Born a moment ago in the Sun\'s core, where it\'s about 15 million degrees.',
     ['F-03'],
@@ -152,7 +151,6 @@ export const createLevel2 = scriptedLevel(2, async (s) => {
   );
 
   // 2.4
-  s.cues.stopTicking();
   s.cues.whoosh();
   await s.hud.fade(1, 0.8);
 });

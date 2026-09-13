@@ -88,7 +88,7 @@ Camera pulls back; the neutrino floats in warm haze. The through-line counter fa
 
 | # | Player sees | Player does | Neutrino | Caption | Facts | Cue |
 |---|---|---|---|---|---|---|
-| 2.1 | Card 1. Counter appears: "Neutrinos through you since you started: …" | reads, presses Space | wiggle | "Meet a neutrino. Born a moment ago in the Sun's core, where it's about 15 million degrees." | F-03 | blip, tick loop starts |
+| 2.1 | Card 1. Counter appears: "Neutrinos through you since you started: …" | reads, presses Space | wiggle | "Meet a neutrino. Born a moment ago in the Sun's core, where it's about 15 million degrees." | F-03 | blip |
 | 2.2 | Card 2. A seesaw appears. An electron (small solid ball) is placed on one side; the neutrino on the other. The electron side slams down; the neutrino floats up. | presses Space | shrug (while floating up) | "It has almost no mass. Weighed against an electron, it's over a million times lighter." | F-04 | pop on the slam |
 | 2.3 | Card 3. Seesaw fades. The neutrino's glow brightens briefly. | presses Space | cheer | "No electric charge. Most solar neutrinos come from two protons squeezed together; you came from a rarer squeeze, with extra energy a detector can catch." | F-06, F-01, F-02 | chime |
 | 2.4 | Corner button "Want more?" (level 7 only). Fade to level 3. | | | | F-26, F-27 | whoosh |
