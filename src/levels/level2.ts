@@ -139,6 +139,11 @@ export const createLevel2 = scriptedLevel(2, async (s) => {
   });
   await s.b.wait(0.5);
   disposeGroup(seesaw);
+  // Close on the character for card 3: it floats back to centre and the camera pushes in.
+  const fromX = ghost.group.position.x;
+  const fromY = ghost.group.position.y;
+  tween(1, (u) => { ghost.group.position.set(fromX * (1 - u), fromY * (1 - u), 0); });
+  void s.rig.moveTo({ x: 0, y: 0.2, z: 4.5 }, { x: 0, y: -0.3, z: 0 }, 1);
   ghost.react('cheer');
   s.cues.chime();
   await s.b.card(
