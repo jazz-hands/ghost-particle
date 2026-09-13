@@ -60,6 +60,11 @@ const KNOT_SPREAD = 1.2;
 const SUN_GOLD = '#ffdc9b';
 const SUN_EMISSIVE = 2.2;
 const SUN_RADIUS = 3.2;
+const LOOKBACK_Z = -6;
+const EMERGE_FROM_Z = 12;
+const EMERGE_TO_Z = -2;
+const EMERGE_SECONDS = 2;
+const SWING_SECONDS = 2.5;
 // The rush blur: plasma drawn past the camera as streaks. Off under reduced motion.
 const STREAK_COLOR = '#ffd9a0';
 const STREAK_COUNT = 64;
@@ -204,8 +209,8 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
     if (s.keys.isDown('ArrowLeft')) { lane -= STEER * dt; steered = true; }
     if (s.keys.isDown('ArrowRight')) { lane += STEER * dt; steered = true; }
     lane = Math.min(Math.max(lane, -LANE), LANE);
-    ghost.group.position.x = lane;
     if (follow) {
+      ghost.group.position.x = lane;
       s.rig.set({ x: lane * 0.5, y: 0.5, z: 6 }, { x: ghost.group.position.x, y: ghost.group.position.y - 0.6, z: 0 });
     }
 
@@ -311,9 +316,22 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   follow = false;
   s.cues.whoosh();
   s.cues.tada();
+  // The camera turns to the Sun; the neutrino comes out of the glare toward it, then the view
+  // swings round to level 4's framing (camera at the neutrino plus (4, 1.5, 5)) before the fade.
+  ghost.group.position.set(0, 0, EMERGE_FROM_Z);
+  await s.rig.moveTo({ x: 0, y: 0.8, z: LOOKBACK_Z }, { x: 0, y: 0, z: 30 }, 1.5);
   ghost.react('cheer');
-  await s.rig.moveTo({ x: 0, y: 0.8, z: 2 }, { x: 0, y: 0, z: 30 }, 1.5);
-  await s.hud.fade(1, 0.6);
+  let out = 0;
+  s.onUpdate((dt) => {
+    if (out >= 1) return;
+    out = Math.min(out + dt / EMERGE_SECONDS, 1);
+    const u = out * out * (3 - 2 * out);
+    ghost.group.position.set(0, 0, EMERGE_FROM_Z + (EMERGE_TO_Z - EMERGE_FROM_Z) * u);
+    s.rig.set({ x: 0, y: 0.8, z: LOOKBACK_Z }, ghost.group.position);
+  });
+  await s.b.wait(EMERGE_SECONDS);
+  await s.rig.moveTo({ x: 4, y: 1.5, z: EMERGE_TO_Z + 5 }, { x: 0, y: 0, z: EMERGE_TO_Z }, SWING_SECONDS);
+  await s.hud.fade(1, 0.4);
 });
 
 interface RushBlur { mesh: InstancedMesh; update(dt: number): void }
