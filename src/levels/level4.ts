@@ -6,7 +6,10 @@ import { box, cone, neutrino, plane, sphere, tint } from '../render/prims.ts';
 import type { GridTile } from '../hud/hud.ts';
 import { scriptedLevel } from './scripted.ts';
 
-const TRIP_SECONDS = 30;
+// Four flavor shifts (1.5 s each) of travel before the grid at 40%, then a 3 s dash to Earth.
+const TRIP_SECONDS = 15;
+const GRID_AT = 0.4;
+const DASH_SECONDS = 3;
 const KM = 149_597_870.7;
 const LIGHT_SECONDS = 499;
 const STREAKS = 200;
@@ -83,8 +86,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
 
   s.onUpdate((dt) => {
     let speed = paused ? 0 : 1;
-    if (s.keys.isDown('ArrowRight')) speed *= 4;
-    if (rushing) speed *= 8;
+    if (rushing) speed *= ((1 - GRID_AT) * TRIP_SECONDS) / DASH_SECONDS;
     if (speed > 0 && p < 1) {
       p = Math.min(p + (dt * speed) / TRIP_SECONDS, 1);
       readout();
@@ -115,9 +117,9 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
 
   // F-15, F-30: the travel meter reads kilometres and light-seconds.
   readout();
-  await s.b.card('150 million kilometers to Earth. Light takes about 8 minutes 20 seconds. So do you. Hold the right arrow to fast-forward.', ['F-15']);
+  await s.b.card('150 million kilometers to Earth. Light takes about 8 minutes 20 seconds. So do you.', ['F-15']);
 
-  await s.b.until(() => p >= 0.4);
+  await s.b.until(() => p >= GRID_AT);
   paused = true;
   await s.b.card('Halfway to Earth. Before you arrive, meet the family: every particle matter is made of, on one chart.', ['F-16']);
 
@@ -159,7 +161,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   s.hud.note(null);
   paused = false;
 
-  s.keys.onPress('Space', () => { rushing = true; });
+  rushing = true;
   await s.b.until(() => p >= 1);
 
   // 4.8: down through cloud layers, over the ground, into the mountain.
