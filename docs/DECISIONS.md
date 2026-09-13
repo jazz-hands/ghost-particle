@@ -22,11 +22,11 @@ How to use:
 | D-008 | Detector events are simulated | accepted | Rings are generated from published geometry, labelled as simulation. |
 | D-009 | Build budget and cut order | accepted | 5 hours; cut L7, then L4 photo, then L3 steering, then L5 ring count. |
 | D-010 | Input scheme | accepted | Keyboard only for v1. |
-| D-011 | Flavor tints | accepted | The body takes the flavor color, in neon: electron cyan, muon violet, tau orange. Disclosed as a design choice. |
+| D-011 | Flavor tints | accepted | The body takes the flavor color: electron cyan, muon violet, tau orange. Disclosed as a design choice. |
 | D-012 | Dodging has no consequence | accepted | Superseded by D-020: nothing can be hit, no fail state. |
 | D-013 | Mini-game feedback timing | accepted | Reveal answer and one-line reason after each ring. |
 | D-014 | Hosting | accepted | Static build hosted on exe.dev. |
-| D-015 | Text policy | accepted | Level 1 is wordless; captions are cards of at most 25 words. |
+| D-015 | Text policy | accepted | Level 1 is wordless; captions are cards of at most 40 words. |
 | D-016 | HUD is DOM, not 3D text | accepted | Captions, meters, and buttons are HTML overlays. |
 | D-017 | Debug tools gated by URL flag | accepted | lil-gui and Stats mount only with `?debug`. |
 | D-018 | Level module contract | accepted | Each level exports `enter`, `update`, `exit`, and disposes its own objects. |
@@ -39,7 +39,7 @@ How to use:
 | D-025 | Sound is Web Audio synthesis | accepted | Named synth cues, no audio files. Soundtrack only if time remains. |
 | D-026 | BEATS.md is the script | accepted | If a moment isn't in the beat sheet, it isn't built. |
 | D-027 | Cheap rendering for level 5 | accepted | Sensors are one instanced mesh; rings are drawn on a canvas texture on the cylinder wall. |
-| D-028 | Level 6 plots the public dataset | accepted | No rights request for the Sun image; the ending is a chart of Super-K's 22-year public record. |
+| D-028 | Level 6 draws a simulated neutrino sky map | accepted | No rights request for the Sun image; the ending is a chart of Super-K's 22-year public record. |
 | D-029 | Character is a bubble with ink eyes | accepted | Squashed translucent sphere, no antenna, matte dark oval eyes painted into the skin. Final values come from the tuner. |
 
 ## Entries
@@ -95,7 +95,7 @@ Keyboard only for v1: Space to hold and to advance, arrow keys to steer in level
 
 ### D-011 Flavor tints — accepted
 
-The body takes the current flavor's color, as in the approved mockups (an earlier "white base with blue glow" wording is withdrawn). Neon palette: electron flavor cyan `#00E5FF`, muon flavor violet `#B026FF`, tau flavor orange `#FF5C00`. The tuner's "color depth" sets how fully the body takes the color; a flavor change is a material color lerp, no texture rebuild. These are design choices with no physical meaning; the credits say so. The three are far apart in hue and readable against the navy background, and the flavor icon under the counter repeats the tint so colour alone is not the only cue.
+The body takes the current flavor's color, as in the approved mockups (an earlier "white base with blue glow" wording is withdrawn). Palette: electron flavor cyan `#5ee3ff`, muon flavor violet `#b58cff`, tau flavor orange `#ff9f6b`. The tuner's "color depth" sets how fully the body takes the color; a flavor change is a material color lerp, no texture rebuild. These are design choices with no physical meaning; the credits say so. The three are far apart in hue and readable against the navy background, and the flavor icon under the counter repeats the tint so colour alone is not the only cue.
 
 ### D-012 Dodging has no consequence — accepted
 
@@ -114,13 +114,16 @@ What this means in practice:
 - The proxy forwards one port, 8000 by default (`ssh exe.dev share port <vm> <port>`). Serve `dist/` on that port with nginx, which the image ships, or any static server.
 - The current image does not ship Node; if the build runs on the VM, install Node from NodeSource and say so, since that is network egress the project did not otherwise declare.
 - If the Vite dev server is ever exposed through the proxy, it needs `server: { host: true, allowedHosts: ['.exe.xyz'] }` or it answers 403.
+- Visits are counted by nginx alone: a second access log at `/var/log/ghost-particle/visits.log` records one line per page load (GET returning 200, browser user agents only, no assets), outside the rotated log directory so it lives as long as the VM. A systemd timer (`ghost-visits.timer`) runs `/usr/local/bin/visits` every minute to write `stats.txt`, which nginx serves as plain text at `/stats`; `npm run visits` fetches it. The app sends one empty GET per event, `/ping/level/N?s=<seconds played>` at each level start and `/ping/finished?s=…` at the credits (`src/telemetry/ping.ts`); nginx answers 200 and the visits log keeps the path, so `/stats` also shows how far players get and the play time to the credits. Nothing is displayed in the game and nothing is stored in the browser.
 - Git on the VM reaches GitHub through `github.int.exe.xyz`, not github.com, and needs an exe.dev GitHub integration if the repo is ever pushed there.
 
 Source: the `using-exe-dev` and `exe-dev-gotchas` skills in `~/.claude/skills/`. Verify against live output; the platform moves.
 
+Current deployment: the VM `ghost-particle` (25 GB, exeuntu image) serves `/var/www/ghost-particle` with nginx on port 8000, public, at https://ghost-particle.exe.xyz/. `npm run deploy` builds and syncs `dist/` there; assets and fonts are cached immutably by their hashed names.
+
 ### D-015 Text policy — accepted
 
-Level 1 shows only the key prompt. From level 2 on, captions are cards of at most 25 words, at most 7 per level, each tagged with its F-IDs. Side panels ("Want more?") are optional and never block progress.
+Level 1 shows only the key prompt. From level 2 on, captions are cards of at most 40 words, at most 7 per level, each tagged with its F-IDs. Side panels ("Want more?") are optional and never block progress.
 
 ### D-016 HUD is DOM, not 3D text — accepted
 
@@ -170,10 +173,76 @@ All sound is generated with the Web Audio API from a small set of named cues lis
 
 The 11,129 inner sensors (F-18) are a single `InstancedMesh` of a low-poly disc or sphere. The 1,885 outer sensors are not rendered; the player is inside the tank. Rings, the hero's cone hit, and the "sensors lighting up" effect are drawn on a 2D canvas texture mapped to the inside of the cylinder, not by lighting individual instances. Ring radius comes from F-31. The character is one sphere with a canvas skin (D-029), no custom shaders. Rationale: keeps level 5 inside its 1h 30 budget and well under the draw-call ceiling.
 
-### D-028 Level 6 plots the public dataset — accepted
+### D-028 Level 6 draws a simulated neutrino sky map — accepted
 
-The ending uses Super-Kamiokande's public 5-day solar neutrino record, 1996 to 2018 (F-24, A-02), drawn as a chart from the real data file at build time. The famous neutrino image of the Sun (A-01) is not shipped and no usage request is made; the game mentions it only in words. Rationale: no time for a rights request, and the dataset is public, citable, and tells the same story (neutrinos arrive day and night, through the Earth). The chart follows the `dataviz` skill when built.
+The ending shows the Sun in neutrinos as a sky map generated at run time from the scattering physics (F-34): simulated event directions land one at a time on a 90° × 90° field until the Sun stands out of the background, labelled on screen as simulated. The famous photograph (A-01) is not shipped and no usage request is made; the map is drawn from the physics, not from the image. The public 5-day dataset (A-02) is not plotted. Rationale: the payoff is watching the Sun appear out of touches, and a generated map carries no rights problem.
 
 ### D-029 Character is a bubble with ink eyes — accepted
 
-Chosen from `docs/mockups/character.html` (shape) and `docs/mockups/character-eyes.html` (eyes). The body is a slightly squashed sphere with a glossy translucent material; no antenna. The eyes are matte dark ovals with a painted highlight, drawn into the sphere's own skin texture so they follow the surface and deform with squash and stretch. All reactions in `BEATS.md` are redraws of that texture (lids, tilt, spacing, highlight), not extra geometry. Exact material, eye, light and bloom values are set with `docs/mockups/character-tuner.html`; the tuner's JSON output is the final record and is pasted here once decided.
+Chosen from `docs/mockups/character.html` (shape) and `docs/mockups/character-eyes.html` (eyes). The body is a slightly squashed sphere with a glossy translucent material; no antenna. The eyes are matte dark ovals with a painted highlight, drawn into the sphere's own skin texture so they follow the surface and deform with squash and stretch. All reactions in `BEATS.md` are redraws of that texture (lids, tilt, spacing, highlight), not extra geometry. Exact material, eye, light and bloom values were set with `docs/mockups/character-tuner.html`. The tuner's JSON output is the final record and the content of `src/character/config.json`:
+
+```json
+{
+  "flavor": "tau",
+  "body": {
+    "scaleX": 1.06,
+    "scaleY": 0.96,
+    "colorDepth": 1,
+    "opacity": 0.33,
+    "roughness": 0.32,
+    "clearcoat": 1,
+    "clearcoatRoughness": 0.42,
+    "sheen": 0,
+    "sheenColor": "#ffffff",
+    "emissiveBoost": 1
+  },
+  "eyes": {
+    "spacing": 0.062,
+    "height": 0.42,
+    "width": 30,
+    "tall": 43,
+    "tilt": 0,
+    "color": "#0b1a26",
+    "roughness": 0.61,
+    "highlight": true,
+    "hlSize": 9,
+    "hlTall": 13,
+    "hlOffsetX": 9,
+    "hlOffsetY": -16,
+    "hlColor": "#ffffff",
+    "squint": 0,
+    "lowerLid": 0
+  },
+  "light": {
+    "keyIntensity": 1.2,
+    "keyX": 3,
+    "keyY": 6,
+    "keyZ": 5,
+    "fillIntensity": 0.25,
+    "fillColor": "#9fd8ff",
+    "rimIntensity": 1,
+    "rimX": -3,
+    "rimY": 3,
+    "rimZ": -5,
+    "envIntensity": 0.12,
+    "exposure": 0.72
+  },
+  "post": {
+    "bloom": true,
+    "bloomThreshold": 0.71,
+    "bloomStrength": 0.35,
+    "bloomRadius": 0.42,
+    "eyeGlow": 4,
+    "rimShell": true,
+    "rimOpacity": 0.05,
+    "rimScale": 1.006,
+    "halo": false,
+    "haloSize": 3.5,
+    "haloOpacity": 0.29
+  },
+  "view": {
+    "turn": true,
+    "idleBob": true
+  }
+}
+```

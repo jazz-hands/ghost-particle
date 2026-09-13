@@ -125,7 +125,7 @@ Each entry: plain-language wording (what the player reads), precise statement (f
 
 ### F-16 The Standard Model family
 - Player wording: "The Standard Model is the list of basic ingredients: 6 quarks, 6 leptons (three of them neutrinos), 4 force carriers, and the Higgs."
-- Precise: quarks u, d, c, s, t, b; leptons e, μ, τ, νₑ, ν_μ, ν_τ; gauge bosons γ, g, W, Z; Higgs H.
+- Precise: quarks u, d, c, s, t, b; leptons e, μ, τ, νₑ, ν_μ, ν_τ; gauge bosons γ, g, W, Z; Higgs H. Protons and neutrons are each three quarks (uud, udd); only u and d occur in ordinary matter, the heavier four are produced in high-energy collisions. Leptons are not built from quarks; μ and τ are heavier, short-lived versions of the electron, each charged lepton paired with a neutrino. Forces act by exchanging carriers: γ (electromagnetism), g (strong), W and Z (weak). The Higgs field gives particles mass; the Higgs boson was discovered at CERN in 2012.
 - Sources: CERN, "The Standard Model", https://home.cern/science/physics/standard-model/
 - Status: verified.
 - Used: L4. The 17 tile labels are in `BEATS.md` under level 4.
@@ -213,6 +213,13 @@ Each entry: plain-language wording (what the player reads), precise statement (f
 - Status: verified (abstract); check (read the paper for the amplitude before quoting any percentage; none is quoted on screen).
 - Used: L6.
 
+### F-34 Where solar neutrino events point
+- Player wording: none; drives the level 6 sky map.
+- Precise: Super-K detects solar neutrinos through elastic scattering on electrons, which throws the electron forward, so reconstructed event directions cluster around the Sun's direction above a flat background of other events; the electron's angle to the neutrino is limited by the kinematics and the reconstruction adds a smear of tens of degrees. The level 6 map draws simulated events from that shape: a fraction of events Gaussian about the Sun's position, the rest uniform over a 90° × 90° field. Planning values in code: 40% signal, 14° spread.
+- Sources: as F-21 and F-23; the sky-map description in F-25's sources.
+- Status: check (confirm the signal fraction and angular spread against the Super-K solar papers before quoting any number; none is quoted on screen).
+- Used: L6.
+
 ## History (side panels)
 
 ### F-26 Prediction and naming
@@ -279,6 +286,7 @@ Each entry: plain-language wording (what the player reads), precise statement (f
 |---|---|---|---|---|
 | A-01 | Super-K neutrino image of the Sun | R. Svoboda and K. Gordan (LSU), Super-Kamiokande Collaboration | not shipped (D-028); mentioned in text only | n/a |
 | A-02 | Super-K 5-day solar flux dataset, plotted in level 6 | Super-Kamiokande Collaboration, *Phys. Rev. Lett.* 132, 241803 (2024); file `sksolartimevariation5804d.txt` | public download, no licence stated; cite the collaboration and paper in credits | verified |
+| A-04 | Manrope typeface, all on-screen text | The Manrope Project Authors, https://github.com/sharanda/manrope | SIL Open Font License 1.1; licence text shipped at `public/fonts/OFL.txt` | verified |
 | A-03 | Astro Bot screenshots | Sony Interactive Entertainment / Team Asobi | reference only, never shipped | n/a |
 
 Everything else on screen is drawn procedurally by the app and needs no external credit.

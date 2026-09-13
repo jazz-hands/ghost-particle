@@ -38,7 +38,7 @@ One small counter runs from the first key hold in level 1: how many solar neutri
 
 ## Level progression
 
-Each level is one scene with one mechanic and a handful of captions (at most 25 words each). The player advances on rails; interaction is limited to the level's mechanic plus "continue".
+Each level is one scene with one mechanic and a handful of captions (at most 40 words each). The player advances on rails; interaction is limited to the level's mechanic plus "continue".
 
 ### 1. Birth (wordless)
 
@@ -57,7 +57,7 @@ Each level is one scene with one mechanic and a handful of captions (at most 25 
 ### 3. Escaping the Sun: "try to hit something"
 
 - Scene: rushing outward through layers of dense, bright plasma toward the surface.
-- Mechanic: the player is told to try to hit things and can steer left/right into plasma walls, knots of nuclei, and walls of light. The neutrino passes through every one. A "passed through" tally counts them. There is no fail state and no way to collide (D-020).
+- Mechanic: the player is told to try to hit things and can steer left/right into plasma walls, knots of nuclei, and walls of light. The neutrino passes through every one. There is no fail state and no way to collide (D-020).
 - Flavor change: as it climbs, the tint shifts between electron, muon, and tau flavor on its own. Captions explain the three flavors and that flavor change proves the neutrino has mass.
 - Facts: F-10, F-08, F-09, F-12, F-05, F-14. Side panel: F-13.
 
@@ -73,14 +73,14 @@ Each level is one scene with one mechanic and a handful of captions (at most 25 
 - Beat one is the hero's own hit (D-022): the neutrino drifts toward a single electron in slow motion, the player presses, the electron shoots forward, a cone of light blooms, and a fuzzy ring appears on the wall. This is the climax of the game.
 - Mechanic: then the identification mini-game. Five more rings appear one at a time. Sharp-edged rings were made by muons, fuzzy rings by electrons. The player labels each with the E or M key (buttons also clickable); the answer and a one-line reason are revealed after each (D-013). Feedback only, no fail state.
 - Facts: F-17, F-18, F-19, F-20, F-21, F-22, F-23. Formula F-31 sizes the rings.
-- Honesty note on screen: rings are simulated from the published detector geometry and ring physics (F-24). They are not real event records.
+- Honesty note in the credits: rings are simulated from the published detector geometry and ring physics (F-24). They are not real event records.
 
-### 6. Twenty-two years of watching
+### 6. The Sun in neutrinos
 
-- Scene: the tank fades to black and a chart draws itself in: Super-Kamiokande's public solar neutrino record, one point for every five days from 1996 to 2018 (A-02, F-24). The neutrino floats beside it. The chart is built from the real data file at build time; nothing is hand-drawn.
-- Captions: what the dots are, that many arrived at night through the whole Earth, and that the only pattern in all those years is the yearly wobble from Earth's slightly oval orbit (F-33), shown as an expected curve computed from the dataset's own distance column rather than read off the noisy points.
+- Scene: the tank fades to black and a sky map fills in: simulated event directions on a 90° by 90° field centred on the Sun, landing one at a time until the Sun stands out of the background (F-34). The neutrino floats beside it. The map is generated from the physics at run time and says so on screen; the 1998 photograph is not shipped (D-028).
+- Captions: that this is the Sun seen in neutrinos over 503 days, some arriving at night through the whole Earth, and that nothing stopped them.
 - The through-line counter freezes and is shown large.
-- Facts: F-24, F-25 (text mention only, no image), F-33, F-32. The famous neutrino image of the Sun is not shipped (D-028).
+- Facts: F-34, F-25, F-10, F-32.
 - Ends with a credits roll generated from `FACTS.md` sources and asset credits.
 
 ### 7. "Want more?" panels (only if time remains)
@@ -141,5 +141,5 @@ If behind schedule, drop in this order:
 
 1. Level 7 side panels.
 2. Level 4 family photo becomes a single static card (no click).
-3. Level 3 steering becomes an auto-scroll with the same captions and tally.
+3. Level 3 steering becomes an auto-scroll with the same captions.
 4. Level 5 mini-game drops to three rings. The hero's hit is never cut.

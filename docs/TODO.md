@@ -41,7 +41,7 @@ Most entries are now verified. Remaining "check" items, none of which change on-
 - [x] Character: bubble with ink eyes, no antenna (D-029).
 - [ ] Final character values: tune in `docs/mockups/character-tuner.html`, paste the JSON into D-029.
 - [ ] Eye shapes per reaction: define lid, tilt, spacing and highlight values for each of the eleven reactions in BEATS.md, using the tuner's eye controls. The tuner has upper and lower lid controls, so "cheer" (upward arcs) is expressible.
-- [ ] Palette: background gradient stops, UI accent, plasma color in L3, sensor "eye" gold in L5 (flavor tints and base are settled in D-011).
+- [ ] Palette: background gradient stops, UI accent, plasma color in L3, sensor "eye" gold in L5 (flavor tints and base are settled in D-011). Note: `scene.background` passes through ACES tone mapping and exposure, so the current `#070b1a` renders near black on screen; pick the on-screen value inside that pipeline, or paint the background in CSS behind a transparent renderer.
 - [ ] Reference board from the Astro Bot screenshots (private, not committed).
 - [ ] Rough layout for the HUD: caption card position, key prompt, meters, mini-game buttons.
 
@@ -50,7 +50,7 @@ Most entries are now verified. Remaining "check" items, none of which change on-
 - [x] three.js 0.186.0 (MIT). Its `package.json` exports map `three/addons/*` to `examples/jsm/*`, and the tarball contains `examples/jsm/libs/lil-gui.module.min.js` and `examples/jsm/libs/stats.module.js`, so the `three/addons/libs/...` imports resolve under Vite.
 - [x] GSAP 3.15.0, licence field reads "Standard 'no charge' license" (https://gsap.com/standard-license), zero runtime dependencies.
 - [x] Vite 8.3.0. @playwright/test 1.63.0 pulls in `playwright` and `playwright-core` plus a browser download on install.
-- [ ] Playwright with Chromium headless renders WebGL (may need `--use-angle=swiftshader` or `--enable-unsafe-swiftshader`; confirm at scaffold with a one-line canvas test).
+- [x] Playwright with Chromium headless renders WebGL with `--use-angle=swiftshader --enable-unsafe-swiftshader` (asserted by `tests/e2e/smoke.spec.ts`).
 - [ ] Node v26.8.2 and npm are installed at `/opt/homebrew/bin` but that directory is not on PATH in non-interactive shells, which is why `npx` was missing and the Context7 and Playwright MCP servers failed to connect. Fix: add `/opt/homebrew/bin` to PATH in `~/.zshenv` (not only `~/.zshrc`).
 - [ ] Install `poppler` (`brew install poppler`) so PDFs can be read for the remaining fact checks.
 - [x] Bloom: UnrealBloomPass through EffectComposer with an OutputPass, proven in `character-tuner.html`; gentle defaults recorded there.
@@ -58,11 +58,12 @@ Most entries are now verified. Remaining "check" items, none of which change on-
 
 ## 6. Scaffold (first coding step, after the above)
 
-- [ ] `npm create vite@latest` with the vanilla TypeScript template. Add `server: { host: true, allowedHosts: ['.exe.xyz'] }` to `vite.config.ts` so the dev server answers through the exe.dev proxy (D-014).
-- [ ] Add three, gsap, @playwright/test. Record what each pulls in.
-- [ ] Folder layout per SPEC.md architecture.
-- [ ] `src/content/facts.ts` hand-mirrored from FACTS.md with the same IDs, plus `scripts/check-facts.mjs` that fails when a referenced F-ID has no entry in FACTS.md.
-- [ ] `src/character/config.json` from the tuner's JSON; port the tuner's material and skin-texture code into `src/character/`.
+- [x] Vite vanilla TypeScript project, written by hand to the template's shape. `vite.config.ts` has `server: { host: true, allowedHosts: ['.exe.xyz'] }` (D-014).
+- [x] three, @types/three and @playwright/test added at exact versions; what each pulls in is in the commit that added it. gsap comes with the character port.
+- [x] Folder layout per SPEC.md architecture for the modules that exist; the character port, `src/hud`, `src/audio` and `src/rail` arrive with the spine.
+- [x] `src/content/facts.ts` mirrors FACTS.md; `scripts/check-facts.mjs` runs with `npm test`.
+- [x] `src/character/config.json` holds the final tuner JSON (D-029).
+- [ ] Port the tuner's material and skin-texture code into `src/character/`.
 - [ ] Download A-02 (`sksolartimevariation5804d.txt`) into `public/data/`, confirm the flux column definition against its header and the PRL paper, then write the level 6 axis label (F-24).
-- [ ] One Playwright smoke test: app boots, no console errors, screenshot; uses `?level=N` and `window.ghost.next()`.
-- [ ] First commit.
+- [x] Playwright smoke test: boots, no console errors, WebGL, `?level=N`, `window.ghost.next()`, `?debug`, screenshot per level.
+- [x] First commit.
