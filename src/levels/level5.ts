@@ -1,20 +1,16 @@
-import { Group, InstancedMesh, MeshStandardMaterial, Object3D, SphereGeometry } from 'three';
-import type { Mesh } from 'three';
+import { Group } from 'three';
 import { scriptedLevel } from './scripted.ts';
 import type { Scripted } from './scripted.ts';
-import { GREY, cone, cylinderInside, neutrino, plane, ring, sphere } from '../render/prims.ts';
+import { cone, neutrino, ring, sphere } from '../render/prims.ts';
+import { H_TANK, WALL, createTank } from './level5-tank.ts';
 
-// 1 unit = 5 m. F-17: the tank is 39 m wide and 41 m tall.
-const R_TANK = 3.9;
-const H_TANK = 8.2;
-const WALL = 3.85;
-const SENSOR_COLUMNS = 40;
-const SENSOR_ROWS = 30;
 // F-31: cos θ = 1/(nβ) gives 41.2° in water, so a cone of height h has base radius h × tan θ.
 const CHERENKOV = Math.tan((41.2 * Math.PI) / 180);
 const WHITE = '#ffffff';
 
-const EYE: [number, number, number] = [0, 0.4, -0.9];
+// The eye sits across the tank from the hit, not beside it: at the stage's 26-degree lens a
+// ring on the far wall only fits in frame from about six units back.
+const EYE: [number, number, number] = [-2.4, 0.4, -0.9];
 const AIM: [number, number, number] = [WALL, -0.3, 0];
 const PATH_Y = -0.3;
 const ELECTRON_X = 1.5;
@@ -80,49 +76,23 @@ function ringAt(spot: Spot, radius: number, style: RingCase['style'], dots: numb
   return g;
 }
 
-function sensorWall(): InstancedMesh {
-  const count = SENSOR_COLUMNS * SENSOR_ROWS;
-  const mesh = new InstancedMesh(new SphereGeometry(0.04), new MeshStandardMaterial({ color: GREY }), count);
-  const at = new Object3D();
-  let i = 0;
-  for (let c = 0; c < SENSOR_COLUMNS; c++) {
-    const theta = (c / SENSOR_COLUMNS) * Math.PI * 2;
-    for (let r = 0; r < SENSOR_ROWS; r++) {
-      const y = -H_TANK / 2 + ((r + 0.5) / SENSOR_ROWS) * H_TANK;
-      at.position.set(WALL * Math.cos(theta), y, WALL * Math.sin(theta));
-      at.updateMatrix();
-      mesh.setMatrixAt(i++, at.matrix);
-    }
-  }
-  return mesh;
-}
-
-function endDisc(y: number): Mesh {
-  const disc = plane(R_TANK * 2, R_TANK * 2, { opacity: 0.6 });
-  disc.rotation.x = Math.PI / 2;
-  disc.position.y = y;
-  return disc;
-}
-
-function yaw(point: [number, number, number], degrees: number): [number, number, number] {
-  const a = (degrees * Math.PI) / 180;
-  return [point[0] * Math.cos(a) - point[2] * Math.sin(a), point[1], point[0] * Math.sin(a) + point[2] * Math.cos(a)];
-}
-
 export const createLevel5 = scriptedLevel(5, async (s) => {
   const { hud, b, rig, group } = s;
   hud.counter.start();
   hud.counter.setVisible(true);
 
-  group.add(cylinderInside(R_TANK, H_TANK, { opacity: 0.6 }), endDisc(H_TANK / 2), endDisc(-H_TANK / 2), sensorWall());
+  const tank = createTank();
+  s.scene.fog = tank.fog;
+  group.add(tank.group);
 
   const nu = neutrino();
   nu.position.set(0.9, PATH_Y + 0.1, 0);
   group.add(nu);
 
-  // 5.1 the tank fades up while the camera pans slowly across the wall.
-  rig.set(EYE, AIM);
-  void rig.moveTo(EYE, yaw(AIM, 10), 5);
+  // 5.1 the tank fades up while the camera tilts down the full height of the cylinder, from
+  // the top cap to the sensor wall ahead.
+  rig.set(EYE, [0, H_TANK / 2, 0]);
+  void rig.moveTo(EYE, AIM, 5);
   void hud.fade(0, 3);
   await b.card('Super-Kamiokande. A tank 39 meters wide and 41 meters tall, holding 50,000 tons of pure water. Running since 1996.', ['F-17', 'F-19']);
 
