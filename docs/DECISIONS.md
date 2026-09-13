@@ -118,6 +118,8 @@ What this means in practice:
 
 Source: the `using-exe-dev` and `exe-dev-gotchas` skills in `~/.claude/skills/`. Verify against live output; the platform moves.
 
+Current deployment: the VM `ghost-particle-app` (25 GB, exeuntu image) serves `/var/www/ghost-particle` with nginx on port 8000, public, at https://ghost-particle-app.exe.xyz/. `npm run deploy` builds and syncs `dist/` there; assets and fonts are cached immutably by their hashed names.
+
 ### D-015 Text policy — accepted
 
 Level 1 shows only the key prompt. From level 2 on, captions are cards of at most 40 words, at most 7 per level, each tagged with its F-IDs. Side panels ("Want more?") are optional and never block progress.
