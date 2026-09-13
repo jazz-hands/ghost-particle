@@ -57,12 +57,12 @@ All in `src/style.css`, no new stylesheet.
 
 - `@media (max-width: 720px)`: cards are `width: 92vw`, `bottom: calc(3vh + env(safe-area-inset-bottom))`, text `font-size: 1rem`; the counter, sub line and flavor tag use `top` offsets that add `env(safe-area-inset-top)` and shrink to 0.8rem; buttons and tiles have `min-height: 2.75rem`; the reveal line wraps; the credits box is `width: 92vw` with a shorter scroll; sky map notes sit above the bottom safe area.
 - `@media (orientation: portrait)`: the level 4 grid is `width: 92vw`, `top: 6vh`; the meter is `width: 70vw`; the prompt sits at `bottom: 18vh`.
-- `hud.grid()` takes its column count from the caller as today. Level 4 passes 3 columns when `innerWidth < innerHeight`, so keyboard wrap-around stays correct.
+- `hud.grid()` takes its column count from the caller as today. Level 4 passes 3 columns when `isTouch() && innerWidth < innerHeight`, so a narrow desktop window keeps 6 columns and keyboard wrap-around stays correct.
 - `index.html` sets `viewport-fit=cover` so the safe-area insets are populated.
 
 ## Camera framing in portrait
 
-`Stage.resize()` sets the vertical fov so the horizontal fov never drops below the desktop value at 3:2: `fov = aspect < 1.5 ? 2·atan(tan(13°)·1.5/aspect) : 26`, in degrees, clamped to 60. The formula lives in `src/render/fov.ts` as `portraitFov(aspect)` so it is unit-testable. Level cameras are not edited. If a level still crops in portrait after this, it is fixed in that level file and the plan notes which.
+`Stage.resize()` applies the widened fov only on touch: `this.camera.fov = isTouch() ? portraitFov(this.camera.aspect) : DESKTOP_FOV`. `portraitFov` sets the vertical fov so the horizontal fov never drops below the desktop value at 3:2: `fov = aspect < 1.5 ? 2·atan(tan(13°)·1.5/aspect) : 26`, in degrees, clamped to 60. The formula lives in `src/render/fov.ts` as `portraitFov(aspect)`, pure and unit-tested, so a narrow desktop window still renders at 26°. Level cameras are not edited. If a level still crops in portrait after this, it is fixed in that level file and the plan notes which.
 
 ## Performance
 

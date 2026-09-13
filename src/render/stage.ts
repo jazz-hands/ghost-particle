@@ -77,7 +77,7 @@ export class Stage {
     const w = innerWidth;
     const h = innerHeight;
     this.camera.aspect = w / h;
-    this.camera.fov = portraitFov(this.camera.aspect);
+    this.camera.fov = isTouch() ? portraitFov(this.camera.aspect) : DESKTOP_FOV;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(w, h);
     this.composer.setSize(w, h);

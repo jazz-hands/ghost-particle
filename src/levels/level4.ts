@@ -14,6 +14,7 @@ import { CONFIG } from '../character/config.ts';
 import type { CharacterConfig } from '../character/config.ts';
 import { prefersReducedMotion } from '../render/rig.ts';
 import { hint } from '../hud/hints.ts';
+import { isTouch } from '../input/device.ts';
 
 // Two flavor shifts (1.5 s each) of travel before the grid at 40%, then a 3 s dash to Earth.
 const TRIP_SECONDS = 7.5;
@@ -226,7 +227,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
     ghost.group.scale.setScalar(CHARACTER_SCALE * (1 - (1 - ASIDE_SCALE) * u));
   });
 
-  const grid = s.hud.grid(TILES, innerWidth < innerHeight ? 3 : 6, { reveal: true });
+  const grid = s.hud.grid(TILES, isTouch() && innerWidth < innerHeight ? 3 : 6, { reveal: true });
   let hunting = false;
   for (const [row, line, cue] of FAMILIES) {
     grid.show(row);
