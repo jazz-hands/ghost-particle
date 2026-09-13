@@ -53,10 +53,11 @@ const NUCLEI_EMISSIVE = 2.1;
 const KNOT_BEADS = 12;
 const KNOT_RADIUS = 0.22;
 const KNOT_SPREAD = 1.2;
-// 3.7: a large emissive disc; the bloom pass makes the glare.
+// 3.7: a large emissive disc, sized to glare inside the frame rather than fill it; the
+// bloom pass makes the halo.
 const SUN_GOLD = '#ffdc9b';
-const SUN_EMISSIVE = 2.6;
-const SUN_RADIUS = 8;
+const SUN_EMISSIVE = 2.2;
+const SUN_RADIUS = 3.2;
 // The rush blur: plasma drawn past the camera as streaks. Off under reduced motion.
 const STREAK_COLOR = '#ffd9a0';
 const STREAK_COUNT = 64;
