@@ -126,6 +126,17 @@ const REACTIONS = {
     { t: 1.12, rotZ: -0.1, offsetX: 0.04, lowerLid: 0.28, ease: 'inOut' },
     { t: 1.4, ease: 'inOut' },
   ],
+  // Start shut, blink open with one settling blink, then turn to look left and right.
+  wake: [
+    { t: 0, squint: 1, scaleX: 1.05, scaleY: 0.93 },
+    { t: 0.3, squint: 0.97, scaleX: 1.03, scaleY: 0.95, ease: 'inOut' },
+    { t: 0.52, squint: 0, scaleX: 0.98, scaleY: 1.04, ease: 'out' },
+    { t: 0.66, squint: 0.55, ease: 'in' },
+    { t: 0.8, squint: 0, ease: 'out' },
+    { t: 1.2, rotY: -0.2, eyeShiftX: -0.015, ease: 'inOut' },
+    { t: 1.68, rotY: 0.2, eyeShiftX: 0.015, ease: 'inOut' },
+    { t: 2.05, ease: 'inOut' },
+  ],
 };
 
 const NAMES = [
