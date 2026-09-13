@@ -68,6 +68,16 @@ test('done after the last level marks the run finished', () => {
   assert.deepEqual(log, ['enter 1', 'exit 1']);
 });
 
+test('start rejects a level outside the range', () => {
+  const log: string[] = [];
+  const m = new LevelManager([fakeLevel(1, log), fakeLevel(2, log)], base);
+  assert.throws(() => m.start(0), RangeError);
+  assert.throws(() => m.start(3), RangeError);
+  assert.throws(() => m.start(1.5), RangeError);
+  assert.deepEqual(log, []);
+  assert.equal(m.level, 0);
+});
+
 test('a stale done from an exited level is ignored', () => {
   const log: string[] = [];
   const dones: Done[] = [];

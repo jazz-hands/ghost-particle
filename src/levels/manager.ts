@@ -22,6 +22,9 @@ export class LevelManager {
   }
 
   start(at = 1): void {
+    if (!Number.isInteger(at) || at < 1 || at > this.factories.length) {
+      throw new RangeError(`level ${at} is outside 1..${this.factories.length}`);
+    }
     this.enter(at - 1);
   }
 
