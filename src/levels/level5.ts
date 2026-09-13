@@ -25,6 +25,9 @@ const NU_X = 2;
 const ELECTRON_X = 2.6;
 const DRIFT = 0.1;
 const ELECTRON_SPEED = 3;
+// Where the drifting electron parks while the prompt waits, and the shortest hit it can make.
+const DRIFT_STOP = 3.2;
+const MIN_REACH = 0.6;
 const RING_IN = 0.35;
 const GLINT_Y = 0.5;
 // The character's body sphere has radius 1. Smaller than in levels 1 and 2: here it shares the
@@ -149,8 +152,7 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   void rig.moveTo(EYE, AIM, 5);
   void hud.fade(0, 3);
   ghost.react('wake');
-  cues.deepHum(7);
-  await b.card('Super-Kamiokande. A tank 39 meters wide and 41 meters tall, holding 50,000 tons of pure water. Running since 1996.', ['F-17', 'F-19']);
+  await b.card("You've arrived in a detector: Super-Kamiokande, a tank 39 meters wide and 41 meters tall, holding 50,000 tons of pure water, buried under a mountain in Japan. Running since 1996.", ['F-17', 'F-19']);
 
   // 5.2 a glint runs round the sensor wall, lighting each stretch as it passes.
   ghost.react('peek');
@@ -161,17 +163,17 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
     repaint();
     if (u === 1) shown.length = 0;
   });
-  await b.card('11,129 light sensors line the inside, waiting for a flash. About 30 neutrinos a day give them one.', ['F-18', 'F-20']);
+  await b.card('Its walls are lined with 11,129 light sensors, all waiting for a flash. Almost every neutrino slips through unseen. About 30 a day give them one.', ['F-18', 'F-20']);
 
   // 5.3 a lone electron drifts ahead until the player takes the shot.
   const electron = electronBead();
   electron.position.set(ELECTRON_X, PATH_Y, 0);
   group.add(electron);
   let drifting = true;
-  s.onUpdate((dt) => { if (drifting) electron.position.x += DRIFT * dt; });
-  hud.prompt('Press Space');
+  // The drift stops short of the wall, so a long wait on the prompt cannot carry the electron past it.
+  s.onUpdate((dt) => { if (drifting) electron.position.x = Math.min(electron.position.x + DRIFT * dt, DRIFT_STOP); });
+  hud.prompt('Press Space to hit the electron');
   ghost.react('brace');
-  cues.swell();
   if (!calm) void rig.moveTo(HELD_EYE, AIM, 6);
   await b.key('Space');
   drifting = false;
@@ -180,7 +182,7 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
 
   // 5.4 the nudge, the cone, and the ring it paints on the wall.
   const from = electron.position.x;
-  const reach = WALL - from;
+  const reach = Math.max(WALL - from, MIN_REACH);
   const lunge = 0.35 / Math.hypot(from - NU_POS[0], PATH_Y - NU_POS[1], -NU_POS[2]);
   await animate(s, 0.3, (u) => {
     nu.position.set(
@@ -203,7 +205,6 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   });
   electron.visible = false;
   ghost.react('surprised');
-  cues.swellPeak();
   cues.chime();
   rig.shake(HIT_SHAKE);
   await animate(s, RING_IN, (u) => {
@@ -216,7 +217,7 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   rig.shake(0);
   ghost.react('proud');
 
-  await b.card('You hit something. You kicked an electron faster than light moves in water. That makes a cone of light. On the wall: a ring.', ['F-21', 'F-31']);
+  await b.card('You hit something. You kicked an electron faster than light moves in water. That makes a cone of light, and where it lands on the wall: a ring. That ring is how the sensors see you.', ['F-21', 'F-31']);
 
   // 5.6 a sharp ring for comparison, beside the player's fuzzy one.
   const rival: PaintedRing = { theta: 0.62, y: PATH_Y, radius: reach * CHERENKOV * 0.8, style: 'sharp', alpha: 0 };
@@ -235,7 +236,7 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   });
   cues.blip();
   ghost.react('nod');
-  await b.card("Now you're the physicist. Five more rings are coming. Sharp or fuzzy? Press E or M to sort them.", ['F-22']);
+  await b.card("Now you're the physicist. Five more rings are coming from other neutrinos. Sharp or fuzzy? Press E for an electron, M for a muon.", ['F-22']);
 
   // 5.8, 5.9 five rings, one at a time, each answered and then explained.
   shown.length = 0;

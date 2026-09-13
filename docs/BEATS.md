@@ -168,13 +168,13 @@ Inside the tank. Dark water, gold sensor grid on every wall. Camera floats near 
 
 | # | Player sees | Player does | Neutrino | Caption | Facts | Cue |
 |---|---|---|---|---|---|---|
-| 5.1 | Slow reveal of the cylinder. Card. | Space | wake (looks around, awed) | "Super-Kamiokande. A tank 39 meters wide and 41 meters tall, holding 50,000 tons of pure water. Running since 1996." | F-17, F-19 | hum (deep, watery) |
-| 5.2 | Sensors glint in sequence around the wall. Card. | Space | peek | "11,129 light sensors line the inside, waiting for a flash. About 30 neutrinos a day give them one." | F-18, F-20 | tick sweep |
-| 5.3 | **The hero's hit.** A single tiny electron drifts ahead in the water. Time slows. Prompt: "Press Space". | presses Space | brace | none | | swell begins |
-| 5.4 | On press: the neutrino nudges the electron. The electron shoots forward. A blue cone of light grows from its path and hits the wall as a fuzzy ring. Sensors under the ring light up. | watches | surprised, then proud | none | F-21 | swell peaks, chime |
-| 5.5 | Card, over the glowing ring. Counter still ticking. | Space | proud | "You hit something. You kicked an electron faster than light moves in water. That makes a cone of light. On the wall: a ring." | F-21, F-31 | |
+| 5.1 | Slow reveal of the cylinder. Card. | Space | wake (looks around, awed) | "You've arrived in a detector: Super-Kamiokande, a tank 39 meters wide and 41 meters tall, holding 50,000 tons of pure water, buried under a mountain in Japan. Running since 1996." | F-17, F-19 | |
+| 5.2 | Sensors glint in sequence around the wall. Card. | Space | peek | "Its walls are lined with 11,129 light sensors, all waiting for a flash. Almost every neutrino slips through unseen. About 30 a day give them one." | F-18, F-20 | tick sweep |
+| 5.3 | **The hero's hit.** A single tiny electron drifts ahead in the water. Time slows. Prompt: "Press Space to hit the electron". | presses Space | brace | none | | |
+| 5.4 | On press: the neutrino nudges the electron. The electron shoots forward. A blue cone of light grows from its path and hits the wall as a fuzzy ring. Sensors under the ring light up. | watches | surprised, then proud | none | F-21 | chime |
+| 5.5 | Card, over the glowing ring. Counter still ticking. | Space | proud | "You hit something. You kicked an electron faster than light moves in water. That makes a cone of light, and where it lands on the wall: a ring. That ring is how the sensors see you." | F-21, F-31 | |
 | 5.6 | Card. Beside the hero's fuzzy ring, a sharp ring is drawn for comparison. | Space | look-at-self | "Your ring is fuzzy, because the electron scatters and showers. A muon would punch straight through and leave a sharp ring." | F-22 | |
-| 5.7 | Mini-game intro. Two buttons appear, labelled with their keys: "E  Electron" and "M  Muon". Card. | Space | nod | "Now you're the physicist. Five more rings are coming. Sharp or fuzzy? Press E or M to sort them." | F-22 | blip |
+| 5.7 | Mini-game intro. Two buttons appear, labelled with their keys: "E  Electron" and "M  Muon". Card. | Space | nod | "Now you're the physicist. Five more rings are coming from other neutrinos. Sharp or fuzzy? Press E for an electron, M for a muon." | F-22 | blip |
 | 5.8 | Rings 1–5, one at a time. Fixed set, in order: fuzzy, sharp, fuzzy, sharp, fuzzy-but-ambiguous. | presses E or M (or clicks) | peek at each ring | none until answered | F-22, F-31 | blip |
 | 5.9 | After each answer: the ring is labeled, a one-line reason shows for 3 s (table below). | | nod on correct, shrug on wrong | (one line each, table below) | F-22 | chime / buzz |
 | 5.10 | Card, after ring 5. | Space | nod | "Solar neutrinos show up as electron rings pointing away from the Sun. That's how Super-K knows they came from the Sun." | F-23 | |
