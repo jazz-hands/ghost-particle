@@ -86,6 +86,14 @@ const REACTIONS = {
     { t: 0.72, offsetY: 0.03, scaleX: 0.99, scaleY: 1.02, squint: 0.06, ease: 'inOut' },
     { t: 0.88, ease: 'inOut' },
   ],
+  // Rise, flatten the eyes to lines for a beat, settle back down.
+  shrug: [
+    { t: 0 },
+    { t: 0.24, offsetY: 0.15, scaleX: 0.97, scaleY: 1.06, eyeTall: 0.3, eyeWidth: 1.08, ease: 'out' },
+    { t: 0.5, offsetY: 0.17, scaleX: 0.97, scaleY: 1.05, eyeTall: 0.11, eyeWidth: 1.12, ease: 'inOut' },
+    { t: 0.82, offsetY: 0.16, scaleX: 0.97, scaleY: 1.05, eyeTall: 0.11, eyeWidth: 1.12, ease: 'linear' },
+    { t: 1.15, ease: 'inOut' },
+  ],
 };
 
 const NAMES = [
