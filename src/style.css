@@ -428,7 +428,7 @@ html, body {
 .hud-credits-play:hover { background: rgba(255, 206, 138, 0.22); }
 
 /* Phones: everything fits a 360 px portrait or 640 px tall landscape screen (D-030). */
-@media (max-width: 720px) {
+@media (max-width: 720px), (max-height: 500px) {
   .hud-card {
     width: 92vw;
     bottom: calc(3vh + env(safe-area-inset-bottom));
@@ -459,9 +459,21 @@ html, body {
   .hud-credits { width: 92vw; padding: 1.1rem 1rem; }
   .hud-credits-scroll { height: 11em; }
 
-  .hud-skymap .hud-chart-note { bottom: calc(6vh + env(safe-area-inset-bottom)); left: 3vw; right: 3vw; }
-  .hud-skymap .hud-chart-credit { bottom: calc(2vh + env(safe-area-inset-bottom)); left: 3vw; }
+  /* Above the card zone, not behind it: the phone card sits at bottom: 3vh, width: 92vw. */
+  .hud-skymap .hud-chart-note { top: calc(8vh + env(safe-area-inset-top)); bottom: auto; left: 3vw; right: 3vw; }
+  .hud-skymap .hud-chart-credit { top: calc(13vh + env(safe-area-inset-top)); bottom: auto; left: 3vw; }
   .hud-counter-large { padding: 0.9rem 1.2rem 1.1rem; width: 84vw; box-sizing: border-box; }
+}
+
+@media (max-height: 500px) {
+  .hud-credits { padding: 0.8rem 1rem; gap: 0.6rem; }
+  .hud-credits-scroll { height: 6em; }
+  .hud-credits-byline { margin-top: 0.4rem; }
+  .hud-credits-head { margin: 0.8em 0 0.3em; }
+  .hud-credits-play { padding: 0.4rem 1.1rem; }
+
+  .hud-grid { top: 2vh; gap: 0.25rem; }
+  .hud-tile { padding: 0.3rem 0.2rem; }
 }
 
 @media (orientation: portrait) and (max-width: 720px) {
