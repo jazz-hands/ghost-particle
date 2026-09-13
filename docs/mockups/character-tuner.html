@@ -32,6 +32,186 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
+// ---- mirror of src/character/reactions.ts, types stripped; keep the two in step ----
+
+const IDLE = {
+  scaleX: 1, scaleY: 1, offsetX: 0, offsetY: 0, rotZ: 0, rotY: 0,
+  squint: 0, lowerLid: 0, eyeWidth: 1, eyeTall: 1,
+  eyeShiftX: 0, eyeShiftY: 0, eyeTilt: 0, leftEye: 1, rightEye: 1,
+};
+
+const CHANNELS = Object.keys(IDLE);
+
+const EASES = {
+  linear: (x) => x,
+  in: (x) => x * x,
+  out: (x) => 1 - (1 - x) * (1 - x),
+  inOut: (x) => 0.5 - Math.cos(Math.PI * x) / 2,
+  back: (x) => 1 + 2.7 * (x - 1) ** 3 + 1.7 * (x - 1) ** 2,
+};
+
+const REACTIONS = {
+  // Squash flat and squeeze the eyes shut, expecting an impact that never comes.
+  brace: [
+    { t: 0 },
+    { t: 0.12, scaleX: 1.2, scaleY: 0.7, offsetY: -0.11, squint: 0.86, eyeWidth: 1.12, ease: 'out' },
+    { t: 0.44, scaleX: 1.22, scaleY: 0.68, offsetY: -0.12, squint: 0.9, eyeWidth: 1.12, ease: 'inOut' },
+    { t: 0.78, scaleX: 1, scaleY: 1, offsetY: 0, squint: 0.2, ease: 'out' },
+    { t: 0.95, ease: 'back' },
+  ],
+  // Pop back to round (the body's own squash undone) with the eyes wide.
+  surprised: [
+    { t: 0 },
+    { t: 0.09, scaleX: 1.06, scaleY: 0.9, offsetY: -0.04, ease: 'out' },
+    { t: 0.26, scaleX: 0.94, scaleY: 1.1, offsetY: 0.07, eyeWidth: 1.35, eyeTall: 1.35, ease: 'back' },
+    { t: 0.6, scaleX: 0.95, scaleY: 1.07, offsetY: 0.05, eyeWidth: 1.3, eyeTall: 1.3, ease: 'inOut' },
+    { t: 0.92, ease: 'out' },
+  ],
+  // Crouch, launch with a stretch, land with a squash; the lower lids ride up into arcs.
+  cheer: [
+    { t: 0 },
+    { t: 0.11, scaleX: 1.14, scaleY: 0.84, offsetY: -0.08, ease: 'out' },
+    { t: 0.36, scaleX: 0.88, scaleY: 1.18, offsetY: 0.3, lowerLid: 0.55, ease: 'out' },
+    { t: 0.64, scaleX: 1, scaleY: 1, offsetY: 0, lowerLid: 0.5, ease: 'in' },
+    { t: 0.75, scaleX: 1.16, scaleY: 0.86, offsetY: -0.06, lowerLid: 0.5, ease: 'out' },
+    { t: 1, scaleX: 1, scaleY: 1.02, offsetY: 0.02, lowerLid: 0.42, ease: 'back' },
+    { t: 1.3, ease: 'inOut' },
+  ],
+  // Two dips, each with a little squash, and a soft lid drop for warmth.
+  nod: [
+    { t: 0 },
+    { t: 0.18, offsetY: -0.17, scaleX: 1.05, scaleY: 0.92, squint: 0.16, ease: 'inOut' },
+    { t: 0.36, offsetY: 0.04, scaleX: 0.99, scaleY: 1.03, squint: 0.08, ease: 'inOut' },
+    { t: 0.54, offsetY: -0.17, scaleX: 1.05, scaleY: 0.92, squint: 0.16, ease: 'inOut' },
+    { t: 0.72, offsetY: 0.03, scaleX: 0.99, scaleY: 1.02, squint: 0.06, ease: 'inOut' },
+    { t: 0.88, ease: 'inOut' },
+  ],
+  // Rise, flatten the eyes to lines for a beat, settle back down.
+  shrug: [
+    { t: 0 },
+    { t: 0.24, offsetY: 0.15, scaleX: 0.97, scaleY: 1.06, eyeTall: 0.3, eyeWidth: 1.08, ease: 'out' },
+    { t: 0.5, offsetY: 0.17, scaleX: 0.97, scaleY: 1.05, eyeTall: 0.11, eyeWidth: 1.12, ease: 'inOut' },
+    { t: 0.82, offsetY: 0.16, scaleX: 0.97, scaleY: 1.05, eyeTall: 0.11, eyeWidth: 1.12, ease: 'linear' },
+    { t: 1.15, ease: 'inOut' },
+  ],
+  // Lean toward the thing being looked at; the near eye opens larger than the far one.
+  peek: [
+    { t: 0 },
+    { t: 0.26, rotZ: -0.2, offsetX: 0.16, eyeShiftX: 0.012, leftEye: 1.22, rightEye: 0.86, ease: 'out' },
+    { t: 0.72, rotZ: -0.23, offsetX: 0.19, eyeShiftX: 0.014, leftEye: 1.28, rightEye: 0.84, ease: 'inOut' },
+    { t: 1.1, ease: 'inOut' },
+  ],
+  // The eyes travel down the face to look at the body, with a small dip to match.
+  'look-at-self': [
+    { t: 0 },
+    { t: 0.3, eyeShiftY: 0.06, squint: 0.16, offsetY: -0.03, scaleY: 0.98, scaleX: 1.02, ease: 'out' },
+    { t: 0.8, eyeShiftY: 0.08, squint: 0.2, offsetY: -0.04, scaleY: 0.98, scaleX: 1.02, ease: 'inOut' },
+    { t: 1.15, ease: 'inOut' },
+  ],
+  // Puff up and ride one slow swell with the eyes content and half shut.
+  proud: [
+    { t: 0 },
+    { t: 0.45, offsetY: 0.1, scaleX: 1.04, scaleY: 1.05, squint: 0.42, ease: 'inOut' },
+    { t: 0.95, offsetY: 0.13, scaleX: 1.05, scaleY: 1.06, squint: 0.48, ease: 'inOut' },
+    { t: 1.45, offsetY: 0.02, scaleX: 1.01, scaleY: 1.01, squint: 0.3, ease: 'inOut' },
+    { t: 1.75, ease: 'inOut' },
+  ],
+  // Lean in and rock, smiling with the lower lids up: a whole-body goodbye.
+  wave: [
+    { t: 0 },
+    { t: 0.2, rotZ: -0.26, offsetX: 0.11, lowerLid: 0.3, ease: 'out' },
+    { t: 0.44, rotZ: 0.22, offsetX: -0.09, lowerLid: 0.36, ease: 'inOut' },
+    { t: 0.66, rotZ: -0.24, offsetX: 0.1, lowerLid: 0.36, ease: 'inOut' },
+    { t: 0.88, rotZ: 0.18, offsetX: -0.07, lowerLid: 0.34, ease: 'inOut' },
+    { t: 1.12, rotZ: -0.1, offsetX: 0.04, lowerLid: 0.28, ease: 'inOut' },
+    { t: 1.4, ease: 'inOut' },
+  ],
+  // Start shut, blink open with one settling blink, then turn to look left and right.
+  wake: [
+    { t: 0, squint: 1, scaleX: 1.05, scaleY: 0.93 },
+    { t: 0.3, squint: 0.97, scaleX: 1.03, scaleY: 0.95, ease: 'inOut' },
+    { t: 0.52, squint: 0, scaleX: 0.98, scaleY: 1.04, ease: 'out' },
+    { t: 0.66, squint: 0.55, ease: 'in' },
+    { t: 0.8, squint: 0, ease: 'out' },
+    { t: 1.2, rotY: -0.2, eyeShiftX: -0.015, ease: 'inOut' },
+    { t: 1.68, rotY: 0.2, eyeShiftX: 0.015, ease: 'inOut' },
+    { t: 2.05, ease: 'inOut' },
+  ],
+  // A fast jelly wobble that trades width for height each swing and decays.
+  wiggle: [
+    { t: 0 },
+    { t: 0.1, offsetX: 0.11, rotZ: -0.13, scaleX: 1.07, scaleY: 0.94, lowerLid: 0.26, ease: 'out' },
+    { t: 0.23, offsetX: -0.1, rotZ: 0.12, scaleX: 0.94, scaleY: 1.06, lowerLid: 0.32, ease: 'inOut' },
+    { t: 0.35, offsetX: 0.08, rotZ: -0.09, scaleX: 1.05, scaleY: 0.96, lowerLid: 0.32, ease: 'inOut' },
+    { t: 0.47, offsetX: -0.05, rotZ: 0.06, scaleX: 0.97, scaleY: 1.03, lowerLid: 0.26, ease: 'inOut' },
+    { t: 0.62, ease: 'inOut' },
+  ],
+};
+
+const NAMES = [
+  'wake', 'wiggle', 'nod', 'shrug', 'brace', 'surprised',
+  'look-at-self', 'cheer', 'proud', 'peek', 'wave',
+];
+
+function fillPose(k) {
+  const p = { ...IDLE };
+  for (const c of CHANNELS) { const v = k[c]; if (v !== undefined) p[c] = v; }
+  return p;
+}
+
+function poseAt(track, time) {
+  if (track.length === 0) return { ...IDLE };
+  let i = 0;
+  while (i < track.length - 1 && time >= track[i + 1].t) i++;
+  if (i === track.length - 1) return fillPose(track[i]);
+  const a = fillPose(track[i]);
+  const b = fillPose(track[i + 1]);
+  const span = track[i + 1].t - track[i].t;
+  const x = span > 0 ? (time - track[i].t) / span : 1;
+  const k = EASES[track[i + 1].ease ?? 'inOut'](Math.min(1, Math.max(0, x)));
+  const out = { ...IDLE };
+  for (const c of CHANNELS) out[c] = a[c] + (b[c] - a[c]) * k;
+  return out;
+}
+
+function createReactionPlayer() {
+  let track = null;
+  let name = null;
+  let time = 0;
+  return {
+    play(n) {
+      const t = REACTIONS[n];
+      if (!t || t.length === 0) return;
+      track = t; name = n; time = 0;
+    },
+    update(dt) {
+      if (!track) return { ...IDLE };
+      time += dt;
+      if (time >= track[track.length - 1].t) { track = null; name = null; return { ...IDLE }; }
+      return poseAt(track, time);
+    },
+    get playing() { return name; },
+  };
+}
+
+const clamp01 = (v) => Math.min(1, Math.max(0, v));
+
+// The pose channels that are eye-texture settings; eyeShiftX and the per-eye sizes are read
+// straight from the pose by the skin painter.
+function eyesWithPose(base, p) {
+  return {
+    ...base,
+    height: base.height + p.eyeShiftY,
+    width: base.width * p.eyeWidth,
+    tall: base.tall * p.eyeTall,
+    tilt: base.tilt + p.eyeTilt,
+    squint: clamp01(base.squint + p.squint),
+    lowerLid: clamp01(base.lowerLid + p.lowerLid),
+  };
+}
+
+// ---- end mirror ----
+
 const TINTS = { electron: '#5ee3ff', muon: '#b58cff', tau: '#ff9f6b' };
 
 const defaults = {
@@ -67,39 +247,54 @@ const key = new THREE.DirectionalLight(0xffffff, 1); scene.add(key);
 const fill = new THREE.DirectionalLight(0xffffff, 1); scene.add(fill);
 const rim = new THREE.DirectionalLight(0xffffff, 1); scene.add(rim);
 
-// Skin texture. Front of the sphere is u = 0.25, equator v = 0.5; near the equator a canvas circle is a sphere circle.
+// Skin textures. Front of the sphere is u = 0.25, equator v = 0.5; near the equator a canvas
+// circle is a sphere circle. One canvas per channel, repainted in place as a reaction plays.
 const W = 1024, H = 512;
 const scaleHex = (hex, k) => { const c = new THREE.Color(hex); return '#' + c.multiplyScalar(k).getHexString(); };
-function makeSkin(kind) {
+const greyHex = (v) => { const h = Math.round(clamp01(v) * 255).toString(16).padStart(2, '0'); return '#' + h + h + h; };
+const skins = {};
+for (const kind of ['map', 'rough', 'emissive']) {
   const c = document.createElement('canvas'); c.width = W; c.height = H;
-  const g = c.getContext('2d');
-  const e = S.eyes, tint = TINTS[S.flavor];
-  const y = e.height * H, xs = [(0.25 - e.spacing) * W, (0.25 + e.spacing) * W];
-  if (kind === 'map') { g.fillStyle = tint; g.fillRect(0, 0, W, H); }
-  else if (kind === 'emissive') { g.fillStyle = scaleHex(tint, S.body.emissiveBoost); g.fillRect(0, 0, W, H); }
-  else { g.fillStyle = '#000'; g.fillRect(0, 0, W, H); }
+  const t = new THREE.CanvasTexture(c);
+  if (kind !== 'rough') t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  skins[kind] = { ctx: c.getContext('2d'), tex: t };
+}
+function paintSkin(kind, e, p) {
+  const g = skins[kind].ctx, tint = TINTS[S.flavor];
+  g.fillStyle = kind === 'map' ? tint : kind === 'emissive' ? scaleHex(tint, S.body.emissiveBoost) : greyHex(S.body.roughness);
+  g.fillRect(0, 0, W, H);
+  const y = e.height * H, xs = [(0.25 + p.eyeShiftX - e.spacing) * W, (0.25 + p.eyeShiftX + e.spacing) * W];
   xs.forEach((x, i) => {
-    const side = i === 0 ? -1 : 1;
+    const side = i === 0 ? -1 : 1, k = i === 0 ? p.leftEye : p.rightEye;
+    const w = e.width * k, tall = e.tall * k;
     g.save(); g.translate(x, y); g.rotate(side * e.tilt);
-    // Squint: clip the top of the eye with a lid, 0 = open, 1 = closed.
-    const lid = e.squint * e.tall * 2, lower = e.lowerLid * e.tall * 2;
-    g.beginPath(); g.rect(-e.width * 2, -e.tall - 2 + lid, e.width * 4, e.tall * 2 + 4 - lid - lower); g.clip();
-    g.fillStyle = kind === 'map' ? e.color : kind === 'emissive' ? '#000000' : '#e0e0e0';
-    g.beginPath(); g.ellipse(0, 0, e.width, e.tall, 0, 0, Math.PI * 2); g.fill();
+    // Lids clip the eye: squint eats it from the top, lowerLid from the bottom (the cheer arc).
+    const lid = e.squint * tall * 2, lower = e.lowerLid * tall * 2;
+    g.beginPath(); g.rect(-w * 2, -tall - 2 + lid, w * 4, tall * 2 + 4 - lid - lower); g.clip();
+    g.fillStyle = kind === 'map' ? e.color : kind === 'emissive' ? '#000000' : greyHex(e.roughness);
+    g.beginPath(); g.ellipse(0, 0, w, tall, 0, 0, Math.PI * 2); g.fill();
     if (e.highlight && (kind === 'map' || kind === 'emissive')) {
       g.fillStyle = kind === 'map' ? e.hlColor : scaleHex(e.hlColor, S.post.eyeGlow);
-      g.beginPath(); g.ellipse(e.hlOffsetX, e.hlOffsetY, e.hlSize, e.hlTall, 0, 0, Math.PI * 2); g.fill();
+      g.beginPath(); g.ellipse(e.hlOffsetX * k, e.hlOffsetY * k, e.hlSize * k, e.hlTall * k, 0, 0, Math.PI * 2); g.fill();
     }
     g.restore();
   });
-  if (kind === 'rough') { // body roughness in the red channel, eyes matte
-    const img = g.getImageData(0, 0, W, H); const d = img.data;
-    const bodyR = Math.round(S.body.roughness * 255), eyeR = Math.round(S.eyes.roughness * 255);
-    for (let i = 0; i < d.length; i += 4) { const isEye = d[i] > 100; const r = isEye ? eyeR : bodyR; d[i] = d[i + 1] = d[i + 2] = r; d[i + 3] = 255; }
-    g.putImageData(img, 0, 0);
-  }
-  const t = new THREE.CanvasTexture(c); if (kind === 'map' || kind === 'emissive') t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+  skins[kind].tex.needsUpdate = true;
 }
+let drawn = '';
+function drawSkins(p) {
+  const e = eyesWithPose(S.eyes, p);
+  const sig = [e.height, e.width, e.tall, e.tilt, e.squint, e.lowerLid, p.eyeShiftX, p.leftEye, p.rightEye].join();
+  if (sig === drawn) return;
+  drawn = sig;
+  paintSkin('map', e, p); paintSkin('rough', e, p); paintSkin('emissive', e, p);
+}
+
+const player = createReactionPlayer();
+let pose = { ...IDLE };
+function react(name) { player.play(name); }
+window.ghost = { react };
 
 const geo = new THREE.SphereGeometry(1, 128, 96);
 const mat = new THREE.MeshPhysicalMaterial({ transparent: true, metalness: 0, roughness: 1, emissive: new THREE.Color(0x000000) });
@@ -120,15 +315,13 @@ composer.addPass(new OutputPass());
 
 function apply() {
   const b = S.body, l = S.light, tint = TINTS[S.flavor];
-  body.scale.set(b.scaleX, b.scaleY, 1);
-  if (mat.map) mat.map.dispose(); if (mat.roughnessMap) mat.roughnessMap.dispose();
-  mat.map = makeSkin('map'); mat.roughnessMap = makeSkin('rough');
+  mat.map = skins.map.tex; mat.roughnessMap = skins.rough.tex; mat.emissiveMap = skins.emissive.tex;
   mat.color.set('#ffffff').lerp(new THREE.Color(tint), b.colorDepth);
   mat.opacity = b.opacity; mat.clearcoat = b.clearcoat; mat.clearcoatRoughness = b.clearcoatRoughness;
   mat.sheen = b.sheen; mat.sheenColor.set(b.sheenColor);
-  if (mat.emissiveMap) mat.emissiveMap.dispose();
-  mat.emissiveMap = makeSkin('emissive'); mat.emissive.set('#ffffff'); mat.emissiveIntensity = 1;
+  mat.emissive.set('#ffffff'); mat.emissiveIntensity = 1;
   mat.needsUpdate = true;
+  drawn = ''; drawSkins(pose);
   const p = S.post;
   bloomPass.enabled = p.bloom; bloomPass.threshold = p.bloomThreshold; bloomPass.strength = p.bloomStrength; bloomPass.radius = p.bloomRadius;
   rimShell.visible = p.rimShell; rimMat.color.set(tint); rimMat.opacity = p.rimOpacity; rimShell.scale.setScalar(p.rimScale);
@@ -145,6 +338,8 @@ function apply() {
 
 const gui = new GUI({ title: 'Ghost Particle tuner' });
 gui.add(S, 'flavor', Object.keys(TINTS)).onChange(apply);
+const fr = gui.addFolder('reactions');
+for (const name of NAMES) fr.add({ [name]: () => react(name) }, name);
 const fb = gui.addFolder('Body');
 fb.add(S.body, 'scaleX', 0.8, 1.3, 0.01).name('width').onChange(apply);
 fb.add(S.body, 'scaleY', 0.7, 1.2, 0.01).name('height').onChange(apply);
@@ -214,11 +409,17 @@ apply();
 
 addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight); });
 
+let last = 0;
 function frame(t) {
+  const dt = last ? Math.min(0.05, (t - last) / 1000) : 0;
+  last = t;
   controls.update();
-  body.rotation.y = S.view.turn ? Math.sin(t * 0.0004) * 0.6 : 0;
-  body.position.y = S.view.idleBob ? Math.sin(t * 0.002) * 0.05 : 0;
-  if (S.view.idleBob) { const s = 1 + Math.sin(t * 0.002) * 0.02; body.scale.set(S.body.scaleX * s, S.body.scaleY / s, 1); }
+  pose = player.update(dt);
+  drawSkins(pose);
+  const bob = S.view.idleBob ? 1 + Math.sin(t * 0.002) * 0.02 : 1;
+  body.scale.set(S.body.scaleX * pose.scaleX * bob, S.body.scaleY * pose.scaleY / bob, 1);
+  body.position.set(pose.offsetX, (S.view.idleBob ? Math.sin(t * 0.002) * 0.05 : 0) + pose.offsetY, 0);
+  body.rotation.set(0, (S.view.turn ? Math.sin(t * 0.0004) * 0.6 : 0) + pose.rotY, pose.rotZ);
   composer.render();
   requestAnimationFrame(frame);
 }
