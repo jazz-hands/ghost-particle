@@ -19,3 +19,15 @@ test('boots without console errors and can create a WebGL context', async ({ pag
   await page.screenshot({ path: testInfo.outputPath('boot.png') });
   expect(errors).toEqual([]);
 });
+
+test('mounts a full-window canvas', async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.goto('/');
+  const canvas = page.locator('#stage canvas');
+  await expect(canvas).toHaveCount(1);
+  const box = await canvas.boundingBox();
+  const viewport = page.viewportSize()!;
+  expect(box?.width).toBe(viewport.width);
+  expect(box?.height).toBe(viewport.height);
+  expect(errors).toEqual([]);
+});

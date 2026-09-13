@@ -1,0 +1,63 @@
+{
+  "flavor": "tau",
+  "body": {
+    "scaleX": 1.06,
+    "scaleY": 0.96,
+    "colorDepth": 1,
+    "opacity": 0.33,
+    "roughness": 0.32,
+    "clearcoat": 1,
+    "clearcoatRoughness": 0.42,
+    "sheen": 0,
+    "sheenColor": "#ffffff",
+    "emissiveBoost": 1
+  },
+  "eyes": {
+    "spacing": 0.062,
+    "height": 0.42,
+    "width": 30,
+    "tall": 43,
+    "tilt": 0,
+    "color": "#0b1a26",
+    "roughness": 0.61,
+    "highlight": true,
+    "hlSize": 9,
+    "hlTall": 13,
+    "hlOffsetX": 9,
+    "hlOffsetY": -16,
+    "hlColor": "#ffffff",
+    "squint": 0,
+    "lowerLid": 0
+  },
+  "light": {
+    "keyIntensity": 1.2,
+    "keyX": 3,
+    "keyY": 6,
+    "keyZ": 5,
+    "fillIntensity": 0.25,
+    "fillColor": "#9fd8ff",
+    "rimIntensity": 1,
+    "rimX": -3,
+    "rimY": 3,
+    "rimZ": -5,
+    "envIntensity": 0.12,
+    "exposure": 0.72
+  },
+  "post": {
+    "bloom": true,
+    "bloomThreshold": 0.71,
+    "bloomStrength": 0.35,
+    "bloomRadius": 0.42,
+    "eyeGlow": 4,
+    "rimShell": true,
+    "rimOpacity": 0.05,
+    "rimScale": 1.006,
+    "halo": false,
+    "haloSize": 3.5,
+    "haloOpacity": 0.29
+  },
+  "view": {
+    "turn": true,
+    "idleBob": true
+  }
+}
