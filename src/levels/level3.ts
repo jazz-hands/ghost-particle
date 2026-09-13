@@ -83,7 +83,8 @@ const BRACE_Z = -10;
 // The two-part reactions (3.3, 3.6) read as one beat at this spacing.
 const BEAT_GAP = 0.8;
 
-const FLAVOR_CARD = "Neutrinos come in three flavors: electron, muon, and tau. You were born electron-flavor. But look. You're changing. A neutrino can only change flavor if it has some mass. That's how we know you aren't weightless.";
+const FLAVOR_CARD = "Neutrinos come in three kinds, called flavors: electron, muon, and tau. You were born electron-flavor. But look at your colour. You're changing.";
+const MASS_CARD = "A neutrino can only change flavor if it has at least a little mass. That's how we know you aren't weightless.";
 
 interface Obstacle {
   object: Object3D;
@@ -285,7 +286,7 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   // 3.3
   ghost.react('surprised');
   after(BEAT_GAP, () => ghost.react('wiggle'));
-  await s.b.card('Nothing happened. The Sun is opaque to light, but almost transparent to you. Almost nothing can stop a neutrino.', ['F-10']);
+  await s.b.card("Nothing happened. Light can't get through the Sun, but you slip through almost everything. Almost nothing can stop a neutrino.", ['F-10']);
 
   // 3.4
   spawning = true;
@@ -303,8 +304,9 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   rising = true;
   ghost.react('look-at-self');
   after(BEAT_GAP, () => ghost.react('shrug'));
-  s.cues.risingTone(cardSeconds(FLAVOR_CARD));
-  await s.b.card(FLAVOR_CARD, ['F-12', 'F-05']);
+  s.cues.risingTone(cardSeconds(FLAVOR_CARD) + cardSeconds(MASS_CARD));
+  await s.b.card(FLAVOR_CARD, ['F-12']);
+  await s.b.card(MASS_CARD, ['F-05']);
 
   // 3.7: out of the surface into black space, the Sun glaring behind.
   s.scene.fog = null;

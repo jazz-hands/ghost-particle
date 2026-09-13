@@ -88,10 +88,11 @@ Camera pulls back; the neutrino floats in warm haze. The through-line counter fa
 
 | # | Player sees | Player does | Neutrino | Caption | Facts | Cue |
 |---|---|---|---|---|---|---|
-| 2.1 | Card 1. Counter appears: "Neutrinos through you since you started: …" | reads, presses Space | wiggle | "Meet a neutrino. Born a moment ago in the Sun's core, where it's about 15 million degrees." | F-03 | blip |
-| 2.2 | Card 2. A seesaw appears. An electron (small solid ball) is placed on one side; the neutrino on the other. The electron side slams down; the neutrino floats up. | presses Space | shrug (while floating up) | "It has almost no mass. Weighed against an electron, it's over a million times lighter." | F-04 | pop on the slam |
-| 2.3 | Card 3. Seesaw fades. The neutrino's glow brightens briefly. | presses Space | cheer | "No electric charge. Most solar neutrinos come from two protons squeezed together; you came from a rarer squeeze, with extra energy a detector can catch." | F-06, F-01, F-02 | chime |
-| 2.4 | Corner button "Want more?" (level 7 only). Fade to level 3. | | | | F-26, F-27 | whoosh |
+| 2.1 | Card 1. Counter appears: "Neutrinos through you since you started: …" | reads, presses Space | wiggle | "This is you: a neutrino, one of the tiniest particles there is. Born a moment ago in the Sun's core, where it's about 15 million degrees." | F-03 | blip |
+| 2.2 | Card 2. A seesaw appears. An electron (small solid ball) is placed on one side; the neutrino on the other. The electron side slams down; the neutrino floats up. | presses Space | shrug (while floating up) | "It has almost no mass. Weighed against an electron, the small particle that orbits every atom, it's over a million times lighter." | F-04 | pop on the slam |
+| 2.3 | Card 3. Seesaw fades. The neutrino's glow brightens briefly. | presses Space | cheer | "No electric charge either, so electricity and magnets can't grab it. That's why almost nothing can." | F-06 | chime |
+| 2.4 | Card 4. | | proud | "Most of the Sun's neutrinos come from two protons squeezed together. You came from a rarer squeeze, with extra energy a detector can catch." | F-01, F-02 | |
+| 2.5 | Corner button "Want more?" (level 7 only). Fade to level 3. | | | | F-26, F-27 | whoosh |
 
 ---
 
@@ -103,12 +104,13 @@ Camera behind the neutrino, rushing outward through orange-white haze. The neutr
 |---|---|---|---|---|---|---|
 | 3.1 | Rushing haze. Card: instruction. | reads, Space | nod | "You're leaving the Sun. Everything in here is packed tight. Try to hit something. Arrow keys to steer." | | whoosh |
 | 3.2 | A plasma wall spans the whole screen. There is no gap. | steers anywhere | brace as the wall approaches, then surprised after passing | none until after | | thwip |
-| 3.3 | Card, after the pass. | Space | surprised, then wiggle | "Nothing happened. The Sun is opaque to light, but almost transparent to you. Almost nothing can stop a neutrino." | F-10 | tick |
+| 3.3 | Card, after the pass. | Space | surprised, then wiggle | "Nothing happened. Light can't get through the Sun, but you slip through almost everything. Almost nothing can stop a neutrino." | F-10 | tick |
 | 3.4 | A run of obstacles over ~20 s: dense knots of nuclei, more plasma walls, a wall of light. Some have gaps, most don't. | steers freely | brace/surprised on the first two, then just wiggle | none | | thwip each, tick |
 | 3.5 | Card, mid-climb. Haze thins slightly. | Space | nod | "Light from the core takes tens of thousands of years or more to get out. It keeps bumping into things. You take about 2 seconds." | F-08, F-09 | |
-| 3.6 | The neutrino's tint begins to shift. Flavor icon under the counter changes with it. Tint keeps cycling; obstacles thin out and the haze brightens toward the surface. | watches | look-at-self, then shrug | "Neutrinos come in three flavors: electron, muon, and tau. You were born electron-flavor. But look. You're changing. A neutrino can only change flavor if it has some mass. That's how we know you aren't weightless." | F-12, F-05 | rising tone |
-| 3.7 | Burst out of the surface into black space. The Sun glares behind. | | cheer | none | | whoosh, ta-da |
-| 3.8 | Corner button "Want more?" (level 7): who proved flavor change. | | | | F-13 | |
+| 3.6 | The neutrino's tint begins to shift. Flavor icon under the counter changes with it. Card. | watches | look-at-self | "Neutrinos come in three kinds, called flavors: electron, muon, and tau. You were born electron-flavor. But look at your colour. You're changing." | F-12 | rising tone |
+| 3.7 | Card. Tint keeps cycling; obstacles thin out and the haze brightens toward the surface. | | shrug | "A neutrino can only change flavor if it has at least a little mass. That's how we know you aren't weightless." | F-05 | rising tone |
+| 3.8 | Burst out of the surface into black space. The Sun glares behind. | | cheer | none | | whoosh, ta-da |
+| 3.9 | Corner button "Want more?" (level 7): who proved flavor change. | | | | F-13 | |
 
 ---
 
@@ -118,14 +120,14 @@ Open space. Sun shrinking behind, Earth a dot ahead. Travel meter shows kilomete
 
 | # | Player sees | Player does | Neutrino | Caption | Facts | Cue |
 |---|---|---|---|---|---|---|
-| 4.1 | Meter appears: "0 km, 0 light-seconds". Card. | Space | nod | "150 million kilometers to Earth. Light takes about 8 minutes 20 seconds. So do you." | F-15 | tick |
+| 4.1 | Meter appears: "0 km, 0 light-seconds". Card. | Space | nod | "Out of the Sun, into space. Earth is 150 million kilometers away. Light takes about 8 minutes 20 seconds to get there. So do you." | F-15 | tick |
 | 4.2 | Meter ticks for about two flavor shifts (~3 s). Star streaks. Sun shrinks. | watches | wiggle | none | F-30 | tick |
 | 4.3 | At ~40% of the trip the meter pauses. Card. | reads | nod | "Halfway to Earth. Before you arrive, meet the family: every particle matter is made of, on one chart." | F-16 | blip |
-| 4.4 | After the card the neutrino drifts to the right and shrinks, as if zoomed out, to watch. A "family photo" grid builds on the left, one family row at a time (6 quarks, 6 leptons, 4 force carriers, Higgs), each row colour-coded (quarks rose, leptons cyan, force carriers green, Higgs gold) and announced by a one-line timed card (family lines below). Each tile has a name and a plain one-line label (table below); the three neutrino tiles show only a question mark. Then the card below appears; a highlight sits on the first tile, arrows move it, Space picks. Clicking a tile also works. | reads | peek at the grid, then wave | "This is the Standard Model, the list of everything matter is made of. Find yourself." | F-16 | blip |
+| 4.4 | After the card the neutrino drifts to the right and shrinks, as if zoomed out, to watch. A "family photo" grid builds on the left, one family row at a time (6 quarks, 6 leptons, 4 force carriers, Higgs), each row colour-coded (quarks rose, leptons cyan, force carriers green, Higgs gold) and announced by a one-line timed card (family lines below). Each tile has a name and a plain one-line label (table below); the three neutrino tiles show only a question mark. Then the card below appears; a highlight sits on the first tile, arrows move it, Space picks. Clicking a tile also works. | reads | peek at the grid, then wave | "This is the Standard Model, the list of everything matter is made of. Find yourself: arrow keys to move, Space to pick." | F-16 | blip |
 | 4.5 | Wrong tile picked: it wiggles and its one-line label enlarges for 2 s. | picks | shrug | (the tile's own label) | F-16 | buzz |
 | 4.6 | Right tile picked (any of the three neutrino tiles counts): the neutrino jumps into the tile. | picks | cheer | "Found you. You're one of the three neutrinos, in the lepton family, next to the electron." | F-16 | ta-da |
 | 4.7 | Card slides out. The meter dashes the rest of the way in ~3 s; Earth grows to fill the view. | watches | proud | none | | tick rate follows speed |
-| 4.8 | Dive: through clouds, over Japan, into a mountainside. Card. | | brace (playfully, then surprised, it passes through rock too) | "Arriving: Kamioka mine, Japan. 1,000 meters underground. Rock doesn't stop you either." | F-19 | whoosh, thwip |
+| 4.8 | Dive: through clouds, over Japan, into a mountainside. Card. | | brace (playfully, then surprised, it passes through rock too) | "Down through the clouds, over Japan, into a mountain: the Kamioka mine, 1,000 meters underground. Rock doesn't stop you either." | F-19 | whoosh, thwip |
 
 ### Level 4 family lines (F-16)
 
@@ -173,11 +175,11 @@ Inside the tank. Dark water, gold sensor grid on every wall. Camera floats near 
 | 5.3 | **The hero's hit.** A single tiny electron drifts ahead in the water. Time slows. Prompt: "Press Space to hit the electron". | presses Space | brace | none | | |
 | 5.4 | On press: the neutrino nudges the electron. The electron shoots forward. A blue cone of light grows from its path and hits the wall as a fuzzy ring. Sensors under the ring light up. | watches | surprised, then proud | none | F-21 | chime |
 | 5.5 | Card, over the glowing ring. Counter still ticking. | Space | proud | "You hit something. You kicked an electron faster than light moves in water. That makes a cone of light, and where it lands on the wall: a ring. That ring is how the sensors see you." | F-21, F-31 | |
-| 5.6 | Card. Beside the hero's fuzzy ring, a sharp ring is drawn for comparison. | Space | look-at-self | "Your ring is fuzzy, because the electron scatters and showers. A muon would punch straight through and leave a sharp ring." | F-22 | |
+| 5.6 | Card. Beside the hero's fuzzy ring, a sharp ring is drawn for comparison. | Space | look-at-self | "Your ring is fuzzy, because the electron bounces around and sprays out more particles as it goes. A muon, the electron's heavy cousin, would punch straight through and leave a sharp ring." | F-22 | |
 | 5.7 | Mini-game intro. Two buttons appear, labelled with their keys: "E  Electron" and "M  Muon". Card. | Space | nod | "Now you're the physicist. Five more rings are coming from other neutrinos. Sharp or fuzzy? Press E for an electron, M for a muon." | F-22 | blip |
 | 5.8 | Rings 1–5, one at a time. Fixed set, in order: fuzzy, sharp, fuzzy, sharp, fuzzy-but-ambiguous. | presses E or M (or clicks) | peek at each ring | none until answered | F-22, F-31 | blip |
 | 5.9 | After each answer: the ring is labeled, a one-line reason shows for 3 s (table below). | | nod on correct, shrug on wrong | (one line each, table below) | F-22 | chime / buzz |
-| 5.10 | Card, after ring 5. | Space | nod | "Solar neutrinos show up as electron rings pointing away from the Sun. That's how Super-K knows they came from the Sun." | F-23 | |
+| 5.10 | Card, after ring 5. | Space | nod | "Neutrinos from the Sun show up as electron rings that point away from the Sun. That's how Super-K knows where they came from." | F-23 | |
 | 5.11 | Card. Smaller type. | Space | | "These rings are simulated from Super-K's published shape and physics. They are not real recordings." | F-24, F-17, F-18 | |
 | 5.12 | Corner button "Want more?" (level 7). | | | | F-28 | |
 
@@ -199,7 +201,7 @@ F-20 note (card 5.2, "about 30 neutrinos a day"): confirm the number against the
 
 | # | Player sees | Player does | Neutrino | Caption | Facts | Cue |
 |---|---|---|---|---|---|---|
-| 6.1 | The tank fades to black. A dark square field, 90° across, centred on where the Sun is. Thousands of tiny dots land one at a time, each one a detected neutrino's direction in its flavor tint (D-011), slowly at first and then in a rush over ~9 s, until the Sun builds out of them at the centre over a speckled background. The field fills the whole view; a line in the corner says the map is simulated (F-34). The neutrino is not on screen. | watches | off screen | none | F-34, F-25 | tick per burst |
+| 6.1 | The tank fades to black. A dark square field, 90° across, centred on where the Sun is. Thousands of tiny dots land one at a time, each one a detected neutrino's direction in its flavor tint (D-011), slowly at first and then in a rush over ~9 s, until the Sun builds out of them at the centre over a speckled background. The field fills the whole view; a line in the corner says the map is simulated (F-34). The neutrino is not on screen. | watches | off screen | "Every dot is one neutrino the detector caught, placed by the direction it came from. Watch where they pile up." (timed, early in the fill) | F-34, F-25 | tick per burst |
 | 6.2 | Card, over the finished map. | | proud | "This is the Sun, seen in neutrinos. It took 503 days of watching. Some of these neutrinos arrived at night, after passing through the entire Earth." | F-25 | chime |
 | 6.3 | Card. After it, the dots brighten into one warm glow over ~2.5 s. | | nod | "Nothing stopped them. Nothing stopped you." | F-10 | swell |
 | 6.4 | The through-line counter stops, moves to center on a dark plate, grows large. Its own label is the caption: "Neutrinos through you since you started:" and the number. No separate card. | | peek | none | F-32 | tick, then chime |

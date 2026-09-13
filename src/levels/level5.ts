@@ -224,7 +224,7 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   shown.push(rival);
   void animate(s, RING_IN, (u) => { rival.alpha = u; repaint(); });
   ghost.react('look-at-self');
-  await b.card('Your ring is fuzzy, because the electron scatters and showers. A muon would punch straight through and leave a sharp ring.', ['F-22']);
+  await b.card("Your ring is fuzzy, because the electron bounces around and sprays out more particles as it goes. A muon, the electron's heavy cousin, would punch straight through and leave a sharp ring.", ['F-22']);
 
   // 5.7 the sorting game.
   let picked: 'E' | 'M' | null = null;
@@ -274,6 +274,6 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   void rig.moveTo(EYE, AIM, 0.8);
 
   ghost.react('nod');
-  await b.card("Solar neutrinos show up as electron rings pointing away from the Sun. That's how Super-K knows they came from the Sun.", ['F-23']);
+  await b.card("Neutrinos from the Sun show up as electron rings that point away from the Sun. That's how Super-K knows where they came from.", ['F-23']);
   await b.card("These rings are simulated from Super-K's published shape and physics. They are not real recordings.", ['F-24', 'F-17', 'F-18'], { small: true });
 });

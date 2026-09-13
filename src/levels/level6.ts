@@ -67,6 +67,7 @@ export const createLevel6 = scriptedLevel(6, async (s) => {
     if (fill.rush > 0) cues.batchTick(fill.rush);
   });
   await hud.fade(0, 1);
+  await b.card('Every dot is one neutrino the detector caught, placed by the direction it came from. Watch where they pile up.', ['F-34']);
   await b.until(() => fill.done);
   await b.wait(1);
 

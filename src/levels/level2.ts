@@ -87,7 +87,7 @@ export const createLevel2 = scriptedLevel(2, async (s) => {
   ghost.react('wiggle');
   s.cues.blip();
   await s.b.card(
-    'Meet a neutrino. Born a moment ago in the Sun\'s core, where it\'s about 15 million degrees.',
+    "This is you: a neutrino, one of the tiniest particles there is. Born a moment ago in the Sun's core, where it's about 15 million degrees.",
     ['F-03'],
   );
 
@@ -125,7 +125,7 @@ export const createLevel2 = scriptedLevel(2, async (s) => {
     s.cues.pop();
   });
   await s.b.card(
-    'It has almost no mass. Weighed against an electron, it\'s over a million times lighter.',
+    "It has almost no mass. Weighed against an electron, the small particle that orbits every atom, it's over a million times lighter.",
     ['F-04'],
   );
 
@@ -145,10 +145,8 @@ export const createLevel2 = scriptedLevel(2, async (s) => {
   void s.rig.moveTo({ x: 0, y: 0.2, z: 4.5 }, { x: 0, y: -0.3, z: 0 }, 1);
   ghost.react('cheer');
   s.cues.chime();
-  await s.b.card(
-    'No electric charge. Most solar neutrinos come from two protons squeezed together; you came from a rarer squeeze, with extra energy a detector can catch.',
-    ['F-06', 'F-01', 'F-02'],
-  );
+  await s.b.card("No electric charge either, so electricity and magnets can't grab it. That's why almost nothing can.", ['F-06']);
+  await s.b.card("Most of the Sun's neutrinos come from two protons squeezed together. You came from a rarer squeeze, with extra energy a detector can catch.", ['F-01', 'F-02']);
 
   // 2.4
   s.cues.whoosh();

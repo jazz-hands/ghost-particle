@@ -206,7 +206,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   // One soft tick as the meter appears (4.1). The trip has no tick loop.
   s.cues.tick();
   ghost.react('nod');
-  await s.b.card('150 million kilometers to Earth. Light takes about 8 minutes 20 seconds. So do you.', ['F-15']);
+  await s.b.card('Out of the Sun, into space. Earth is 150 million kilometers away. Light takes about 8 minutes 20 seconds to get there. So do you.', ['F-15']);
 
   ghost.react('wiggle');
   await s.b.until(() => p >= GRID_AT);
@@ -234,7 +234,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   }
   hunting = true;
   ghost.react('wave');
-  s.hud.note('This is the Standard Model, the list of everything matter is made of. Find yourself.', ['F-16']);
+  s.hud.note('This is the Standard Model, the list of everything matter is made of. Find yourself: arrow keys to move, Space to pick.', ['F-16']);
   let found = false;
   grid.onPick((i) => {
     if (found || !hunting) return;
@@ -288,7 +288,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   s.cues.thwip();
   await dive;
   s.rig.shake(0);
-  await s.b.card("Arriving: Kamioka mine, Japan. 1,000 meters underground. Rock doesn't stop you either.", ['F-19']);
+  await s.b.card("Down through the clouds, over Japan, into a mountain: the Kamioka mine, 1,000 meters underground. Rock doesn't stop you either.", ['F-19']);
 });
 
 // The beat sheet's reduced-motion rule: the idle bob goes, nothing else changes.
