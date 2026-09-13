@@ -300,14 +300,14 @@ export class Hud {
   skymap(opts: { degrees: number; note: string; credit: string }): SkyMapHandle {
     // A dot at rest, and the wider, brighter stamp it lands as for one frame.
     const DOT_RADIUS = 1.5;
-    const DOT_ALPHA = 0.5;
+    const DOT_ALPHA = 0.62;
     const FLARE_RADIUS = 3.6;
     const FLARE_ALPHA = 0.85;
     // The centre's bloom: warm, wide and soft-edged, strengthening as arrivals pile up. The
     // curve is asymptotic, so it needs no total to aim at: 3000 arrivals reach two thirds.
     const WASH_DEGREES = 30;
     const WASH_RGB = '255, 206, 138';
-    const WASH_PEAK = 0.24;
+    const WASH_PEAK = 0.3;
     const WASH_ARRIVALS = 3000;
     // The glow-up: the settled dots are lifted and pulled toward white, so the crowded centre
     // reads as gold-white while the sparse edges keep their tints.

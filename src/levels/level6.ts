@@ -18,10 +18,11 @@ const FREEZE_CHIME_AFTER = 0.9;
 const COUNTER_SECONDS = 4;
 // 6.5: the character sees the player off from the lower right of whatever view the credits
 // arrive in. It is placed along a line out of the camera, so the camera itself never moves.
-const GOODBYE_NDC = { x: 0.72, y: -0.6 };
+const GOODBYE_NDC = { x: 0.7, y: -0.52 };
 const GOODBYE_DEPTH = 7;
-// The character's body sphere has radius 1; the blockout's ghost was half that.
-const CHARACTER_SCALE = 0.5;
+// The character's body sphere has radius 1. Half of that is the size it plays levels at; this
+// is a goodbye from the corner, so it is smaller again and clear of the screen edge.
+const CHARACTER_SCALE = 0.22;
 const WAVE_EVERY = 4;
 
 function creditLines(): string[] {
