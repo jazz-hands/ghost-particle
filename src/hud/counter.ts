@@ -24,6 +24,7 @@ function round(n: number): string {
 
 export class Counter {
   private readonly el: HTMLDivElement;
+  private readonly label: Text;
   private readonly text: HTMLSpanElement;
   private startedAt: number | null = null;
   private stoppedAt: number | null = null;
@@ -34,7 +35,8 @@ export class Counter {
     this.el = document.createElement('div');
     this.el.className = 'hud-counter';
     this.el.hidden = true;
-    this.el.append(document.createTextNode('Neutrinos through you since you started: '));
+    this.label = document.createTextNode('Neutrinos through you since you started: ');
+    this.el.append(this.label);
     this.text = document.createElement('span');
     this.text.className = 'hud-counter-value';
     this.el.append(this.text);
@@ -71,6 +73,7 @@ export class Counter {
 
   freezeLarge(): void {
     this.stop();
+    this.label.data = 'The number of neutrinos that have passed through you since the start of the game:';
     this.el.classList.add('hud-counter-large');
   }
 
