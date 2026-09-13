@@ -199,9 +199,9 @@ F-20 note (card 5.2, "about 30 neutrinos a day"): confirm the number against the
 
 | # | Player sees | Player does | Neutrino | Caption | Facts | Cue |
 |---|---|---|---|---|---|---|
-| 6.1 | The tank fades to black. A dark square field, 90° across, centred on where the Sun is. Dots land one at a time, each one a detected neutrino's direction, slowly at first and then in a rush over ~9 s; bins brighten with their count until a bright blob sits at the centre over a speckled background. A line under the field says the map is simulated (F-34). The neutrino floats beside it. | watches | peek at the field as it fills | none | F-34, F-25 | hum (soft), tick per burst |
+| 6.1 | The tank fades to black. A dark square field, 90° across, centred on where the Sun is. Thousands of tiny dots land one at a time, each one a detected neutrino's direction in its flavor tint (D-011), slowly at first and then in a rush over ~9 s, until the Sun builds out of them at the centre over a speckled background. A line under the field says the map is simulated (F-34). The neutrino floats beside it. | watches | peek at the field as it fills | none | F-34, F-25 | hum (soft), tick per burst |
 | 6.2 | Card, over the finished map. | | proud | "This is the Sun, seen in neutrinos. It took 503 days of watching. Some of these neutrinos arrived at night, after passing through the entire Earth." | F-25 | chime |
-| 6.3 | Card. | | nod | "Nothing stopped them. Nothing stopped you." | F-10 | |
+| 6.3 | Card. After it, the dots brighten into one warm glow over ~2.5 s. | | nod | "Nothing stopped them. Nothing stopped you." | F-10 | swell |
 | 6.4 | The through-line counter stops, moves to center, grows large. | | peek | "And through you, since you pressed start:" (the number) | F-32 | tick, then chime |
 | 6.5 | Credits roll, generated from FACTS.md: facts and sources, "made with" list, the tint disclaimer, the sky-map disclaimer, the counter's reference-person disclosure. "Play again" at the end. | scrolls, or waits | wave | none | all | ta-da |
 

@@ -2,11 +2,12 @@ import { scriptedLevel } from './scripted.ts';
 import { neutrino } from '../render/prims.ts';
 import { FACTS } from '../content/facts.ts';
 import { FIELD_DEGREES, sampleEvent, seeded } from '../content/skymap.ts';
+import { TINTS } from '../content/flavors.ts';
 
 // The map fills over MAP_SECONDS, slowly at first and faster as it goes, to EVENTS in total (F-34).
-const EVENTS = 6000;
+const EVENTS = 9000;
 const MAP_SECONDS = 9;
-const BINS = 48;
+const GLOW_SECONDS = 2.5;
 
 function creditLines(): string[] {
   const facts = Object.values(FACTS).flatMap((fact) => [`${fact.id} ${fact.title}`, ...fact.sources]);
@@ -35,7 +36,6 @@ export const createLevel6 = scriptedLevel(6, async (s) => {
   // 6.1: the field fills with event directions until the Sun stands out.
   const map = hud.skymap({
     degrees: FIELD_DEGREES,
-    bins: BINS,
     note: 'Simulated from the scattering physics (F-34); not the real 503-day map.',
     credit: 'After the Super-Kamiokande solar neutrino sky map (F-25).',
   });
@@ -48,7 +48,10 @@ export const createLevel6 = scriptedLevel(6, async (s) => {
     const u = elapsed / MAP_SECONDS;
     const target = Math.round(EVENTS * u * u);
     const batch = [];
-    for (; dropped < target; dropped += 1) batch.push(sampleEvent(rand));
+    for (; dropped < target; dropped += 1) {
+      const e = sampleEvent(rand);
+      batch.push({ x: e.x, y: e.y, color: TINTS[e.flavor] });
+    }
     if (batch.length > 0) map.drop(batch);
   });
   await hud.fade(0, 1);
@@ -58,6 +61,7 @@ export const createLevel6 = scriptedLevel(6, async (s) => {
   // 6.2, 6.3
   await b.card('This is the Sun, seen in neutrinos. It took 503 days of watching. Some of these neutrinos arrived at night, after passing through the entire Earth.', ['F-25']);
   await b.card('Nothing stopped them. Nothing stopped you.', ['F-10']);
+  await map.glow(GLOW_SECONDS);
 
   // 6.4: the through-line counter stops and grows.
   hud.counter.freezeLarge();

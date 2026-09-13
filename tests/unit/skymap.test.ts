@@ -31,3 +31,10 @@ test('the same seed gives the same events', () => {
   const b = seeded(3);
   for (let i = 0; i < 100; i += 1) assert.deepEqual(sampleEvent(a), sampleEvent(b));
 });
+
+test('about a third of events are electron flavor', () => {
+  const rand = seeded(5);
+  let electron = 0;
+  for (let i = 0; i < 10000; i += 1) if (sampleEvent(rand).flavor === 'electron') electron += 1;
+  assert.ok(Math.abs(electron / 10000 - 0.34) < 0.02);
+});

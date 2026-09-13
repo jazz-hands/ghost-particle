@@ -261,13 +261,22 @@ html, body {
 
 .hud-skymap {
   position: absolute;
-  left: 6vw;
+  left: 5vw;
   top: 50%;
   transform: translateY(-50%);
-  width: min(52vh, 40vw);
+  width: min(72vh, 46vw);
 }
 
-.hud-skymap canvas { display: block; width: 100%; height: auto; border: 1px solid #3b4756; }
+.hud-skymap canvas { display: block; width: 100%; height: auto; }
+
+.hud-skymap-glow {
+  position: absolute;
+  inset: 0;
+  aspect-ratio: 1;
+  background: radial-gradient(circle at 50% 50%, #fff4d6 0%, #ffcf7a 18%, rgba(255, 180, 84, 0.55) 40%, rgba(255, 180, 84, 0) 70%);
+  opacity: 0;
+  pointer-events: none;
+}
 .hud-chart-axis { fill: none; stroke: #6b7a89; }
 .hud-chart-point { fill: #cfd8dc; stroke: #cfd8dc; }
 .hud-chart-curve { fill: none; stroke: #cfd8dc; stroke-width: 1.5; }
