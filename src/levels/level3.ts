@@ -152,13 +152,11 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   fog.density = 0.03;
   await s.b.card('Light from the core takes tens of thousands of years or more to get out. It keeps bumping into things. You take about 2 seconds.', ['F-08', 'F-09']);
   cycling = true;
-  await s.b.card("Neutrinos come in three flavors: electron, muon, and tau. You were born electron-flavor. But look. You're changing.", ['F-12']);
-
   spawning = false;
   rising = true;
-  await s.b.card("A neutrino can only change flavor if it has some mass. That's how we know you aren't weightless.", ['F-05']);
+  await s.b.card("Neutrinos come in three flavors: electron, muon, and tau. You were born electron-flavor. But look. You're changing. A neutrino can only change flavor if it has some mass. That's how we know you aren't weightless.", ['F-12', 'F-05']);
 
-  // 3.8: out of the surface into black space, the Sun glaring behind.
+  // 3.7: out of the surface into black space, the Sun glaring behind.
   s.scene.fog = null;
   s.scene.background = stageBackground;
   const sun = sphere(8);
