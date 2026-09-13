@@ -78,8 +78,6 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   };
 
   s.onUpdate((dt) => {
-    const rate = s.hud.cardUp ? 1 / 3 : 1;
-
     if (s.keys.isDown('ArrowLeft')) lane -= STEER * dt;
     if (s.keys.isDown('ArrowRight')) lane += STEER * dt;
     lane = Math.min(Math.max(lane, -LANE), LANE);
@@ -87,7 +85,7 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
     if (follow) s.rig.set({ x: lane * 0.5, y: 0.5, z: 6 }, { x: ghost.position.x, y: ghost.position.y - 0.6, z: 0 });
 
     if (spawning) {
-      spawnIn -= dt * rate;
+      spawnIn -= dt;
       if (spawnIn <= 0) {
         add(nextObstacle());
         spawnIn = 1.5 + Math.random() * 0.5;
@@ -95,7 +93,7 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
     }
 
     for (const o of [...obstacles]) {
-      o.object.position.z += RAIL * rate * dt;
+      o.object.position.z += RAIL * dt;
       if (!o.passed && o.object.position.z >= 0) {
         o.passed = true;
         tally += 1;

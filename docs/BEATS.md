@@ -20,9 +20,9 @@ Pacing is judged against these. A level that runs long is cut, not sped up.
 | 6 Twenty-two years of watching | 60 s |
 | Total | 5 min 35 s, about six minutes |
 
-Caption rules: at most 25 words, plain language, every card that states a fact is tagged with F-IDs (D-002, D-015); pure instruction cards carry no tag. "Continue" always means pressing Space. Space is never also a hold key on a level that has cards; holds use the right arrow.
+Caption rules: at most 25 words, plain language, every card that states a fact is tagged with F-IDs (D-002, D-015); pure instruction cards carry no tag. Cards are timed: each stays for 1.5 s plus 0.3 s per word while the action continues underneath, and pressing Space dismisses it early. Space is never also a hold key on a level that has cards; holds use the right arrow.
 
-Rail rule (levels 3 and 4): while a card is up the rail slows to about a third of speed and resumes on Space, so nothing is missed while reading.
+Rail rule (levels 3 and 4): the rail never slows for a card; steering stays live while a card is up.
 
 Input map (D-010): Space = hold in level 1, continue elsewhere. Left/Right = steer in level 3, move the grid highlight in level 4. Hold Right = fast-forward in level 4. M = measure in level 4. E / M = electron / muon in level 5. Escape = close a side panel. Mouse clicks also work on every DOM control, but nothing requires them.
 

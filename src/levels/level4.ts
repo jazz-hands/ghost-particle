@@ -80,7 +80,6 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
 
   s.onUpdate((dt) => {
     let speed = paused ? 0 : 1;
-    if (s.hud.cardUp) speed /= 3;
     if (s.keys.isDown('ArrowRight')) speed *= 4;
     if (rushing) speed *= 8;
     if (speed > 0 && p < 1) {
