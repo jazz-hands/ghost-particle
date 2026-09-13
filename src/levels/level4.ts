@@ -41,12 +41,15 @@ const STAR_SLOWEST = 0.4;
 
 // The Sun keeps levels 1 and 2's amber family, so the star left behind is the one you were born
 // in: a warm emissive disc inside a soft additive halo, both shrinking together.
-const SUN_RADIUS = 4;
+const SUN_RADIUS = 5;
 const SUN_CORE = '#ffe6bd';
 const SUN_GLOW = '#ff9f45';
-const SUN_EMISSIVE = 1.6;
-const SUN_GLOW_SIZE = 26;
-const SUN_GLOW_OPACITY = 0.5;
+const SUN_EMISSIVE = 0.9;
+const SUN_GLOW_SIZE = 12;
+// Off the camera's left shoulder and low, where neither the grid nor the caption sits: the
+// blockout put it behind the camera, where none of the shrinking could be seen.
+const SUN_AT = new Vector3(-34, -18, -11);
+const SUN_GLOW_OPACITY = 0.35;
 const SUN_SHRINK = 0.85;
 
 // Earth is procedural: a deep ocean blue body under a slightly larger translucent white shell
@@ -134,7 +137,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   }));
   halo.scale.setScalar(SUN_GLOW_SIZE);
   sun.add(halo);
-  sun.position.set(-6, 0, 25);
+  sun.position.copy(SUN_AT);
   s.group.add(sun);
   // Sprite materials go with the level group; the texture they share does not.
   sun.addEventListener('removed', () => halo.material.map?.dispose());
