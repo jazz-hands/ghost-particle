@@ -77,6 +77,15 @@ const REACTIONS = {
     { t: 1, scaleX: 1, scaleY: 1.02, offsetY: 0.02, lowerLid: 0.42, ease: 'back' },
     { t: 1.3, ease: 'inOut' },
   ],
+  // Two dips, each with a little squash, and a soft lid drop for warmth.
+  nod: [
+    { t: 0 },
+    { t: 0.18, offsetY: -0.17, scaleX: 1.05, scaleY: 0.92, squint: 0.16, ease: 'inOut' },
+    { t: 0.36, offsetY: 0.04, scaleX: 0.99, scaleY: 1.03, squint: 0.08, ease: 'inOut' },
+    { t: 0.54, offsetY: -0.17, scaleX: 1.05, scaleY: 0.92, squint: 0.16, ease: 'inOut' },
+    { t: 0.72, offsetY: 0.03, scaleX: 0.99, scaleY: 1.02, squint: 0.06, ease: 'inOut' },
+    { t: 0.88, ease: 'inOut' },
+  ],
 };
 
 const NAMES = [
