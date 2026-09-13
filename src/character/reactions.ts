@@ -73,6 +73,13 @@ export const REACTIONS: Record<string, Keyframe[]> = {
     { t: 0.82, offsetY: 0.16, scaleX: 0.97, scaleY: 1.05, eyeTall: 0.11, eyeWidth: 1.12, ease: 'linear' },
     { t: 1.15, ease: 'inOut' },
   ],
+  // Lean toward the thing being looked at; the near eye opens larger than the far one.
+  peek: [
+    { t: 0 },
+    { t: 0.26, rotZ: -0.2, offsetX: 0.16, eyeShiftX: 0.012, leftEye: 1.22, rightEye: 0.86, ease: 'out' },
+    { t: 0.72, rotZ: -0.23, offsetX: 0.19, eyeShiftX: 0.014, leftEye: 1.28, rightEye: 0.84, ease: 'inOut' },
+    { t: 1.1, ease: 'inOut' },
+  ],
 };
 
 export const NAMES = [
