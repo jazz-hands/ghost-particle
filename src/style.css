@@ -57,10 +57,11 @@ html, body {
 }
 
 .hud-card-hint {
-  margin-top: 0.5rem;
-  font-size: 0.8rem;
-  color: #8fa0b1;
-  text-align: right;
+  margin-top: 0.6rem;
+  font-size: 0.75rem;
+  font-style: italic;
+  color: #5c6a78;
+  text-align: center;
 }
 
 .hud-note { cursor: default; }
