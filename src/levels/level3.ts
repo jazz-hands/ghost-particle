@@ -24,7 +24,7 @@ const TRY_Z = -20;
 // Inside a star, in one warm family. The deep core orange is both the background and the fog,
 // so obstacles fade into the haze instead of ending at a silhouette; the climb lands on an
 // orange-white surface. Emissive values are set against the stage's bloom threshold of 0.71.
-const CORE_ORANGE = '#c9350a';
+const CORE_ORANGE = '#7d1c03';
 const SURFACE_GOLD = '#ffd8a0';
 const FOG_DENSITY = 0.055;
 // 3.5: the haze thins.
@@ -32,17 +32,17 @@ const FOG_THIN = 0.032;
 // 3.6: it keeps thinning as the surface brightens.
 const FOG_SURFACE = 0.012;
 // The star's own glare, one unfogged sprite behind every obstacle.
-const GLARE_AMBER = '#ff9a3c';
-const GLARE_SIZE = 70;
+const GLARE_AMBER = '#ff8a28';
+const GLARE_SIZE = 42;
 const GLARE_Z = -56;
-const GLARE_OPACITY = 0.75;
+const GLARE_OPACITY = 0.5;
 // Plasma walls are glowing translucent sheets; the wall of light is brighter and whiter.
-const PLASMA_ORANGE = '#ff8f37';
-const PLASMA_OPACITY = 0.34;
-const PLASMA_EMISSIVE = 1.15;
+const PLASMA_ORANGE = '#ffae52';
+const PLASMA_OPACITY = 0.45;
+const PLASMA_EMISSIVE = 1.8;
 const LIGHT_WALL = '#fff4de';
-const LIGHT_WALL_OPACITY = 0.6;
-const LIGHT_WALL_EMISSIVE = 1.9;
+const LIGHT_WALL_OPACITY = 0.7;
+const LIGHT_WALL_EMISSIVE = 2.6;
 const WALL_W = 12;
 const WALL_H = 8;
 const GAP_HALF_W = 5;
@@ -391,7 +391,7 @@ function glareTexture(): CanvasTexture {
   const g = canvas.getContext('2d')!;
   const gradient = g.createRadialGradient(128, 128, 0, 128, 128, 128);
   gradient.addColorStop(0, 'rgba(255,255,255,1)');
-  gradient.addColorStop(0.45, 'rgba(255,255,255,0.34)');
+  gradient.addColorStop(0.3, 'rgba(255,255,255,0.3)');
   gradient.addColorStop(1, 'rgba(255,255,255,0)');
   g.fillStyle = gradient;
   g.fillRect(0, 0, 256, 256);
