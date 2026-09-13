@@ -94,10 +94,10 @@ const NEUTRINO_TILES = [9, 10, 11];
 // One line per family as its row of tiles arrives (F-16).
 // Each family arrives with its own sound.
 const FAMILIES: [string, string, 'pop' | 'blip' | 'thwip' | 'chime'][] = [
-  ['Quarks', 'Quarks: the pieces inside protons and neutrons.', 'pop'],
-  ['Leptons', 'Leptons: the electron and its cousins.', 'blip'],
-  ['Force carriers', 'Force carriers: what pushes and pulls.', 'thwip'],
-  ['Higgs', 'The Higgs: where mass comes from.', 'chime'],
+  ['Quarks', "Quarks: the pieces inside protons and neutrons. Three quarks together make a proton, and three quarks make a neutron. Only Up and Down are in everyday matter; the other four are heavier cousins that appear when particles collide hard.", 'pop'],
+  ['Leptons', "Leptons: the electron and its cousins. They aren't built from quarks. The electron orbits atoms; the muon and tau are heavier versions that decay in a flash. Each has a neutrino partner: no charge, almost no mass.", 'blip'],
+  ['Force carriers', "Force carriers: what pushes and pulls. Particles don't touch; they trade these. The photon carries light and electricity, the gluon holds quarks together, and the W and Z carry the weak force, the only one a neutrino feels besides gravity.", 'thwip'],
+  ['Higgs', "The Higgs: where mass comes from. Its field fills all of space, and particles get their mass from how strongly they feel it. Found in 2012, the last piece of the chart.", 'chime'],
 ];
 // Screen-right of the camera at (4, 1.5, 5): where the neutrino sits, smaller, to watch the grid.
 const ASIDE = new Vector3(1.25, -0.35, -0.6);
@@ -235,7 +235,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   }
   hunting = true;
   ghost.react('wave');
-  s.hud.note('This is the Standard Model, the list of everything matter is made of. Find yourself: arrow keys to move, Space to pick.', ['F-16']);
+  s.hud.note('This is the Standard Model, the list of everything matter is made of.\nFind yourself. Arrow keys to move, Space to pick.', ['F-16']);
   let found = false;
   let wrong = 0;
   grid.onPick((i) => {

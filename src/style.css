@@ -54,6 +54,7 @@ html, body {
 .hud-card-text {
   font-size: 1.15rem;
   line-height: 1.45;
+  white-space: pre-line;
 }
 
 .hud-card-hint {

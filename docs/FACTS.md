@@ -125,7 +125,7 @@ Each entry: plain-language wording (what the player reads), precise statement (f
 
 ### F-16 The Standard Model family
 - Player wording: "The Standard Model is the list of basic ingredients: 6 quarks, 6 leptons (three of them neutrinos), 4 force carriers, and the Higgs."
-- Precise: quarks u, d, c, s, t, b; leptons e, μ, τ, νₑ, ν_μ, ν_τ; gauge bosons γ, g, W, Z; Higgs H.
+- Precise: quarks u, d, c, s, t, b; leptons e, μ, τ, νₑ, ν_μ, ν_τ; gauge bosons γ, g, W, Z; Higgs H. Protons and neutrons are each three quarks (uud, udd); only u and d occur in ordinary matter, the heavier four are produced in high-energy collisions. Leptons are not built from quarks; μ and τ are heavier, short-lived versions of the electron, each charged lepton paired with a neutrino. Forces act by exchanging carriers: γ (electromagnetism), g (strong), W and Z (weak). The Higgs field gives particles mass; the Higgs boson was discovered at CERN in 2012.
 - Sources: CERN, "The Standard Model", https://home.cern/science/physics/standard-model/
 - Status: verified.
 - Used: L4. The 17 tile labels are in `BEATS.md` under level 4.
