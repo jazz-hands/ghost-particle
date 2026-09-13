@@ -1,6 +1,6 @@
 import {
-  AdditiveBlending, CanvasTexture, CircleGeometry, Color, DoubleSide, FogExp2, Group,
-  InstancedMesh, Mesh, MeshStandardMaterial, Object3D, PlaneGeometry, SphereGeometry,
+  AdditiveBlending, BoxGeometry, CanvasTexture, CircleGeometry, Color, DoubleSide, FogExp2,
+  Group, InstancedMesh, Mesh, MeshStandardMaterial, Object3D, PlaneGeometry, SphereGeometry,
   SRGBColorSpace, Sprite, SpriteMaterial,
 } from 'three';
 import { cycleFlavor } from '../content/flavors.ts';
@@ -57,6 +57,17 @@ const KNOT_SPREAD = 1.2;
 const SUN_GOLD = '#ffdc9b';
 const SUN_EMISSIVE = 2.6;
 const SUN_RADIUS = 8;
+// The rush blur: plasma drawn past the camera as streaks. Off under reduced motion.
+const STREAK_COLOR = '#ffd9a0';
+const STREAK_COUNT = 64;
+const STREAK_LENGTH = 3;
+const STREAK_THICKNESS = 0.035;
+const STREAK_EMISSIVE = 1.6;
+const STREAK_OPACITY = 0.4;
+const STREAK_SPEED = RAIL * 2.4;
+// Kept off the rail itself, so the streaks never sit in front of the character.
+const STREAK_NEAR = 1.8;
+const STREAK_FAR = 8;
 // The character's body sphere has radius 1; the blockout's ghost was half that.
 const CHARACTER_SCALE = 0.5;
 // Far enough out that the squash lands before the obstacle arrives.
@@ -114,6 +125,9 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   glare.renderOrder = -1;
   s.group.add(glare);
   glare.addEventListener('removed', () => glareTex.dispose());
+
+  const streaks = prefersReducedMotion() ? null : rushBlur();
+  if (streaks) s.group.add(streaks.mesh);
 
   const obstacles: Obstacle[] = [];
   let lane = 0;
@@ -191,6 +205,8 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
     if (follow) {
       s.rig.set({ x: lane * 0.5, y: 0.5, z: 6 }, { x: ghost.group.position.x, y: ghost.group.position.y - 0.6, z: 0 });
     }
+
+    streaks?.update(dt);
 
     if (spawning) {
       spawnIn -= dt;
@@ -295,6 +311,54 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   ghost.react('cheer');
   await s.rig.moveTo({ x: 0, y: 0.8, z: 2 }, { x: 0, y: 0, z: 30 }, 1.5);
 });
+
+interface RushBlur { mesh: InstancedMesh; update(dt: number): void }
+
+// One instanced mesh of thin bars flying past. The beat sheet turns this off under a
+// reduced-motion preference; steering and the obstacles are untouched either way.
+function rushBlur(): RushBlur {
+  const material = glowMaterial(STREAK_COLOR, STREAK_EMISSIVE, STREAK_OPACITY);
+  material.blending = AdditiveBlending;
+  const mesh = new InstancedMesh(
+    new BoxGeometry(STREAK_THICKNESS, STREAK_THICKNESS, STREAK_LENGTH),
+    material,
+    STREAK_COUNT,
+  );
+  const at = new Object3D();
+  const z = new Float32Array(STREAK_COUNT);
+  const x = new Float32Array(STREAK_COUNT);
+  const y = new Float32Array(STREAK_COUNT);
+
+  const place = (i: number, front: boolean): void => {
+    const angle = Math.random() * Math.PI * 2;
+    const radius = STREAK_NEAR + Math.random() * (STREAK_FAR - STREAK_NEAR);
+    x[i] = Math.cos(angle) * radius;
+    y[i] = Math.sin(angle) * radius;
+    z[i] = front ? SPAWN_Z * Math.random() : SPAWN_Z;
+  };
+  for (let i = 0; i < STREAK_COUNT; i += 1) place(i, true);
+
+  const write = (): void => {
+    for (let i = 0; i < STREAK_COUNT; i += 1) {
+      at.position.set(x[i]!, y[i]!, z[i]!);
+      at.updateMatrix();
+      mesh.setMatrixAt(i, at.matrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+  };
+  write();
+
+  return {
+    mesh,
+    update(dt) {
+      for (let i = 0; i < STREAK_COUNT; i += 1) {
+        z[i]! += STREAK_SPEED * dt;
+        if (z[i]! > 8) place(i, false);
+      }
+      write();
+    },
+  };
+}
 
 function glowMaterial(color: string, emissive: number, opacity = 1): MeshStandardMaterial {
   return new MeshStandardMaterial({
