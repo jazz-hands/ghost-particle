@@ -93,7 +93,9 @@ export const createLevel6 = scriptedLevel(6, async (s) => {
   map.clearing(GOODBYE_NDC.x, GOODBYE_NDC.y, GOODBYE_CLEARING);
   hud.credits(creditLines(), () => { location.assign(location.pathname); }, BYLINE);
   goodbye(s);
-  await b.key('Space');
+  // The credits are the end: nothing waits on a key, Play again reloads, and the debug hook's
+  // next() or skip() is the only other way past this point.
+  await b.until(() => false);
 });
 
 // The character comes back for the credits: small, beside the button, waving every few seconds.
