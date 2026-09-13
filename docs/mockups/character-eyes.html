@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ghost Particle — bubble eye study</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html, body { margin: 0; height: 100%; background: #000; color: #cfd8dc; font-family: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif; }
+  canvas { display: block; }
+  .labels { position: fixed; left: 0; right: 0; bottom: 7vh; display: grid; grid-template-columns: repeat(5, 1fr); text-align: center; pointer-events: none; }
+  .labels div { font-size: clamp(13px, 1.2vw, 18px); }
+  .labels span { display: block; font-size: 0.8em; color: #78909c; margin-top: 0.3em; }
+  .note { position: fixed; top: 4vh; left: 0; right: 0; text-align: center; font-size: clamp(12px, 1vw, 15px); color: #78909c; pointer-events: none; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div class="note">Bubble eye study. No antenna, no glow sprites, no post-processing. Electron tint. Keys 1, 2, 3 switch flavor. Space toggles a slow turn.</div>
+<div class="labels">
+  <div>Window eyes<span>openings in the skin, lit from inside</span></div>
+  <div>Lantern eyes<span>soft light through the skin</span></div>
+  <div>Dimple eyes<span>real dents in the surface</span></div>
+  <div>Inner-bubble eyes<span>droplets sunk inside</span></div>
+  <div>Ink eyes<span>printed on, like a vinyl toy</span></div>
+</div>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const TINTS = { electron: '#4FC3F7', muon: '#B388FF', tau: '#FF8A65' };
+let tintHex = TINTS.electron;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+document.body.prepend(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.55;
+
+const camera = new THREE.PerspectiveCamera(26, innerWidth / innerHeight, 0.1, 100);
+camera.position.set(0, 0.35, 15.5);
+camera.lookAt(0, 0, 0);
+
+const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(3, 6, 5); scene.add(key);
+const fill = new THREE.DirectionalLight(0x9fd8ff, 0.35); fill.position.set(-5, 1, 3); scene.add(fill);
+const rim = new THREE.DirectionalLight(0xffffff, 1.1); rim.position.set(-3, 3, -5); scene.add(rim);
+
+// Equirect skin texture. Front of the sphere is at u = 0.25, equator at v = 0.5.
+// Near the equator one canvas pixel is the same size in u and v, so circles stay circles.
+const W = 1024, H = 512;
+const EYE = { u: 0.25, du: 0.062, v: 0.42 };
+function skin(draw) {
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  draw(g, (EYE.u - EYE.du) * W, (EYE.u + EYE.du) * W, EYE.v * H);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+const roundRect = (g, x, y, w, h, r) => { g.beginPath(); g.roundRect(x - w / 2, y - h / 2, w, h, r); };
+const blank = (color) => skin((g) => { g.fillStyle = color; g.fillRect(0, 0, W, H); });
+const black = () => skin((g) => { g.fillStyle = '#000'; g.fillRect(0, 0, W, H); });
+
+function bodyMaterial(extra = {}) {
+  return new THREE.MeshPhysicalMaterial(Object.assign({
+    color: new THREE.Color(tintHex), roughness: 0.18, metalness: 0,
+    clearcoat: 1, clearcoatRoughness: 0.08,
+    transparent: true, opacity: 0.82,
+    sheen: 0.4, sheenColor: new THREE.Color('#ffffff'),
+  }, extra));
+}
+const bodyGeo = () => new THREE.SphereGeometry(1, 128, 96);
+const materials = []; // for retint
+
+function bubble(mat, geo = bodyGeo()) {
+  const g = new THREE.Group();
+  const m = new THREE.Mesh(geo, mat); m.scale.set(1.06, 0.96, 1); g.add(m);
+  materials.push(mat);
+  return g;
+}
+
+// 1. Window eyes: pale rounded-rect openings painted into the skin, emissive so they glow.
+function windowEyes() {
+  const map = skin((g, xl, xr, y) => {
+    g.fillStyle = tintHex; g.fillRect(0, 0, W, H);
+    for (const x of [xl, xr]) { roundRect(g, x, y, 62, 96, 28); g.fillStyle = '#0b1a26'; g.fill();
+      roundRect(g, x, y, 52, 86, 24); g.fillStyle = '#ffffff'; g.fill(); }
+  });
+  const emissive = skin((g, xl, xr, y) => {
+    g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+    for (const x of [xl, xr]) { roundRect(g, x, y, 52, 86, 24); g.fillStyle = '#ffffff'; g.fill(); }
+  });
+  return bubble(bodyMaterial({ map, emissiveMap: emissive, emissive: new THREE.Color('#dff6ff'), emissiveIntensity: 3.0 }));
+}
+
+// 2. Lantern eyes: soft-edged glow in the emissive map only; the skin stays untouched.
+function lanternEyes() {
+  const emissive = skin((g, xl, xr, y) => {
+    g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+    for (const x of [xl, xr]) {
+      const r = g.createRadialGradient(x, y, 6, x, y, 52);
+      r.addColorStop(0, '#ffffff'); r.addColorStop(0.5, '#e6f8ff'); r.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = r; g.beginPath(); g.ellipse(x, y, 52, 62, 0, 0, Math.PI * 2); g.fill();
+    }
+  });
+  return bubble(bodyMaterial({ emissiveMap: emissive, emissive: new THREE.Color('#ffffff'), emissiveIntensity: 4.0 }));
+}
+
+// 3. Dimple eyes: push vertices inward around two points; darker tint inside the dent.
+function dimpleEyes() {
+  const geo = bodyGeo();
+  const pos = geo.attributes.position; const v = new THREE.Vector3();
+  const centers = [-0.38, 0.38].map(x => new THREE.Vector3(x, 0.26, 1).normalize());
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    for (const c of centers) {
+      const d = v.distanceTo(c);
+      const R = 0.27; if (d < R) { const k = 1 - d / R; const depth = 0.07 * k * k * (3 - 2 * k); v.multiplyScalar(1 - depth); }
+    }
+    pos.setXYZ(i, v.x, v.y, v.z);
+  }
+  geo.computeVertexNormals();
+  const map = skin((g, xl, xr, y) => {
+    g.fillStyle = tintHex; g.fillRect(0, 0, W, H);
+    for (const x of [xl, xr]) {
+      const r = g.createRadialGradient(x, y, 0, x, y, 44);
+      r.addColorStop(0, '#0b1a26'); r.addColorStop(0.8, '#0b1a26'); r.addColorStop(1, tintHex);
+      g.fillStyle = r; g.beginPath(); g.ellipse(x, y, 44, 48, 0, 0, Math.PI * 2); g.fill();
+    }
+  });
+  const rough = skin((g, xl, xr, y) => {
+    g.fillStyle = '#333'; g.fillRect(0, 0, W, H);
+    for (const x of [xl, xr]) { g.fillStyle = '#bbb'; g.beginPath(); g.ellipse(x, y, 42, 46, 0, 0, Math.PI * 2); g.fill(); }
+  });
+  return bubble(bodyMaterial({ map, roughnessMap: rough, roughness: 1 }), geo);
+}
+
+// 4. Inner-bubble eyes: two denser droplets sunk just inside the surface.
+function innerBubbleEyes() {
+  const g = bubble(bodyMaterial({ opacity: 0.72 }));
+  const dropMat = new THREE.MeshPhysicalMaterial({ color: new THREE.Color('#0b1a26'), roughness: 0.25, clearcoat: 1, clearcoatRoughness: 0.1 });
+  for (const sx of [-0.36, 0.36]) {
+    const d = new THREE.Mesh(new THREE.SphereGeometry(0.2, 32, 24), dropMat);
+    d.position.set(sx, 0.24, 0.82); d.scale.set(1, 1.3, 0.7); g.add(d);
+    const glint = new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 8), new THREE.MeshBasicMaterial({ color: '#e8f8ff' }));
+    glint.position.set(sx + 0.06, 0.33, 0.95); glint.scale.setScalar(1.4); g.add(glint);
+  }
+  return g;
+}
+
+// 5. Ink eyes: matte dark ovals printed on the skin with a painted highlight, like a vinyl toy.
+function inkEyes() {
+  const map = skin((g, xl, xr, y) => {
+    g.fillStyle = tintHex; g.fillRect(0, 0, W, H);
+    for (const x of [xl, xr]) {
+      g.fillStyle = '#0b1a26'; g.beginPath(); g.ellipse(x, y, 30, 48, 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#ffffff'; g.beginPath(); g.ellipse(x + 9, y - 16, 9, 12, 0, 0, Math.PI * 2); g.fill();
+    }
+  });
+  const rough = skin((g, xl, xr, y) => {
+    g.fillStyle = '#2a2a2a'; g.fillRect(0, 0, W, H);
+    for (const x of [xl, xr]) { g.fillStyle = '#e0e0e0'; g.beginPath(); g.ellipse(x, y, 30, 48, 0, 0, Math.PI * 2); g.fill(); }
+  });
+  return bubble(bodyMaterial({ map, roughnessMap: rough, roughness: 1, clearcoat: 0.6 }));
+}
+
+const builders = [windowEyes, lanternEyes, dimpleEyes, innerBubbleEyes, inkEyes];
+let figures = [];
+function build() {
+  for (const f of figures) scene.remove(f);
+  materials.length = 0;
+  figures = builders.map(b => b());
+  const spacing = 2.9;
+  figures.forEach((f, i) => { f.position.x = (i - 2) * spacing; f.lookAt(camera.position.x, f.position.y, camera.position.z); scene.add(f); });
+}
+build();
+
+let turning = false;
+addEventListener('keydown', (e) => {
+  const map = { '1': 'electron', '2': 'muon', '3': 'tau' };
+  if (map[e.key]) { tintHex = TINTS[map[e.key]]; build(); }
+  if (e.key === ' ') turning = !turning;
+});
+addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+
+function frame(t) {
+  if (turning) figures.forEach(f => { f.lookAt(camera.position.x, f.position.y, camera.position.z); f.rotateY(Math.sin(t * 0.0004) * 0.6); });
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
