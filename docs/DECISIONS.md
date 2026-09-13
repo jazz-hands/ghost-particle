@@ -26,7 +26,7 @@ How to use:
 | D-012 | Dodging has no consequence | accepted | Superseded by D-020: nothing can be hit, no fail state. |
 | D-013 | Mini-game feedback timing | accepted | Reveal answer and one-line reason after each ring. |
 | D-014 | Hosting | accepted | Static build hosted on exe.dev. |
-| D-015 | Text policy | accepted | Level 1 is wordless; captions are cards of at most 25 words. |
+| D-015 | Text policy | accepted | Level 1 is wordless; captions are cards of at most 40 words. |
 | D-016 | HUD is DOM, not 3D text | accepted | Captions, meters, and buttons are HTML overlays. |
 | D-017 | Debug tools gated by URL flag | accepted | lil-gui and Stats mount only with `?debug`. |
 | D-018 | Level module contract | accepted | Each level exports `enter`, `update`, `exit`, and disposes its own objects. |
@@ -120,7 +120,7 @@ Source: the `using-exe-dev` and `exe-dev-gotchas` skills in `~/.claude/skills/`.
 
 ### D-015 Text policy — accepted
 
-Level 1 shows only the key prompt. From level 2 on, captions are cards of at most 25 words, at most 7 per level, each tagged with its F-IDs. Side panels ("Want more?") are optional and never block progress.
+Level 1 shows only the key prompt. From level 2 on, captions are cards of at most 40 words, at most 7 per level, each tagged with its F-IDs. Side panels ("Want more?") are optional and never block progress.
 
 ### D-016 HUD is DOM, not 3D text — accepted
 

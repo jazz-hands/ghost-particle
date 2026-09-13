@@ -51,6 +51,7 @@ export class Hud {
   private readonly slots = new Map<string, HTMLElement>();
   private readonly closers = new Set<() => void>();
   private cardEl: HTMLElement | null = null;
+  private cardFinish: (() => void) | null = null;
   private fadeEl: HTMLElement | null = null;
 
   constructor(root: HTMLElement, keys: Keys) {
@@ -63,6 +64,10 @@ export class Hud {
     return this.cardEl !== null;
   }
 
+  closeCard(): void {
+    this.cardFinish?.();
+  }
+
   card(text: string, facts?: string[], opts?: { small?: boolean }): Promise<void> {
     const box = this.buildCard('hud-card', text, facts, opts?.small === true);
     div('hud-card-hint', box).textContent = 'Space ▸';
@@ -71,10 +76,12 @@ export class Hud {
       const finish = (): void => {
         if (this.cardEl !== box) return;
         this.cardEl = null;
+        this.cardFinish = null;
         close();
         box.remove();
         resolve();
       };
+      this.cardFinish = finish;
       const off = this.keys.onPress('Space', finish);
       box.addEventListener('click', finish);
       const close = (): void => {

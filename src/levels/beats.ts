@@ -1,5 +1,12 @@
 export interface CardHost {
   card(text: string, facts?: string[], opts?: { small?: boolean }): Promise<void>;
+  closeCard(): void;
+}
+
+// Reading time for a caption: cards are timed, Space only dismisses one early.
+export function cardSeconds(text: string): number {
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  return 1 + 0.22 * words;
 }
 
 export interface PressHost {
@@ -49,8 +56,15 @@ export class Beats {
   card(text: string, facts?: string[], opts?: { small?: boolean }): Promise<void> {
     return this.begin((finish) => {
       let live = true;
+      let left = cardSeconds(text);
       void this.host.card(text, facts, opts).then(() => { if (live) finish(); });
-      return { off: () => { live = false; } };
+      return {
+        tick: (dt) => {
+          left -= dt;
+          if (left <= 0 && live) this.host.closeCard();
+        },
+        off: () => { live = false; },
+      };
     });
   }
 

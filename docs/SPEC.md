@@ -38,7 +38,7 @@ One small counter runs from the first key hold in level 1: how many solar neutri
 
 ## Level progression
 
-Each level is one scene with one mechanic and a handful of captions (at most 25 words each). The player advances on rails; interaction is limited to the level's mechanic plus "continue".
+Each level is one scene with one mechanic and a handful of captions (at most 40 words each). The player advances on rails; interaction is limited to the level's mechanic plus "continue".
 
 ### 1. Birth (wordless)
 
@@ -57,7 +57,7 @@ Each level is one scene with one mechanic and a handful of captions (at most 25 
 ### 3. Escaping the Sun: "try to hit something"
 
 - Scene: rushing outward through layers of dense, bright plasma toward the surface.
-- Mechanic: the player is told to try to hit things and can steer left/right into plasma walls, knots of nuclei, and walls of light. The neutrino passes through every one. A "passed through" tally counts them. There is no fail state and no way to collide (D-020).
+- Mechanic: the player is told to try to hit things and can steer left/right into plasma walls, knots of nuclei, and walls of light. The neutrino passes through every one. There is no fail state and no way to collide (D-020).
 - Flavor change: as it climbs, the tint shifts between electron, muon, and tau flavor on its own. Captions explain the three flavors and that flavor change proves the neutrino has mass.
 - Facts: F-10, F-08, F-09, F-12, F-05, F-14. Side panel: F-13.
 
@@ -141,5 +141,5 @@ If behind schedule, drop in this order:
 
 1. Level 7 side panels.
 2. Level 4 family photo becomes a single static card (no click).
-3. Level 3 steering becomes an auto-scroll with the same captions and tally.
+3. Level 3 steering becomes an auto-scroll with the same captions.
 4. Level 5 mini-game drops to three rings. The hero's hit is never cut.

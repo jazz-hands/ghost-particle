@@ -9,11 +9,14 @@ const LANE = 2;
 const STEER = 3;
 const RAIL = 12;
 const SPAWN_Z = -60;
+const HALT_Z = -5;
+const TRY_Z = -20;
 const SURFACE = '#c9d2da';
 
 interface Obstacle {
   object: Object3D;
   passed: boolean;
+  halts: boolean;
 }
 
 export const createLevel3 = scriptedLevel(3, async (s) => {
@@ -37,11 +40,12 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   let shown: Flavor | null = null;
   let dawn = 0;
   let rising = false;
+  let steered = false;
 
-  const add = (object: Object3D): void => {
-    object.position.z = SPAWN_Z;
+  const add = (object: Object3D, halts = false): void => {
+    object.position.z = halts ? TRY_Z : SPAWN_Z;
     s.group.add(object);
-    obstacles.push({ object, passed: false });
+    obstacles.push({ object, passed: false, halts });
   };
 
   const plasmaWall = (gap: boolean): Object3D => {
@@ -78,16 +82,14 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   };
 
   s.onUpdate((dt) => {
-    const rate = s.hud.cardUp ? 1 / 3 : 1;
-
-    if (s.keys.isDown('ArrowLeft')) lane -= STEER * dt;
-    if (s.keys.isDown('ArrowRight')) lane += STEER * dt;
+    if (s.keys.isDown('ArrowLeft')) { lane -= STEER * dt; steered = true; }
+    if (s.keys.isDown('ArrowRight')) { lane += STEER * dt; steered = true; }
     lane = Math.min(Math.max(lane, -LANE), LANE);
     ghost.position.x = lane;
     if (follow) s.rig.set({ x: lane * 0.5, y: 0.5, z: 6 }, { x: ghost.position.x, y: ghost.position.y - 0.6, z: 0 });
 
     if (spawning) {
-      spawnIn -= dt * rate;
+      spawnIn -= dt;
       if (spawnIn <= 0) {
         add(nextObstacle());
         spawnIn = 1.5 + Math.random() * 0.5;
@@ -95,11 +97,16 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
     }
 
     for (const o of [...obstacles]) {
-      o.object.position.z += RAIL * rate * dt;
+      // The first two obstacles wait just ahead until the player steers (3.2), then autoplay.
+      if (o.halts && !steered && o.object.position.z + RAIL * dt >= HALT_Z) {
+        o.object.position.z = HALT_Z;
+        s.hud.prompt('Arrow keys to steer');
+        continue;
+      }
+      o.object.position.z += RAIL * dt;
       if (!o.passed && o.object.position.z >= 0) {
         o.passed = true;
         tally += 1;
-        s.hud.sub([`Passed through: ${tally}`]);
       }
       if (o.object.position.z > 8) {
         disposeGroup(o.object);
@@ -127,29 +134,28 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
 
   await s.b.card("You're leaving the Sun. Everything in here is packed tight. Try to hit something. Arrow keys to steer.");
 
-  add(plasmaWall(false));
-  await s.b.until(() => tally >= 1);
+  for (const gap of [false, true]) {
+    steered = false;
+    add(plasmaWall(gap), true);
+    const before = tally;
+    await s.b.until(() => tally > before);
+    s.hud.prompt(null);
+  }
 
   await s.b.card('Nothing happened. The Sun is opaque to light, but almost transparent to you. Almost nothing can stop a neutrino.', ['F-10']);
 
   spawning = true;
-  spawnIn = 1;
-  await s.b.wait(9);
+  spawnIn = 0.5;
+  await s.b.wait(3);
 
   fog.density = 0.03;
   await s.b.card('Light from the core takes tens of thousands of years or more to get out. It keeps bumping into things. You take about 2 seconds.', ['F-08', 'F-09']);
-  await s.b.wait(9);
-
   cycling = true;
-  await s.b.card("Neutrinos come in three flavors: electron, muon, and tau. You were born electron-flavor. But look. You're changing.", ['F-12']);
-
-  await s.b.card("A neutrino can only change flavor if it has some mass. That's how we know you aren't weightless.", ['F-05']);
-
   spawning = false;
   rising = true;
-  await s.b.card('Of boron-8 neutrinos born electron-flavor like you, only about a third still look that way when they reach Earth.', ['F-14']);
+  await s.b.card("Neutrinos come in three flavors: electron, muon, and tau. You were born electron-flavor. But look. You're changing. A neutrino can only change flavor if it has some mass. That's how we know you aren't weightless.", ['F-12', 'F-05']);
 
-  // 3.9: out of the surface into black space, the Sun glaring behind.
+  // 3.7: out of the surface into black space, the Sun glaring behind.
   s.scene.fog = null;
   s.scene.background = stageBackground;
   const sun = sphere(8);
@@ -157,6 +163,4 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   s.group.add(sun);
   follow = false;
   await s.rig.moveTo({ x: 0, y: 0.8, z: 2 }, { x: 0, y: 0, z: 30 }, 1.5);
-  s.hud.big(`Passed through: ${tally}`, 2);
-  await s.b.wait(2);
 });

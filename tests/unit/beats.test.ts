@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Beats } from '../../src/levels/beats.ts';
+import { Beats, cardSeconds } from '../../src/levels/beats.ts';
 
 type Resolver = () => void;
 
@@ -13,6 +13,9 @@ function host() {
     card(text: string) {
       cards.push(text);
       return new Promise<void>((resolve) => { resolvers.push(resolve); });
+    },
+    closeCard() {
+      resolvers.pop()?.();
     },
   };
 }
@@ -97,6 +100,21 @@ test('card resolves when the host card resolves, and next() resolves it early', 
   b.next();
   await tick();
   assert.equal(second(), true);
+});
+
+test('a card closes on its own after its reading time', async () => {
+  const h = host();
+  const b = new Beats(h, pressHost());
+  const text = 'one two three four five';
+  const done = settled(b.card(text));
+  assert.equal(cardSeconds(text), 2.1);
+  b.update(2);
+  await tick();
+  assert.equal(done(), false);
+  b.update(0.2);
+  await tick();
+  assert.equal(done(), true);
+  assert.equal(h.resolvers.length, 0);
 });
 
 test('key resolves on that key and unsubscribes afterwards', async () => {

@@ -20,9 +20,9 @@ Pacing is judged against these. A level that runs long is cut, not sped up.
 | 6 Twenty-two years of watching | 60 s |
 | Total | 5 min 35 s, about six minutes |
 
-Caption rules: at most 25 words, plain language, every card that states a fact is tagged with F-IDs (D-002, D-015); pure instruction cards carry no tag. "Continue" always means pressing Space. Space is never also a hold key on a level that has cards; holds use the right arrow.
+Caption rules: at most 40 words, plain language, every card that states a fact is tagged with F-IDs (D-002, D-015); pure instruction cards carry no tag. Cards are timed: each stays for 1 s plus 0.22 s per word while the action continues underneath, and pressing Space dismisses it early. Space is never also a hold key on a level that has cards; holds use the right arrow.
 
-Rail rule (levels 3 and 4): while a card is up the rail slows to about a third of speed and resumes on Space, so nothing is missed while reading.
+Rail rule (levels 3 and 4): the rail never slows for a card; steering stays live while a card is up.
 
 Input map (D-010): Space = hold in level 1, continue elsewhere. Left/Right = steer in level 3, move the grid highlight in level 4. Hold Right = fast-forward in level 4. M = measure in level 4. E / M = electron / muon in level 5. Escape = close a side panel. Mouse clicks also work on every DOM control, but nothing requires them.
 
@@ -97,20 +97,18 @@ Camera pulls back; the neutrino floats in warm haze. The through-line counter fa
 
 ## Level 3 — Escaping the Sun: "try to hit something"
 
-Camera behind the neutrino, rushing outward through orange-white haze. The neutrino cannot collide with anything; steering only changes its lane. A "Passed through" tally sits under the counter.
+Camera behind the neutrino, rushing outward through orange-white haze. The neutrino cannot collide with anything; steering only changes its lane.
 
 | # | Player sees | Player does | Neutrino | Caption | Facts | Cue |
 |---|---|---|---|---|---|---|
 | 3.1 | Rushing haze. Card: instruction. | reads, Space | nod | "You're leaving the Sun. Everything in here is packed tight. Try to hit something. Arrow keys to steer." | | whoosh |
 | 3.2 | A plasma wall spans the whole screen. There is no gap. | steers anywhere | brace as the wall approaches, then surprised after passing | none until after | | thwip |
-| 3.3 | Card, after the pass. Tally appears: "Passed through: 1". | Space | surprised, then wiggle | "Nothing happened. The Sun is opaque to light, but almost transparent to you. Almost nothing can stop a neutrino." | F-10 | tick |
-| 3.4 | A run of obstacles over ~20 s: dense knots of nuclei, more plasma walls, a wall of light. Some have gaps, most don't. Tally climbs on each. | steers freely | brace/surprised on the first two, then just wiggle | none | | thwip each, tick |
+| 3.3 | Card, after the pass. | Space | surprised, then wiggle | "Nothing happened. The Sun is opaque to light, but almost transparent to you. Almost nothing can stop a neutrino." | F-10 | tick |
+| 3.4 | A run of obstacles over ~20 s: dense knots of nuclei, more plasma walls, a wall of light. Some have gaps, most don't. | steers freely | brace/surprised on the first two, then just wiggle | none | | thwip each, tick |
 | 3.5 | Card, mid-climb. Haze thins slightly. | Space | nod | "Light from the core takes tens of thousands of years or more to get out. It keeps bumping into things. You take about 2 seconds." | F-08, F-09 | |
-| 3.6 | The neutrino's tint begins to shift. Flavor icon under the counter changes with it. | watches | look-at-self | "Neutrinos come in three flavors: electron, muon, and tau. You were born electron-flavor. But look. You're changing." | F-12 | rising tone |
-| 3.7 | Card. Tint keeps cycling. | Space | shrug | "A neutrino can only change flavor if it has some mass. That's how we know you aren't weightless." | F-05 | |
-| 3.8 | Card. Obstacles thin out; haze brightens toward the surface. | Space | nod | "Of boron-8 neutrinos born electron-flavor like you, only about a third still look that way when they reach Earth." | F-14 | |
-| 3.9 | Burst out of the surface into black space. The Sun glares behind. Tally final value shown once, big. | | cheer | none | | whoosh, ta-da |
-| 3.10 | Corner button "Want more?" (level 7): who proved flavor change. | | | | F-13 | |
+| 3.6 | The neutrino's tint begins to shift. Flavor icon under the counter changes with it. Tint keeps cycling; obstacles thin out and the haze brightens toward the surface. | watches | look-at-self, then shrug | "Neutrinos come in three flavors: electron, muon, and tau. You were born electron-flavor. But look. You're changing. A neutrino can only change flavor if it has some mass. That's how we know you aren't weightless." | F-12, F-05 | rising tone |
+| 3.7 | Burst out of the surface into black space. The Sun glares behind. | | cheer | none | | whoosh, ta-da |
+| 3.8 | Corner button "Want more?" (level 7): who proved flavor change. | | | | F-13 | |
 
 ---
 
