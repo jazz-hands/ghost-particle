@@ -13,6 +13,7 @@ import { setCurrentNeutrino } from '../character/current.ts';
 import { CONFIG } from '../character/config.ts';
 import type { CharacterConfig } from '../character/config.ts';
 import { prefersReducedMotion } from '../render/rig.ts';
+import { hint } from '../hud/hints.ts';
 
 // Two flavor shifts (1.5 s each) of travel before the grid at 40%, then a 3 s dash to Earth.
 const TRIP_SECONDS = 7.5;
@@ -235,7 +236,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   }
   hunting = true;
   ghost.react('wave');
-  s.hud.note('This is the Standard Model, the list of everything matter is made of.\nFind yourself. Arrow keys to move, Space to pick.', ['F-16']);
+  s.hud.note(`This is the Standard Model, the list of everything matter is made of.\nFind yourself. ${hint('pick')}`, ['F-16']);
   let found = false;
   let wrong = 0;
   grid.onPick((i) => {

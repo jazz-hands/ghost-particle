@@ -7,6 +7,7 @@ import { setCurrentNeutrino } from '../character/current.ts';
 import { CONFIG } from '../character/config.ts';
 import type { CharacterConfig } from '../character/config.ts';
 import { prefersReducedMotion } from '../render/rig.ts';
+import { hint } from '../hud/hints.ts';
 
 const CHARGE_SECONDS = 2.5;
 const DRAIN_SECONDS = 0.8;
@@ -57,7 +58,7 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
 
   // 1.1
   await s.b.wait(2);
-  s.hud.prompt('Hold Space');
+  s.hud.prompt(hint('hold'));
   await s.b.key('Space');
 
   // 1.2
@@ -76,7 +77,7 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
   s.keys.onRelease('Space', () => {
     if (!charging || charge >= 1) return;
     bounce = 1;
-    s.hud.prompt('Hold Space');
+    s.hud.prompt(hint('hold'));
   });
   s.onUpdate((dt) => {
     if (!charging) return;
@@ -163,7 +164,7 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
 
   // 1.7
   s.hud.title('GHOST PARTICLE');
-  s.hud.prompt('Press Space');
+  s.hud.prompt(hint('press'));
   await s.b.key('Space');
   s.cues.blip();
   ghost.react('wiggle');

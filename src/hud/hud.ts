@@ -2,6 +2,7 @@ import { Counter } from './counter.ts';
 import type { Keys } from '../input/keys.ts';
 import { TINTS } from '../content/flavors.ts';
 import type { Flavor } from '../content/flavors.ts';
+import { hint } from './hints.ts';
 
 export interface GridTile { row: string; name: string; label: string }
 
@@ -78,7 +79,7 @@ export class Hud {
 
   card(text: string, facts?: string[], opts?: { small?: boolean }): Promise<void> {
     const box = this.buildCard('hud-card', text, facts, opts?.small === true);
-    div('hud-card-hint', box).textContent = 'Space to continue';
+    div('hud-card-hint', box).textContent = hint('continue');
     this.cardEl = box;
     return new Promise<void>((resolve) => {
       const finish = (): void => {

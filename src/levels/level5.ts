@@ -10,6 +10,7 @@ import { setCurrentNeutrino } from '../character/current.ts';
 import { CONFIG } from '../character/config.ts';
 import type { CharacterConfig } from '../character/config.ts';
 import { prefersReducedMotion } from '../render/rig.ts';
+import { hint } from '../hud/hints.ts';
 
 // F-31: cos θ = 1/(nβ) gives 41.2° in water, so a cone of height h has base radius h × tan θ.
 const CHERENKOV = Math.tan((41.2 * Math.PI) / 180);
@@ -172,7 +173,7 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   let drifting = true;
   // The drift stops short of the wall, so a long wait on the prompt cannot carry the electron past it.
   s.onUpdate((dt) => { if (drifting) electron.position.x = Math.min(electron.position.x + DRIFT * dt, DRIFT_STOP); });
-  hud.prompt('Press Space to hit the electron');
+  hud.prompt(hint('hit'));
   ghost.react('brace');
   if (!calm) void rig.moveTo(HELD_EYE, AIM, 6);
   await b.key('Space');
@@ -236,7 +237,7 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   });
   cues.blip();
   ghost.react('nod');
-  await b.card("Now you're the physicist. Five more rings are coming from other neutrinos. Sharp or fuzzy? Press E for an electron, M for a muon.", ['F-22']);
+  await b.card(`Now you're the physicist. Five more rings are coming from other neutrinos. Sharp or fuzzy? ${hint('sort')}`, ['F-22']);
 
   // 5.8, 5.9 five rings, one at a time, each answered and then explained.
   shown.length = 0;

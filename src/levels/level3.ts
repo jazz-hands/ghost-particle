@@ -13,6 +13,7 @@ import { setCurrentNeutrino } from '../character/current.ts';
 import { CONFIG } from '../character/config.ts';
 import type { CharacterConfig } from '../character/config.ts';
 import { prefersReducedMotion } from '../render/rig.ts';
+import { hint } from '../hud/hints.ts';
 
 const LANE = 2;
 const STEER = 3;
@@ -229,7 +230,7 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
       // The first two obstacles wait just ahead until the player steers (3.2), then autoplay.
       if (o.halts && !steered && o.object.position.z + RAIL * dt >= HALT_Z) {
         o.object.position.z = HALT_Z;
-        s.hud.prompt('Arrow keys to steer');
+        s.hud.prompt(hint('steer'));
         continue;
       }
       o.object.position.z += RAIL * dt;
@@ -272,7 +273,7 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   // 3.1
   s.cues.whoosh();
   ghost.react('nod');
-  await s.b.card("You're leaving the Sun. Everything in here is packed tight. Try to hit something. Arrow keys to steer.");
+  await s.b.card(`You're leaving the Sun. Everything in here is packed tight. Try to hit something. ${hint('steer')}.`);
 
   // 3.2
   for (const gap of [false, true]) {
