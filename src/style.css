@@ -14,3 +14,253 @@ html, body {
   inset: 0;
   pointer-events: none;
 }
+
+.hud-layer {
+  position: absolute;
+  inset: 0;
+}
+
+#hud button,
+.hud-card,
+.hud-tile {
+  pointer-events: auto;
+}
+
+/* Cards: bottom centre, with their fact tags underneath. */
+.hud-card {
+  position: absolute;
+  left: 50%;
+  bottom: 6vh;
+  transform: translateX(-50%);
+  width: min(46rem, 80vw);
+  padding: 1rem 1.25rem;
+  border: 1px solid #3b4756;
+  border-radius: 0.5rem;
+  background: rgba(7, 11, 26, 0.86);
+  cursor: pointer;
+}
+
+.hud-card-small { width: min(28rem, 60vw); }
+
+.hud-card-text {
+  font-size: 1.15rem;
+  line-height: 1.45;
+}
+
+.hud-card-facts {
+  margin-top: 0.4rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.7rem;
+  color: #7d8c9c;
+}
+
+.hud-card-hint {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #8fa0b1;
+  text-align: right;
+}
+
+.hud-note { cursor: default; }
+
+.hud-prompt {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  transform: translateX(-50%);
+  font-size: 1.1rem;
+  color: #9fb0c1;
+}
+
+.hud-title {
+  position: absolute;
+  left: 50%;
+  top: 32%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  text-align: center;
+}
+
+.hud-big {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  transform: translate(-50%, -50%);
+  font-size: 2.6rem;
+  text-align: center;
+}
+
+.hud-meter {
+  position: absolute;
+  left: 50%;
+  top: 64%;
+  transform: translateX(-50%);
+  width: min(20rem, 50vw);
+  height: 0.35rem;
+  border: 1px solid #3b4756;
+  border-radius: 0.2rem;
+  overflow: hidden;
+}
+
+.hud-meter-fill {
+  height: 100%;
+  width: 0;
+  background: #cfd8dc;
+}
+
+.hud-readout {
+  position: absolute;
+  left: 50%;
+  top: 3vh;
+  transform: translateX(-50%);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Counter and the tallies under it. */
+.hud-counter {
+  position: fixed;
+  right: 2vw;
+  top: 2vh;
+  font-size: 0.95rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-counter-large {
+  right: auto;
+  left: 50%;
+  top: 45%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 2rem;
+}
+
+.hud-sub {
+  position: absolute;
+  right: 2vw;
+  top: 6vh;
+  font-size: 0.8rem;
+  text-align: right;
+  color: #9fb0c1;
+}
+
+.hud-flavor {
+  position: absolute;
+  right: 2vw;
+  top: 10vh;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid currentcolor;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+}
+
+/* Overlays. */
+.hud-overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.hud-flash { background: #ffffff; }
+.hud-fade { background: #000000; opacity: 0; }
+
+/* Standard Model grid. */
+.hud-grid {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  gap: 0.4rem;
+  width: min(52rem, 86vw);
+}
+
+.hud-tile {
+  padding: 0.5rem 0.3rem;
+  border: 1px solid #3b4756;
+  border-radius: 0.3rem;
+  background: rgba(7, 11, 26, 0.7);
+  text-align: center;
+  cursor: pointer;
+}
+
+.hud-tile-name { font-size: 1.1rem; }
+.hud-tile-label { font-size: 0.7rem; color: #8fa0b1; }
+.hud-tile-on { border-color: #cfd8dc; }
+.hud-tile-marked { background: #37444f; }
+.hud-tile-loud .hud-tile-label { font-size: 0.95rem; color: #cfd8dc; }
+
+/* Buttons and the line above them. */
+.hud-buttons {
+  position: absolute;
+  left: 50%;
+  bottom: 22vh;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.75rem;
+}
+
+.hud-button {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid #3b4756;
+  border-radius: 0.3rem;
+  background: rgba(7, 11, 26, 0.8);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.hud-button kbd {
+  font-family: ui-monospace, monospace;
+  color: #8fa0b1;
+}
+
+.hud-reveal {
+  position: absolute;
+  left: 50%;
+  bottom: 30vh;
+  transform: translateX(-50%);
+  font-size: 1.1rem;
+}
+
+/* Chart, on the left of the screen. */
+.hud-chart {
+  position: absolute;
+  left: 2vw;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 65%;
+}
+
+.hud-chart svg { width: 100%; height: auto; }
+.hud-chart-axis { fill: none; stroke: #6b7a89; }
+.hud-chart-point { fill: #cfd8dc; stroke: #cfd8dc; }
+.hud-chart-curve { fill: none; stroke: #cfd8dc; stroke-width: 1.5; }
+.hud-chart-label { fill: #8fa0b1; font-size: 11px; text-anchor: middle; }
+
+.hud-chart-note,
+.hud-chart-credit {
+  font-size: 0.75rem;
+  color: #8fa0b1;
+}
+
+/* Credits. */
+.hud-credits {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(34rem, 80vw);
+  text-align: center;
+}
+
+.hud-credits-scroll {
+  height: 11em;
+  overflow: hidden;
+}
+
+.hud-credits-line {
+  line-height: 1.8;
+  font-size: 0.9rem;
+}
+
+.hud-play-again { margin-top: 1rem; }
