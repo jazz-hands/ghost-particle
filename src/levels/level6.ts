@@ -39,6 +39,7 @@ function creditLines(): string[] {
     'three.js, Vite, TypeScript, Playwright',
     '## The small print',
     'The flavor colours are a design choice with no physical meaning (D-011).',
+    "The detector rings are simulated from Super-Kamiokande's published shape and physics (F-24); they are not real recordings.",
     'The Sun-in-neutrinos map is simulated from the scattering physics (F-34); it is not the 1998 Super-Kamiokande image.',
     'Assumes an adult of 150 lb and 5 ft 7 in standing and facing the Sun. Turn sideways and the number drops; it is a rough figure.',
   ];

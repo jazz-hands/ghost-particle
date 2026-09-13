@@ -73,7 +73,7 @@ Each level is one scene with one mechanic and a handful of captions (at most 40 
 - Beat one is the hero's own hit (D-022): the neutrino drifts toward a single electron in slow motion, the player presses, the electron shoots forward, a cone of light blooms, and a fuzzy ring appears on the wall. This is the climax of the game.
 - Mechanic: then the identification mini-game. Five more rings appear one at a time. Sharp-edged rings were made by muons, fuzzy rings by electrons. The player labels each with the E or M key (buttons also clickable); the answer and a one-line reason are revealed after each (D-013). Feedback only, no fail state.
 - Facts: F-17, F-18, F-19, F-20, F-21, F-22, F-23. Formula F-31 sizes the rings.
-- Honesty note on screen: rings are simulated from the published detector geometry and ring physics (F-24). They are not real event records.
+- Honesty note in the credits: rings are simulated from the published detector geometry and ring physics (F-24). They are not real event records.
 
 ### 6. The Sun in neutrinos
 

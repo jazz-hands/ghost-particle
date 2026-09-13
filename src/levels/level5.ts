@@ -271,9 +271,7 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
     repaint();
   }
   buttons.close();
-  void rig.moveTo(EYE, AIM, 0.8);
-
-  ghost.react('nod');
-  await b.card("Neutrinos from the Sun show up as electron rings that point away from the Sun. That's how Super-K knows where they came from.", ['F-23']);
-  await b.card("These rings are simulated from Super-K's published shape and physics. They are not real recordings.", ['F-24', 'F-17', 'F-18'], { small: true });
+  // The last ring is the end; level 6 opens on its own fade to black. The rings' honesty line
+  // (F-24) is in the credits.
+  await b.wait(0.5);
 });

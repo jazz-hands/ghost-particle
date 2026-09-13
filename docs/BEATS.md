@@ -179,9 +179,9 @@ Inside the tank. Dark water, gold sensor grid on every wall. Camera floats near 
 | 5.7 | Mini-game intro. Two buttons appear, labelled with their keys: "E  Electron" and "M  Muon". Card. | Space | nod | "Now you're the physicist. Five more rings are coming from other neutrinos. Sharp or fuzzy? Press E for an electron, M for a muon." | F-22 | blip |
 | 5.8 | Rings 1–5, one at a time. Fixed set, in order: fuzzy, sharp, fuzzy, sharp, fuzzy-but-ambiguous. | presses E or M (or clicks) | peek at each ring | none until answered | F-22, F-31 | blip |
 | 5.9 | After each answer: the ring is labeled, a one-line reason shows for 3 s (table below). | | nod on correct, shrug on wrong | (one line each, table below) | F-22 | chime / buzz |
-| 5.10 | Card, after ring 5. | Space | nod | "Neutrinos from the Sun show up as electron rings that point away from the Sun. That's how Super-K knows where they came from." | F-23 | |
-| 5.11 | Card. Smaller type. | Space | | "These rings are simulated from Super-K's published shape and physics. They are not real recordings." | F-24, F-17, F-18 | |
-| 5.12 | Corner button "Want more?" (level 7). | | | | F-28 | |
+| 5.10 | Corner button "Want more?" (level 7). | | | | F-28 | |
+
+After ring 5 the level ends on its own; level 6 fades in from black. The honesty line for the rings (F-24: simulated from Super-K's published shape and physics, not real recordings) is in the credits.
 
 ### Level 5 ring answers and reveal lines (F-22)
 
