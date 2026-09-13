@@ -7,6 +7,7 @@ export interface GridTile { row: string; name: string; label: string }
 
 export interface GridHandle {
   onPick(fn: (index: number) => void): void;
+  show(row: string): void;
   wiggle(index: number, seconds: number): void;
   setLabel(index: number, label: string): void;
   mark(index: number): void;
@@ -190,7 +191,7 @@ export class Hud {
     });
   }
 
-  grid(tiles: GridTile[], columns: number): GridHandle {
+  grid(tiles: GridTile[], columns: number, opts?: { reveal?: boolean }): GridHandle {
     const box = div('hud-grid', this.layer);
     box.style.gridTemplateColumns = `repeat(${columns}, minmax(0, 1fr))`;
     const picks: ((index: number) => void)[] = [];
@@ -199,6 +200,7 @@ export class Hud {
     const cells = tiles.map((tile, i) => {
       const cell = div('hud-tile', box);
       cell.dataset.row = tile.row;
+      if (opts?.reveal) cell.hidden = true;
       div('hud-tile-name', cell).textContent = tile.name;
       div('hud-tile-label', cell).textContent = tile.label;
       cell.addEventListener('click', () => { move(i); pick(); });
@@ -228,6 +230,13 @@ export class Hud {
 
     return {
       onPick(fn) { picks.push(fn); },
+      show(row) {
+        for (const cell of cells) {
+          if (cell.dataset.row !== row || !cell.hidden) continue;
+          cell.hidden = false;
+          cell.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 350 });
+        }
+      },
       wiggle: (index, seconds) => {
         const cell = cells[index];
         if (!cell) return;

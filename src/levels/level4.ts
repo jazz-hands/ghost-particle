@@ -1,16 +1,19 @@
 import { Group, Vector3 } from 'three';
 import type { Mesh } from 'three';
-import { FLAVORS, cycleFlavor } from '../content/flavors.ts';
+import { cycleFlavor } from '../content/flavors.ts';
+import { cardSeconds } from './beats.ts';
 import type { Flavor } from '../content/flavors.ts';
 import { box, cone, neutrino, plane, sphere, tint } from '../render/prims.ts';
 import type { GridTile } from '../hud/hud.ts';
 import { scriptedLevel } from './scripted.ts';
 
-const TRIP_SECONDS = 30;
+// Four flavor shifts (1.5 s each) of travel before the grid at 40%, then a 3 s dash to Earth.
+const TRIP_SECONDS = 15;
+const GRID_AT = 0.4;
+const DASH_SECONDS = 3;
 const KM = 149_597_870.7;
 const LIGHT_SECONDS = 499;
 const STREAKS = 200;
-const HOLD = 0.6;
 const HOP = 0.5;
 
 // F-16: the Standard Model, four rows of six columns; the three neutrinos hide behind a "?".
@@ -35,7 +38,20 @@ const TILES: GridTile[] = [
 ];
 
 const NEUTRINO_TILES = [9, 10, 11];
+// One line per family as its row of tiles arrives (F-16).
+const FAMILIES: [string, string][] = [
+  ['Quarks', 'Quarks: the pieces inside protons and neutrons.'],
+  ['Leptons', 'Leptons: the electron and its cousins.'],
+  ['Force carriers', 'Force carriers: what pushes and pulls.'],
+  ['Higgs', 'The Higgs: where mass comes from.'],
+];
+// Screen-right of the camera at (4, 1.5, 5): where the neutrino sits, smaller, to watch the grid.
+const ASIDE = new Vector3(1.1, -0.3, -0.9);
+const ASIDE_SCALE = 0.5;
 const REVEALED = 'Ghost particles. Almost no mass, no charge, three flavors.';
+const FOUND = "Found you. You're one of the three neutrinos, in the lepton family, next to the electron.";
+// Family cards get a second over the reading time: the new tiles are read alongside them.
+const FAMILY_EXTRA = 1;
 
 export const createLevel4 = scriptedLevel(4, async (s) => {
   const ghost = neutrino();
@@ -66,22 +82,15 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   let paused = false;
   let rushing = false;
   let shown: Flavor | null = null;
-  let holding: Flavor | null = null;
-  let holdLeft = 0;
   let hopLeft = 0;
-  const tally: Record<Flavor, number> = { electron: 0, muon: 0, tau: 0 };
 
   const readout = (): void => {
     s.hud.readout(`${Math.round(p * KM).toLocaleString()} km, ${(p * LIGHT_SECONDS).toFixed(0)} light-seconds`);
   };
-  const tallyLine = (): void => {
-    s.hud.sub([`electron ${tally.electron} · muon ${tally.muon} · tau ${tally.tau}`]);
-  };
 
   s.onUpdate((dt) => {
     let speed = paused ? 0 : 1;
-    if (s.keys.isDown('ArrowRight')) speed *= 4;
-    if (rushing) speed *= 8;
+    if (rushing) speed *= ((1 - GRID_AT) * TRIP_SECONDS) / DASH_SECONDS;
     if (speed > 0 && p < 1) {
       p = Math.min(p + (dt * speed) / TRIP_SECONDS, 1);
       readout();
@@ -97,11 +106,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
       if (bar.position.z > 10) bar.position.z -= 70;
     }
 
-    if (holdLeft > 0) {
-      holdLeft -= dt;
-      if (holdLeft <= 0) holding = null;
-    }
-    const f = holding ?? cycleFlavor(s.time);
+    const f = cycleFlavor(s.time);
     if (f !== shown) {
       shown = f;
       tint(ghost, f);
@@ -110,32 +115,38 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
 
     if (hopLeft > 0) {
       hopLeft = Math.max(hopLeft - dt, 0);
-      ghost.position.y = Math.sin((1 - hopLeft / HOP) * Math.PI) * 0.5;
+      ghost.position.y = ASIDE.y + Math.sin((1 - hopLeft / HOP) * Math.PI) * 0.5;
     }
   });
 
   // F-15, F-30: the travel meter reads kilometres and light-seconds.
   readout();
-  await s.b.card('150 million kilometers to Earth. Light takes about 8 minutes 20 seconds. So do you. Hold the right arrow to fast-forward.', ['F-15']);
+  await s.b.card('150 million kilometers to Earth. Light takes about 8 minutes 20 seconds. So do you.', ['F-15']);
 
-  await s.b.until(() => p >= 0.15);
-  tallyLine();
-  s.keys.onPress('KeyM', () => {
-    const picked = FLAVORS[Math.floor(Math.random() * FLAVORS.length)]!;
-    tally[picked] += 1;
-    holding = picked;
-    holdLeft = HOLD;
-    tallyLine();
-  });
-  await s.b.card('Press M to measure your flavor. Keep going. Notice the pattern.', ['F-12', 'F-14']);
-
-  await s.b.until(() => p >= 0.4);
+  await s.b.until(() => p >= GRID_AT);
   paused = true;
-  const grid = s.hud.grid(TILES, 6);
+  await s.b.card('Halfway to Earth. Before you arrive, meet the family: every particle matter is made of, on one chart.', ['F-16']);
+
+  let aside = 0;
+  s.onUpdate((dt) => {
+    if (aside >= 1) return;
+    aside = Math.min(aside + dt / 0.6, 1);
+    const u = aside * aside * (3 - 2 * aside);
+    ghost.position.lerpVectors(new Vector3(0, 0, 0), ASIDE, u);
+    ghost.scale.setScalar(1 - (1 - ASIDE_SCALE) * u);
+  });
+
+  const grid = s.hud.grid(TILES, 6, { reveal: true });
+  let hunting = false;
+  for (const [row, line] of FAMILIES) {
+    grid.show(row);
+    await s.b.card(line, ['F-16'], { seconds: cardSeconds(line) + FAMILY_EXTRA });
+  }
+  hunting = true;
   s.hud.note('This is the Standard Model, the list of everything matter is made of. Find yourself.', ['F-16']);
   let found = false;
   grid.onPick((i) => {
-    if (found) return;
+    if (found || !hunting) return;
     if (!NEUTRINO_TILES.includes(i)) {
       grid.wiggle(i, 2);
       s.hud.note(TILES[i]!.label, ['F-16']);
@@ -144,17 +155,16 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
     found = true;
     grid.mark(i);
     hopLeft = HOP;
-    s.hud.note("Found you. You're one of the three neutrinos, in the lepton family, next to the electron.", ['F-16']);
+    s.hud.note(null);
     for (const n of NEUTRINO_TILES) grid.setLabel(n, REVEALED);
   });
   await s.b.until(() => found);
 
-  await s.b.key('Space');
+  await s.b.card(FOUND, ['F-16']);
   grid.close();
-  s.hud.note(null);
   paused = false;
 
-  s.keys.onPress('Space', () => { rushing = true; });
+  rushing = true;
   await s.b.until(() => p >= 1);
 
   // 4.8: down through cloud layers, over the ground, into the mountain.

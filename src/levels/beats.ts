@@ -53,11 +53,11 @@ export class Beats {
     }));
   }
 
-  card(text: string, facts?: string[], opts?: { small?: boolean }): Promise<void> {
+  card(text: string, facts?: string[], opts?: { small?: boolean; seconds?: number }): Promise<void> {
     return this.begin((finish) => {
       let live = true;
-      let left = cardSeconds(text);
-      void this.host.card(text, facts, opts).then(() => { if (live) finish(); });
+      let left = opts?.seconds ?? cardSeconds(text);
+      void this.host.card(text, facts, { small: opts?.small }).then(() => { if (live) finish(); });
       return {
         tick: (dt) => {
           left -= dt;
