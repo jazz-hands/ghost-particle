@@ -107,7 +107,6 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
       if (!o.passed && o.object.position.z >= 0) {
         o.passed = true;
         tally += 1;
-        s.hud.sub([`Passed through: ${tally}`]);
       }
       if (o.object.position.z > 8) {
         disposeGroup(o.object);
@@ -164,6 +163,4 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   s.group.add(sun);
   follow = false;
   await s.rig.moveTo({ x: 0, y: 0.8, z: 2 }, { x: 0, y: 0, z: 30 }, 1.5);
-  s.hud.big(`Passed through: ${tally}`, 2);
-  await s.b.wait(2);
 });
