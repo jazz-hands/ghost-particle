@@ -173,6 +173,12 @@ html, body {
   to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
+/* The beat sheet's reduced-motion rule: the number arrives at its size instead of growing
+   into it. The fill and the glow-up are unchanged. */
+@media (prefers-reduced-motion: reduce) {
+  .hud-counter-large { animation: none; }
+}
+
 .hud-sub {
   position: absolute;
   right: 2vw;
