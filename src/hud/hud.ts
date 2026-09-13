@@ -15,6 +15,11 @@ export interface GridHandle {
 }
 
 export interface ChartPoint { x: number; y: number; err: number }
+export interface SkyMapHandle {
+  drop(points: { x: number; y: number; color: string }[]): void;   // events in field degrees, centre (0, 0)
+  glow(seconds: number): Promise<void>;                           // brightens the field into one light
+  close(): void;
+}
 
 export interface ChartHandle {
   draw(seconds: number): Promise<void>;
@@ -285,6 +290,53 @@ export class Hud {
       duration: Math.max(seconds, 0) * 1000,
       easing: 'linear',
     })).then(() => el.remove());
+  }
+
+  // A 90° × 90° field: every event is one tiny tinted dot on black; additive drawing lets the
+  // Sun build out of density, and glow() brightens the whole field into one light at the end.
+  skymap(opts: { degrees: number; note: string; credit: string }): SkyMapHandle {
+    const box = div('hud-skymap', this.layer);
+    const canvas = document.createElement('canvas');
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
+    box.append(canvas);
+    div('hud-chart-note', box).textContent = opts.note;
+    div('hud-chart-credit', box).textContent = opts.credit;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    const close = (): void => {
+      box.remove();
+      this.closers.delete(close);
+    };
+    this.closers.add(close);
+    return {
+      drop(points) {
+        if (!ctx) return;
+        const scale = canvas.width / opts.degrees;
+        const half = opts.degrees / 2;
+        const midY = canvas.height / 2;
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = 0.55;
+        for (const p of points) {
+          const y = midY - p.y * scale;
+          if (y < 0 || y > canvas.height) continue;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc((p.x + half) * scale, y, 1.6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = 'source-over';
+      },
+      glow(seconds) {
+        const halo = div('hud-skymap-glow', box);
+        return ended(halo.animate([{ opacity: 0 }, { opacity: 1 }], { duration: Math.max(seconds, 0) * 1000, fill: 'forwards' }));
+      },
+      close,
+    };
   }
 
   chart(points: ChartPoint[], opts: { xLabel: string; yLabel: string; credit: string; note: string }): ChartHandle {

@@ -195,18 +195,17 @@ F-20 note (card 5.2, "about 30 neutrinos a day"): confirm the number against the
 
 ---
 
-## Level 6 — Twenty-two years of watching
+## Level 6 — The Sun in neutrinos
 
 | # | Player sees | Player does | Neutrino | Caption | Facts | Cue |
 |---|---|---|---|---|---|---|
-| 6.1 | The tank fades to black. A chart draws itself left to right over ~6 s: Super-K's public solar neutrino record, one point with error bars for every five days, 1996 to 2018 (A-02). Axis labels in plain words: "Year" and "Super-K's measurement (millions per square centimetre per second)". The label must not claim these are all the neutrinos reaching Earth (see F-24). Credit line beneath. The neutrino floats beside it. | | peek at the chart as it draws | none | F-24 | hum (soft), tick per year |
-| 6.2 | Card. | Space | proud | "This is 22 years of Super-Kamiokande watching the Sun, one dot for every five days. Each dot measures how many neutrinos like you reach Earth." | F-24 | |
-| 6.3 | Card. | Space | nod | "Many of those arrived at night, through the whole Earth. Nothing stopped them. Nothing stopped you." | F-25, F-10 | |
-| 6.4 | Card. The expected yearly curve is drawn over the points: the average measurement divided by the Sun–Earth distance squared, taken from the dataset's own distance column (F-24). The raw points alone cannot show the wobble; their error bars are larger than it. | Space | look-at-self | "The only pattern in all those years is a gentle yearly wobble, because Earth's orbit is slightly oval." | F-33 | |
-| 6.5 | The through-line counter stops, moves to center, grows large. | | peek | "And through you, since you pressed start:" (the number) | F-32 | tick, then chime |
-| 6.6 | Credits roll, generated from FACTS.md: facts and sources, the dataset credit, "made with" list, the tint disclaimer, the counter's reference-person disclosure. "Play again" at the end. | scrolls, or waits | wave | none | all | ta-da |
+| 6.1 | The tank fades to black. A dark square field, 90° across, centred on where the Sun is. Thousands of tiny dots land one at a time, each one a detected neutrino's direction in its flavor tint (D-011), slowly at first and then in a rush over ~9 s, until the Sun builds out of them at the centre over a speckled background. The field fills the whole view; a line in the corner says the map is simulated (F-34). The neutrino is not on screen. | watches | off screen | none | F-34, F-25 | hum (soft), tick per burst |
+| 6.2 | Card, over the finished map. | | proud | "This is the Sun, seen in neutrinos. It took 503 days of watching. Some of these neutrinos arrived at night, after passing through the entire Earth." | F-25 | chime |
+| 6.3 | Card. After it, the dots brighten into one warm glow over ~2.5 s. | | nod | "Nothing stopped them. Nothing stopped you." | F-10 | swell |
+| 6.4 | The through-line counter stops, moves to center, grows large. | | peek | "And through you, since you pressed start:" (the number) | F-32 | tick, then chime |
+| 6.5 | Credits roll, generated from FACTS.md: facts and sources, "made with" list, the tint disclaimer, the sky-map disclaimer, the counter's reference-person disclosure. "Play again" at the end. | scrolls, or waits | wave | none | all | ta-da |
 
-The chart is generated from the real data file (F-24) at build time. Consult the `dataviz` skill before writing the chart code.
+The map is generated at run time from the shape in F-34; the 1998 photograph is never shipped (D-028).
 
 ---
 

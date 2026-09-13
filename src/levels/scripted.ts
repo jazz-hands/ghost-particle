@@ -45,6 +45,7 @@ export function scriptedLevel(id: number, script: (s: Scripted) => Promise<void>
       group: Group;
       hooks: ((dt: number) => void)[];
       subs: (() => void)[];
+      background: Scene['background'];
     } | null = null;
 
     return {
@@ -67,7 +68,7 @@ export function scriptedLevel(id: number, script: (s: Scripted) => Promise<void>
           time: 0,
           onUpdate(fn) { hooks.push(fn); },
         };
-        live = { s, b, hud: ctx.hud, scene: ctx.scene, group, hooks, subs };
+        live = { s, b, hud: ctx.hud, scene: ctx.scene, group, hooks, subs, background: ctx.scene.background };
         void script(s).then(() => { if (!b.cancelled) ctx.done(); });
       },
       update(dt) {
@@ -81,6 +82,8 @@ export function scriptedLevel(id: number, script: (s: Scripted) => Promise<void>
         live.b.cancel();
         live.hud.clear();
         live.scene.fog = null;
+        // A level that tinted the sky (level 3's surface glow) hands the stage colour back.
+        live.scene.background = live.background;
         disposeGroup(live.group);
         for (const off of live.subs) off();
         live = null;

@@ -39,7 +39,7 @@ How to use:
 | D-025 | Sound is Web Audio synthesis | accepted | Named synth cues, no audio files. Soundtrack only if time remains. |
 | D-026 | BEATS.md is the script | accepted | If a moment isn't in the beat sheet, it isn't built. |
 | D-027 | Cheap rendering for level 5 | accepted | Sensors are one instanced mesh; rings are drawn on a canvas texture on the cylinder wall. |
-| D-028 | Level 6 plots the public dataset | accepted | No rights request for the Sun image; the ending is a chart of Super-K's 22-year public record. |
+| D-028 | Level 6 draws a simulated neutrino sky map | accepted | No rights request for the Sun image; the ending is a chart of Super-K's 22-year public record. |
 | D-029 | Character is a bubble with ink eyes | accepted | Squashed translucent sphere, no antenna, matte dark oval eyes painted into the skin. Final values come from the tuner. |
 
 ## Entries
@@ -170,9 +170,9 @@ All sound is generated with the Web Audio API from a small set of named cues lis
 
 The 11,129 inner sensors (F-18) are a single `InstancedMesh` of a low-poly disc or sphere. The 1,885 outer sensors are not rendered; the player is inside the tank. Rings, the hero's cone hit, and the "sensors lighting up" effect are drawn on a 2D canvas texture mapped to the inside of the cylinder, not by lighting individual instances. Ring radius comes from F-31. The character is one sphere with a canvas skin (D-029), no custom shaders. Rationale: keeps level 5 inside its 1h 30 budget and well under the draw-call ceiling.
 
-### D-028 Level 6 plots the public dataset — accepted
+### D-028 Level 6 draws a simulated neutrino sky map — accepted
 
-The ending uses Super-Kamiokande's public 5-day solar neutrino record, 1996 to 2018 (F-24, A-02), drawn as a chart from the real data file at build time. The famous neutrino image of the Sun (A-01) is not shipped and no usage request is made; the game mentions it only in words. Rationale: no time for a rights request, and the dataset is public, citable, and tells the same story (neutrinos arrive day and night, through the Earth). The chart follows the `dataviz` skill when built.
+The ending shows the Sun in neutrinos as a sky map generated at run time from the scattering physics (F-34): simulated event directions land one at a time on a 90° × 90° field until the Sun stands out of the background, labelled on screen as simulated. The famous photograph (A-01) is not shipped and no usage request is made; the map is drawn from the physics, not from the image. The public 5-day dataset (A-02) is not plotted. Rationale: the payoff is watching the Sun appear out of touches, and a generated map carries no rights problem.
 
 ### D-029 Character is a bubble with ink eyes — accepted
 

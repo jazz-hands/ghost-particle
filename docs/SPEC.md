@@ -75,12 +75,12 @@ Each level is one scene with one mechanic and a handful of captions (at most 40 
 - Facts: F-17, F-18, F-19, F-20, F-21, F-22, F-23. Formula F-31 sizes the rings.
 - Honesty note on screen: rings are simulated from the published detector geometry and ring physics (F-24). They are not real event records.
 
-### 6. Twenty-two years of watching
+### 6. The Sun in neutrinos
 
-- Scene: the tank fades to black and a chart draws itself in: Super-Kamiokande's public solar neutrino record, one point for every five days from 1996 to 2018 (A-02, F-24). The neutrino floats beside it. The chart is built from the real data file at build time; nothing is hand-drawn.
-- Captions: what the dots are, that many arrived at night through the whole Earth, and that the only pattern in all those years is the yearly wobble from Earth's slightly oval orbit (F-33), shown as an expected curve computed from the dataset's own distance column rather than read off the noisy points.
+- Scene: the tank fades to black and a sky map fills in: simulated event directions on a 90° by 90° field centred on the Sun, landing one at a time until the Sun stands out of the background (F-34). The neutrino floats beside it. The map is generated from the physics at run time and says so on screen; the 1998 photograph is not shipped (D-028).
+- Captions: that this is the Sun seen in neutrinos over 503 days, some arriving at night through the whole Earth, and that nothing stopped them.
 - The through-line counter freezes and is shown large.
-- Facts: F-24, F-25 (text mention only, no image), F-33, F-32. The famous neutrino image of the Sun is not shipped (D-028).
+- Facts: F-34, F-25, F-10, F-32.
 - Ends with a credits roll generated from `FACTS.md` sources and asset credits.
 
 ### 7. "Want more?" panels (only if time remains)
