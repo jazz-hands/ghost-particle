@@ -25,6 +25,17 @@ try {
     await page.screenshot({ path: `shots/level-${level}.png` });
     console.log(`shots/level-${level}.png`);
   }
+  const mobile = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
+  const phone = await mobile.newPage();
+  mkdirSync('shots/mobile', { recursive: true });
+  for (let level = 1; level <= 6; level++) {
+    await phone.goto(`http://localhost:${PORT}/?level=${level}`);
+    await phone.waitForFunction((n) => window.ghost?.level === n, level);
+    await phone.waitForTimeout(SETTLE_MS);
+    await phone.screenshot({ path: `shots/mobile/level-${level}.png` });
+    console.log(`shots/mobile/level-${level}.png`);
+  }
+  await mobile.close();
 } finally {
   await browser.close();
   await server.close();
