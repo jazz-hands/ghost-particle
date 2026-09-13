@@ -56,6 +56,7 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
       ? Math.min(charge + dt / CHARGE_SECONDS, 1)
       : Math.max(charge - dt / DRAIN_SECONDS, 0);
     bounce = Math.max(bounce - dt / BOUNCE_SECONDS, 0);
+    s.cues.hum(charge);
     const gap = TOGETHER + (APART - TOGETHER) * (1 - charge) + bounce * 0.6;
     proton.position.x = -gap;
     beryllium.position.x = gap;
@@ -66,6 +67,8 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
   charging = false;
   glowing = false;
   s.hud.prompt(null);
+  s.cues.hum(0);
+  s.cues.crackle();
   s.hud.flash(0.4);
   for (const mesh of [glow, proton, beryllium]) disposeGroup(mesh);
 
@@ -89,6 +92,8 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
     sparks.push(spark);
     s.group.add(spark);
   }
+
+  s.cues.pop();
 
   const ghost = createNeutrino();
   ghost.group.scale.setScalar(CHARACTER_SCALE);
@@ -117,7 +122,9 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
     }
     fadeTo(skin, born);
   });
-  await s.b.wait(1);
+  await s.b.wait(0.35);
+  s.cues.chime();
+  await s.b.wait(0.65);
   for (const spark of sparks) disposeGroup(spark);
   fadeTo(skin, 1);
 
@@ -125,6 +132,7 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
   s.hud.title('GHOST PARTICLE');
   s.hud.prompt('Press Space');
   await s.b.key('Space');
+  s.cues.blip();
   ghost.react('wiggle');
   s.hud.title(null);
   s.hud.prompt(null);

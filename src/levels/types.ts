@@ -2,6 +2,7 @@ import type { PerspectiveCamera, Scene } from 'three';
 import type { Hud } from '../hud/hud.ts';
 import type { Keys } from '../input/keys.ts';
 import type { CameraRig } from '../render/rig.ts';
+import type { Cues } from '../audio/cues.ts';
 
 export interface LevelContext {
   scene: Scene;
@@ -9,6 +10,7 @@ export interface LevelContext {
   hud: Hud;
   keys: Keys;
   rig: CameraRig;
+  cues: Cues;
   done: () => void;
 }
 

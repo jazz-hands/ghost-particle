@@ -7,6 +7,7 @@ import type { Hud } from '../hud/hud.ts';
 import type { Keys } from '../input/keys.ts';
 import type { CameraRig } from '../render/rig.ts';
 import { disposeGroup } from '../render/prims.ts';
+import type { Cues } from '../audio/cues.ts';
 
 export interface Scripted {
   ctx: LevelContext;
@@ -14,6 +15,7 @@ export interface Scripted {
   hud: Hud;
   keys: Keys;
   rig: CameraRig;
+  cues: Cues;
   scene: Scene;
   group: Group;
   time: number;
@@ -59,6 +61,7 @@ export function scriptedLevel(id: number, script: (s: Scripted) => Promise<void>
           hud: ctx.hud,
           keys: scopeKeys(ctx.keys, subs),
           rig: ctx.rig,
+          cues: ctx.cues,
           scene: ctx.scene,
           group,
           time: 0,
