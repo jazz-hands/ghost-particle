@@ -5,9 +5,11 @@ import { LevelManager } from './levels/manager.ts';
 import { Hud } from './hud/hud.ts';
 import { Keys } from './input/keys.ts';
 import { CameraRig } from './render/rig.ts';
+import { Cues } from './audio/cues.ts';
 import { LEVELS } from './levels/index.ts';
 import { parseFlags } from './debug/flags.ts';
 import { installGhostHook } from './debug/ghost.ts';
+import { installCurrentReactHook } from './character/current.ts';
 import { mountDebug } from './debug/gui.ts';
 
 const flags = parseFlags(location.search, LEVELS.length);
@@ -19,9 +21,12 @@ stage.setBloom(CONFIG.post);
 const keys = new Keys();
 const hud = new Hud(document.getElementById('hud')!, keys);
 const rig = new CameraRig(stage.camera);
+const cues = new Cues();
+keys.onPress('Space', () => cues.unlock());
 
-const manager = new LevelManager(LEVELS, { scene: stage.scene, camera: stage.camera, hud, keys, rig });
+const manager = new LevelManager(LEVELS, { scene: stage.scene, camera: stage.camera, hud, keys, rig, cues });
 installGhostHook(manager);
+installCurrentReactHook();
 const debug = flags.debug ? mountDebug(manager) : null;
 manager.start(flags.level);
 

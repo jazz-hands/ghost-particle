@@ -1,6 +1,12 @@
-import { disposeGroup, neutrino, setOpacity, sphere } from '../render/prims.ts';
-import type { Mesh } from 'three';
+import { disposeGroup } from '../render/prims.ts';
+import { Color, Mesh, MeshStandardMaterial, SphereGeometry } from 'three';
+import type { Material, Object3D } from 'three';
 import { scriptedLevel } from './scripted.ts';
+import { createNeutrino } from '../character/neutrino.ts';
+import { setCurrentNeutrino } from '../character/current.ts';
+import { CONFIG } from '../character/config.ts';
+import type { CharacterConfig } from '../character/config.ts';
+import { prefersReducedMotion } from '../render/rig.ts';
 
 const CHARGE_SECONDS = 2.5;
 const DRAIN_SECONDS = 0.8;
@@ -9,9 +15,31 @@ const SPARK_COUNT = 12;
 const SPARK_SECONDS = 0.8;
 const APART = 3;
 const TOGETHER = 0.25;
+// The character's body sphere has radius 1; the blockout's ghost was half that.
+const CHARACTER_SCALE = 0.5;
+
+// One warm amber family on the stage's navy (SPEC "Look and feel"). Emissive intensities are
+// set against the stage's existing bloom threshold of 0.71.
+const GLOW_AMBER = '#ffb454';
+const GLOW_OPACITY = 0.22;
+const GLOW_EMISSIVE = 0.8;
+const GLOW_PULSE = 2.4;
+// The core tightens as the blobs arrive instead of growing into a third body.
+const GLOW_CHARGE_LIFT = 0.1;
+const GLOW_TIGHTEN = 0.25;
+const PROTON_AMBER = '#ffcf94';
+const BERYLLIUM_AMBER = '#ff9f45';
+const NUCLEUS_AMBER = '#ffb454';
+const SPARK_AMBER = '#ffe6bd';
+const BLOB_OPACITY = 0.82;
+const PROTON_EMISSIVE = 0.95;
+const BERYLLIUM_EMISSIVE = 1.4;
+const NUCLEUS_EMISSIVE = 1.9;
+const SPARK_EMISSIVE = 2.2;
+const FLASH_SECONDS = 0.5;
 
 export const createLevel1 = scriptedLevel(1, async (s) => {
-  const glow = sphere(0.35, { opacity: 0.25 });
+  const glow = blob(0.35, GLOW_AMBER, GLOW_OPACITY, GLOW_EMISSIVE);
   s.group.add(glow);
 
   let charge = 0;
@@ -20,7 +48,11 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
   s.onUpdate((dt) => {
     if (!glowing) return;
     pulse += dt;
-    setOpacity(glow, 0.25 + 0.1 * Math.sin(pulse * 2.4) + 0.3 * charge);
+    const breath = Math.sin(pulse * GLOW_PULSE);
+    const material = skinOf(glow);
+    material.opacity = GLOW_OPACITY + 0.1 * breath + GLOW_CHARGE_LIFT * charge;
+    material.emissiveIntensity = GLOW_EMISSIVE + 0.35 * breath + GLOW_CHARGE_LIFT * charge;
+    glow.scale.setScalar(1 + 0.06 * breath - GLOW_TIGHTEN * charge);
   });
 
   // 1.1
@@ -31,9 +63,9 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
   // 1.2
   s.hud.prompt(null);
   s.hud.counter.start();
-  const proton = sphere(0.18);
+  const proton = blob(0.18, PROTON_AMBER, BLOB_OPACITY, PROTON_EMISSIVE);
   proton.position.x = -APART;
-  const beryllium = sphere(0.3);
+  const beryllium = blob(0.3, BERYLLIUM_AMBER, BLOB_OPACITY, BERYLLIUM_EMISSIVE);
   beryllium.position.x = APART;
   s.group.add(proton, beryllium);
 
@@ -52,6 +84,7 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
       ? Math.min(charge + dt / CHARGE_SECONDS, 1)
       : Math.max(charge - dt / DRAIN_SECONDS, 0);
     bounce = Math.max(bounce - dt / BOUNCE_SECONDS, 0);
+    s.cues.hum(charge);
     const gap = TOGETHER + (APART - TOGETHER) * (1 - charge) + bounce * 0.6;
     proton.position.x = -gap;
     beryllium.position.x = gap;
@@ -62,15 +95,20 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
   charging = false;
   glowing = false;
   s.hud.prompt(null);
-  s.hud.flash(0.4);
+  s.cues.hum(0);
+  s.cues.crackle();
+  s.hud.flash(FLASH_SECONDS);
   for (const mesh of [glow, proton, beryllium]) disposeGroup(mesh);
 
-  const nucleus = sphere(0.25);
+  const nucleus = blob(0.25, NUCLEUS_AMBER, 0.92, NUCLEUS_EMISSIVE);
   s.group.add(nucleus);
   let jittering = true;
-  s.onUpdate(() => {
+  let wobble = 0;
+  s.onUpdate((dt) => {
     if (!jittering) return;
+    wobble += dt;
     nucleus.position.set(jitter(), jitter(), jitter());
+    nucleus.scale.set(1 + 0.08 * Math.sin(wobble * 11), 1 - 0.08 * Math.sin(wobble * 11), 1);
   });
   await s.b.wait(1);
   jittering = false;
@@ -79,15 +117,31 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
   // 1.6
   const sparks: Mesh[] = [];
   for (let i = 0; i < SPARK_COUNT; i += 1) {
-    const spark = sphere(0.05, { opacity: 0.6 });
+    const spark = blob(0.05, SPARK_AMBER, 0.7, SPARK_EMISSIVE);
     const angle = (i / SPARK_COUNT) * Math.PI * 2;
     spark.userData.dir = [Math.cos(angle), Math.sin(angle) * 0.7, Math.sin(angle * 2) * 0.4];
     sparks.push(spark);
     s.group.add(spark);
   }
-  const ghost = neutrino();
-  setOpacity(ghost, 0);
-  s.group.add(ghost);
+
+  s.cues.pop();
+
+  const ghost = createNeutrino(characterConfig());
+  ghost.group.scale.setScalar(CHARACTER_SCALE);
+  const skin = fadeTargets(ghost.group);
+  fadeTo(skin, 0);
+  setCurrentNeutrino(ghost);
+  s.group.add(ghost.group);
+  // exit() clears the level group, and three.js announces that to each child: the only
+  // teardown hook a scripted level gets.
+  ghost.group.addEventListener('removed', () => {
+    setCurrentNeutrino(null);
+    ghost.dispose();
+  });
+  // F-12: the hero is born electron-flavor; config.json's tau is only the tuner's last state.
+  ghost.setFlavor('electron');
+  ghost.react('wake');
+  s.onUpdate((dt) => ghost.update(dt));
 
   let born = 0;
   s.onUpdate((dt) => {
@@ -97,21 +151,65 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
     for (const spark of sparks) {
       const dir = spark.userData.dir as number[];
       spark.position.set(dir[0]! * u * 1.8, dir[1]! * u * 1.8, dir[2]! * u * 1.8);
-      setOpacity(spark, 0.6 * (1 - u));
+      skinOf(spark).opacity = 0.7 * (1 - u);
     }
-    setOpacity(ghost, 0.45 * born);
+    fadeTo(skin, born);
   });
-  await s.b.wait(1);
+  await s.b.wait(0.35);
+  s.cues.chime();
+  await s.b.wait(0.65);
   for (const spark of sparks) disposeGroup(spark);
-  setOpacity(ghost, 0.45);
+  fadeTo(skin, 1);
 
   // 1.7
   s.hud.title('GHOST PARTICLE');
   s.hud.prompt('Press Space');
   await s.b.key('Space');
+  s.cues.blip();
+  ghost.react('wiggle');
   s.hud.title(null);
   s.hud.prompt(null);
+  await s.b.wait(0.7);
 });
+
+// The beat sheet's reduced-motion rule: the idle bob goes, nothing else changes.
+function characterConfig(): CharacterConfig {
+  if (!prefersReducedMotion()) return CONFIG;
+  return { ...CONFIG, view: { ...CONFIG.view, idleBob: false } };
+}
+
+function blob(radius: number, color: string, opacity: number, emissive: number): Mesh {
+  return new Mesh(new SphereGeometry(radius, 32, 16), new MeshStandardMaterial({
+    color,
+    emissive: new Color(color),
+    emissiveIntensity: emissive,
+    roughness: 0.3,
+    metalness: 0,
+    transparent: true,
+    opacity,
+  }));
+}
+
+function skinOf(mesh: Mesh): MeshStandardMaterial {
+  return mesh.material as MeshStandardMaterial;
+}
+
+interface FadeTarget { material: Material; opacity: number }
+
+// The character fades in to its own translucency (config.body.opacity and the rim and halo
+// values beneath it), not to a flat prims opacity.
+function fadeTargets(root: Object3D): FadeTarget[] {
+  const targets: FadeTarget[] = [];
+  root.traverse((child) => {
+    const material = (child as Partial<Mesh>).material;
+    if (material && !Array.isArray(material)) targets.push({ material, opacity: material.opacity });
+  });
+  return targets;
+}
+
+function fadeTo(targets: FadeTarget[], u: number): void {
+  for (const t of targets) t.material.opacity = t.opacity * u;
+}
 
 function jitter(): number {
   return (Math.random() * 2 - 1) * 0.03;
