@@ -62,7 +62,6 @@ export const createLevel6 = scriptedLevel(6, async (s) => {
   s.onUpdate((dt) => {
     if (fill.done) return;
     const batch = fill.advance(dt);
-    cues.fieldHum(fill.progress);
     if (batch.length === 0) return;
     map.drop(batch);
     if (fill.rush > 0) cues.batchTick(fill.rush);
@@ -75,7 +74,6 @@ export const createLevel6 = scriptedLevel(6, async (s) => {
   cues.chime();
   await b.card('This is the Sun, seen in neutrinos. It took 503 days of watching. Some of these neutrinos arrived at night, after passing through the entire Earth.', ['F-25']);
   await b.card('Nothing stopped them. Nothing stopped you.', ['F-10']);
-  cues.fieldHum(null);
   cues.swell(GLOW_SECONDS);
   await map.glow(GLOW_SECONDS);
 
