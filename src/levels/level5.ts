@@ -94,7 +94,7 @@ function characterConfig(): CharacterConfig {
 }
 
 export const createLevel5 = scriptedLevel(5, async (s) => {
-  const { hud, b, rig, group } = s;
+  const { hud, b, rig, cues, group } = s;
   hud.counter.start();
   hud.counter.setVisible(true);
 
@@ -128,10 +128,12 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   void rig.moveTo(EYE, AIM, 5);
   void hud.fade(0, 3);
   ghost.react('wake');
+  cues.deepHum(7);
   await b.card('Super-Kamiokande. A tank 39 meters wide and 41 meters tall, holding 50,000 tons of pure water. Running since 1996.', ['F-17', 'F-19']);
 
   // 5.2 a glint runs round the sensor wall, lighting each stretch as it passes.
   ghost.react('peek');
+  cues.tickSweep(14, 3);
   void animate(s, 3, (u) => {
     const theta = Math.PI / 2 - u * Math.PI * 2;
     shown[0] = { theta, y: GLINT_Y, radius: 0, style: 'fuzzy', alpha: u === 1 ? 0 : 0.9 };
@@ -148,6 +150,7 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   s.onUpdate((dt) => { if (drifting) electron.position.x += DRIFT * dt; });
   hud.prompt('Press Space');
   ghost.react('brace');
+  cues.swell();
   void rig.moveTo(HELD_EYE, AIM, 6);
   await b.key('Space');
   drifting = false;
@@ -179,6 +182,8 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   });
   electron.visible = false;
   ghost.react('surprised');
+  cues.swellPeak();
+  cues.chime();
   rig.shake(HIT_SHAKE);
   await animate(s, RING_IN, (u) => {
     rig.shake(HIT_SHAKE * (1 - u));
@@ -203,8 +208,11 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   let picked: 'E' | 'M' | null = null;
   let accepting = false;
   const buttons = hud.buttons([{ key: 'E', label: 'Electron' }, { key: 'M', label: 'Muon' }], (key) => {
-    if (accepting && (key === 'E' || key === 'M')) picked = key;
+    if (!accepting || (key !== 'E' && key !== 'M')) return;
+    cues.blip();
+    picked = key;
   });
+  cues.blip();
   ghost.react('nod');
   await b.card("Now you're the physicist. Five more rings are coming. Sharp or fuzzy? Press E or M to sort them.", ['F-22']);
 
@@ -215,13 +223,17 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
     const painted: PaintedRing = { ...item.spot, radius: item.radius, style: item.style, alpha: 0 };
     shown.push(painted);
     void animate(s, RING_IN, (u) => { painted.alpha = u; repaint(); });
+    cues.blip();
     void rig.moveTo(EYE, wallPoint(item.spot), 0.8);
     ghost.react('peek');
     picked = null;
     accepting = true;
     await b.until(() => picked !== null);
     accepting = false;
-    ghost.react(item.answer === 'either' || picked === item.answer ? 'nod' : 'shrug');
+    const right = item.answer === 'either' || picked === item.answer;
+    ghost.react(right ? 'nod' : 'shrug');
+    if (right) cues.chime();
+    else cues.buzz();
     hud.reveal(item.reveal, 3);
     await b.wait(3);
     shown.length = 0;
