@@ -22,7 +22,7 @@ How to use:
 | D-008 | Detector events are simulated | accepted | Rings are generated from published geometry, labelled as simulation. |
 | D-009 | Build budget and cut order | accepted | 5 hours; cut L7, then L4 photo, then L3 steering, then L5 ring count. |
 | D-010 | Input scheme | accepted | Keyboard only for v1. |
-| D-011 | Flavor tints | accepted | The body takes the flavor color: electron sky-blue, muon violet, tau coral. Disclosed as a design choice. |
+| D-011 | Flavor tints | accepted | The body takes the flavor color, in neon: electron cyan, muon violet, tau orange. Disclosed as a design choice. |
 | D-012 | Dodging has no consequence | accepted | Superseded by D-020: nothing can be hit, no fail state. |
 | D-013 | Mini-game feedback timing | accepted | Reveal answer and one-line reason after each ring. |
 | D-014 | Hosting | accepted | Static build hosted on exe.dev. |
@@ -95,7 +95,7 @@ Keyboard only for v1: Space to hold and to advance, arrow keys to steer in level
 
 ### D-011 Flavor tints — accepted
 
-The body takes the current flavor's color, as in the approved mockups (an earlier "white base with blue glow" wording is withdrawn). Electron flavor sky-blue `#4FC3F7`, muon flavor violet `#B388FF`, tau flavor coral `#FF8A65`. The tuner's "color depth" sets how fully the body takes the color; a flavor change is a material color lerp, no texture rebuild. These are design choices with no physical meaning; the credits say so. The three are far apart in hue and readable against the navy background, and the flavor icon under the counter repeats the tint so colour alone is not the only cue.
+The body takes the current flavor's color, as in the approved mockups (an earlier "white base with blue glow" wording is withdrawn). Neon palette: electron flavor cyan `#00E5FF`, muon flavor violet `#B026FF`, tau flavor orange `#FF5C00`. The tuner's "color depth" sets how fully the body takes the color; a flavor change is a material color lerp, no texture rebuild. These are design choices with no physical meaning; the credits say so. The three are far apart in hue and readable against the navy background, and the flavor icon under the counter repeats the tint so colour alone is not the only cue.
 
 ### D-012 Dodging has no consequence — accepted
 

@@ -9,7 +9,7 @@
   canvas { display: block; }
   .note { position: fixed; top: 14px; left: 16px; font-size: 13px; color: #78909c; pointer-events: none; max-width: 40ch; line-height: 1.4; }
   #out { position: fixed; left: 16px; bottom: 16px; width: 44ch; height: 20vh; background: #05080c; color: #b0bec5; border: 1px solid #1b2730; border-radius: 10px; padding: 10px; font: 12px/1.4 ui-monospace, Menlo, monospace; resize: vertical; }
-  #out:focus { outline: 1px solid #4FC3F7; }
+  #out:focus { outline: 1px solid #00E5FF; }
   .lil-gui { --width: 300px; --font-family: inherit; }
 </style>
 <script type="importmap">
@@ -32,7 +32,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-const TINTS = { electron: '#4FC3F7', muon: '#B388FF', tau: '#FF8A65' };
+const TINTS = { electron: '#00E5FF', muon: '#B026FF', tau: '#FF5C00' };
 
 const defaults = {
   flavor: 'electron',
