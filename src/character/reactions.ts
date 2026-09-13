@@ -38,6 +38,14 @@ export const REACTIONS: Record<string, Keyframe[]> = {
     { t: 0.78, scaleX: 1, scaleY: 1, offsetY: 0, squint: 0.2, ease: 'out' },
     { t: 0.95, ease: 'back' },
   ],
+  // Pop back to round (the body's own squash undone) with the eyes wide.
+  surprised: [
+    { t: 0 },
+    { t: 0.09, scaleX: 1.06, scaleY: 0.9, offsetY: -0.04, ease: 'out' },
+    { t: 0.26, scaleX: 0.94, scaleY: 1.1, offsetY: 0.07, eyeWidth: 1.35, eyeTall: 1.35, ease: 'back' },
+    { t: 0.6, scaleX: 0.95, scaleY: 1.07, offsetY: 0.05, eyeWidth: 1.3, eyeTall: 1.3, ease: 'inOut' },
+    { t: 0.92, ease: 'out' },
+  ],
 };
 
 export const NAMES = [
