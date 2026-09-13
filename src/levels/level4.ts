@@ -12,6 +12,8 @@ import { scriptedLevel } from './scripted.ts';
 import { createNeutrino } from '../character/neutrino.ts';
 import { setCurrentNeutrino } from '../character/current.ts';
 import { CONFIG } from '../character/config.ts';
+import type { CharacterConfig } from '../character/config.ts';
+import { prefersReducedMotion } from '../render/rig.ts';
 
 // Four flavor shifts (1.5 s each) of travel before the grid at 40%, then a 3 s dash to Earth.
 const TRIP_SECONDS = 15;
@@ -103,9 +105,12 @@ const FOUND = "Found you. You're one of the three neutrinos, in the lepton famil
 const FAMILY_EXTRA = 1;
 // Halfway down the plunge, where the mountain takes over from the clouds.
 const ROCK_AT = 1.8;
+// The plunge is the only shake in the level; CameraRig drops it under reduced motion. The star
+// speed and the dive itself are unchanged either way.
+const DIVE_SHAKE = 0.06;
 
 export const createLevel4 = scriptedLevel(4, async (s) => {
-  const ghost = createNeutrino(CONFIG);
+  const ghost = createNeutrino(characterConfig());
   ghost.group.scale.setScalar(CHARACTER_SCALE);
   setCurrentNeutrino(ghost);
   s.group.add(ghost.group);
@@ -270,13 +275,21 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   s.hud.readout(null);
   ghost.react('brace');
   s.cues.whoosh();
+  s.rig.shake(DIVE_SHAKE);
   const dive = s.rig.moveTo({ x: 0, y: -0.5, z: -18 }, { x: 0, y: -2, z: -24 }, 3);
   await s.b.wait(ROCK_AT);
   ghost.react('surprised');
   s.cues.thwip();
   await dive;
+  s.rig.shake(0);
   await s.b.card("Arriving: Kamioka mine, Japan. 1,000 meters underground. Rock doesn't stop you either.", ['F-19']);
 });
+
+// The beat sheet's reduced-motion rule: the idle bob goes, nothing else changes.
+function characterConfig(): CharacterConfig {
+  if (!prefersReducedMotion()) return CONFIG;
+  return { ...CONFIG, view: { ...CONFIG.view, idleBob: false } };
+}
 
 interface Starfield { points: Points; positions: Float32Array; layers: Float32Array }
 
