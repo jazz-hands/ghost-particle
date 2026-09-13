@@ -93,15 +93,16 @@ const TILES: GridTile[] = [
 
 const NEUTRINO_TILES = [9, 10, 11];
 // One line per family as its row of tiles arrives (F-16).
-const FAMILIES: [string, string][] = [
-  ['Quarks', 'Quarks: the pieces inside protons and neutrons.'],
-  ['Leptons', 'Leptons: the electron and its cousins.'],
-  ['Force carriers', 'Force carriers: what pushes and pulls.'],
-  ['Higgs', 'The Higgs: where mass comes from.'],
+// Each family arrives with its own sound.
+const FAMILIES: [string, string, 'pop' | 'blip' | 'thwip' | 'chime'][] = [
+  ['Quarks', 'Quarks: the pieces inside protons and neutrons.', 'pop'],
+  ['Leptons', 'Leptons: the electron and its cousins.', 'blip'],
+  ['Force carriers', 'Force carriers: what pushes and pulls.', 'thwip'],
+  ['Higgs', 'The Higgs: where mass comes from.', 'chime'],
 ];
 // Screen-right of the camera at (4, 1.5, 5): where the neutrino sits, smaller, to watch the grid.
-const ASIDE = new Vector3(1.1, -0.3, -0.9);
-const ASIDE_SCALE = 0.5;
+const ASIDE = new Vector3(1.25, -0.35, -0.6);
+const ASIDE_SCALE = 0.85;
 const REVEALED = 'Ghost particles. Almost no mass, no charge, three flavors.';
 const FOUND = "Found you. You're one of the three neutrinos, in the lepton family, next to the electron.";
 // Family cards get a second over the reading time: the new tiles are read alongside them.
@@ -225,10 +226,10 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
 
   const grid = s.hud.grid(TILES, 6, { reveal: true });
   let hunting = false;
-  for (const [row, line] of FAMILIES) {
+  for (const [row, line, cue] of FAMILIES) {
     grid.show(row);
     ghost.react('peek');
-    s.cues.blip();
+    s.cues[cue]();
     await s.b.card(line, ['F-16'], { seconds: cardSeconds(line) + FAMILY_EXTRA });
   }
   hunting = true;

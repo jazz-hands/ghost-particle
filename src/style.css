@@ -128,9 +128,8 @@ html, body {
 
 .hud-readout {
   position: absolute;
-  left: 50%;
+  left: 2vw;
   top: 3vh;
-  transform: translateX(-50%);
   font-variant-numeric: tabular-nums;
 }
 
@@ -188,7 +187,7 @@ html, body {
   top: 9vh;
   display: grid;
   gap: 0.4rem;
-  width: min(46rem, 64vw);
+  width: min(62rem, 66vw);
 }
 
 .hud-tile {
@@ -200,8 +199,8 @@ html, body {
   cursor: pointer;
 }
 
-.hud-tile-name { font-size: 1.1rem; }
-.hud-tile-label { font-size: 0.7rem; color: #8fa0b1; }
+.hud-tile-name { font-size: 1.35rem; }
+.hud-tile-label { font-size: 0.85rem; color: #8fa0b1; }
 .hud-tile-on { border-color: #cfd8dc; }
 .hud-tile[data-row="Higgs"] { grid-column: 1; }
 /* Family colours: no violet or orange, so nothing reads as muon or tau; leptons share the electron-flavor cyan. */
