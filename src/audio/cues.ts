@@ -23,6 +23,23 @@ const TADA_NOTES = [
   { hz: 783.99, delay: 0.24, decay: 0.9 },
 ] as const;
 
+// Level 6's field (6.1): the charge hum held far down as a bed under the fill, lifting a
+// little as the map crowds, and never near the charge hum's own peak.
+const FIELD_HUM_LOW = 0.06;
+const FIELD_HUM_HIGH = 0.2;
+// Single ticks as batches land, never a loop: wide at the start of the rush and no tighter
+// than a quarter second at its densest.
+const BATCH_TICK_WIDE = 0.8;
+const BATCH_TICK_TIGHT = 0.25;
+// The swell into the glow (6.3): a pad climbing an octave and a fifth, arriving late so it
+// peaks with the light rather than ahead of it.
+const SWELL_SECONDS = 2.5;
+const SWELL_LOW_HZ = 110;
+const SWELL_HIGH_HZ = 330;
+const SWELL_PEAK = 0.17;
+const SWELL_CURVE = 2.2;
+const SWELL_RELEASE = 1.2;
+
 const clamp01 = (v: number): number => Math.min(Math.max(v, 0), 1);
 
 /** The charge hum's pitch, bent so the last part of the hold still climbs audibly. */
@@ -59,6 +76,26 @@ export function tadaNotes(): readonly { hz: number; delay: number; decay: number
   return TADA_NOTES;
 }
 
+/** The fill's bed hum: low the whole way, lifting as the map fills. */
+export function fieldHumLevel(u: number): number {
+  return FIELD_HUM_LOW + (FIELD_HUM_HIGH - FIELD_HUM_LOW) * clamp01(u);
+}
+
+/** The gap between batch ticks a fraction u into the rush; never tighter than a quarter second. */
+export function batchTickSpacing(u: number): number {
+  return BATCH_TICK_WIDE - (BATCH_TICK_WIDE - BATCH_TICK_TIGHT) * clamp01(u);
+}
+
+/** The swell's pitch a fraction u through its rise; geometric, so it reads as one steady climb. */
+export function swellFrequency(u: number): number {
+  return SWELL_LOW_HZ * (SWELL_HIGH_HZ / SWELL_LOW_HZ) ** clamp01(u);
+}
+
+/** The swell's loudness through the same rise: held back early, full with the light. */
+export function swellGain(u: number): number {
+  return SWELL_PEAK * clamp01(u) ** SWELL_CURVE;
+}
+
 export class Cues {
   private ctx: AudioContext | null = null;
   private out: GainNode | null = null;
@@ -66,6 +103,7 @@ export class Cues {
   private hums: { osc: OscillatorNode; sub: OscillatorNode; filter: BiquadFilterNode; gain: GainNode } | null = null;
   private humLevel = -1;
   private ticker: ReturnType<typeof setInterval> | null = null;
+  private lastBatchTick = -Infinity;
 
   /** The first Space keydown is the only gesture allowed to start audio (1.1). */
   unlock(): void {
@@ -252,6 +290,52 @@ export class Cues {
   /** Three ascending bell notes: the burst out of the Sun. */
   tada(): void {
     for (const note of tadaNotes()) this.bell(note.hz, note.delay, 0.2, note.decay);
+  }
+
+  /** The bed under the level 6 fill: the hum held low, or null to let it go. */
+  fieldHum(u: number | null): void {
+    this.hum(u === null ? 0 : fieldHumLevel(u));
+  }
+
+  /** One soft tick as a batch of arrivals lands, rate-limited so a rush never becomes a loop. */
+  batchTick(u = 1): void {
+    const ctx = this.ctx;
+    if (!ctx) return;
+    if (ctx.currentTime - this.lastBatchTick < batchTickSpacing(u)) return;
+    this.lastBatchTick = ctx.currentTime;
+    this.tick();
+  }
+
+  /** A pad that rises and blooms: the dots going up into one light. */
+  swell(seconds = SWELL_SECONDS): void {
+    const ctx = this.ctx;
+    const out = this.out;
+    if (!ctx || !out) return;
+    const t = ctx.currentTime;
+    const span = Math.max(seconds, 0.1);
+    const steps = 24;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, t);
+    for (let i = 1; i <= steps; i += 1) {
+      gain.gain.exponentialRampToValueAtTime(Math.max(swellGain(i / steps), 0.0001), t + (span * i) / steps);
+    }
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + span + SWELL_RELEASE);
+    gain.connect(out);
+    // A fifth above the root, detuned a little, so the pad beats slowly instead of sitting still.
+    for (const [partial, detune] of [[1, 0], [1.5, 8]] as const) {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.detune.value = detune;
+      for (let i = 0; i <= steps; i += 1) {
+        const at = t + (span * i) / steps;
+        const hz = swellFrequency(i / steps) * partial;
+        if (i === 0) osc.frequency.setValueAtTime(hz, at);
+        else osc.frequency.exponentialRampToValueAtTime(hz, at);
+      }
+      osc.connect(gain);
+      osc.start(t);
+      osc.stop(t + span + SWELL_RELEASE + 0.1);
+    }
   }
 
   private bell(hz: number, delay: number, peak: number, decay = 1.1): void {

@@ -1,6 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { humFrequency, humVolume, risingToneFrequency, thwipPitch, tadaNotes, tickSeconds } from '../../src/audio/cues.ts';
+import {
+  batchTickSpacing, fieldHumLevel, humFrequency, humVolume, risingToneFrequency, swellFrequency,
+  swellGain, thwipPitch, tadaNotes, tickSeconds,
+} from '../../src/audio/cues.ts';
 
 test('the hum rises in pitch across the hold', () => {
   assert.ok(humFrequency(0) < humFrequency(0.5));
@@ -70,4 +73,32 @@ test('the fanfare is three ascending notes, staggered, the last ringing on', () 
     assert.ok(notes[i]!.delay > notes[i - 1]!.delay);
   }
   assert.ok(notes[2]!.decay > notes[1]!.decay);
+});
+
+test('the field hum stays a bed: audible from the first dot, never near the charge hum', () => {
+  assert.ok(fieldHumLevel(0) > 0);
+  assert.ok(fieldHumLevel(0) < fieldHumLevel(1));
+  assert.ok(fieldHumLevel(1) < 0.25);
+});
+
+test('the field hum clamps outside 0..1', () => {
+  assert.equal(fieldHumLevel(-1), fieldHumLevel(0));
+  assert.equal(fieldHumLevel(2), fieldHumLevel(1));
+});
+
+test('batch ticks tighten through the rush but never become a loop', () => {
+  assert.ok(batchTickSpacing(0) > batchTickSpacing(1));
+  for (const u of [-1, 0, 0.5, 1, 2]) assert.ok(batchTickSpacing(u) >= 0.25);
+});
+
+test('the swell climbs an octave and a fifth', () => {
+  assert.ok(swellFrequency(0) < swellFrequency(0.5));
+  assert.ok(swellFrequency(0.5) < swellFrequency(1));
+  assert.ok(Math.abs(swellFrequency(1) / swellFrequency(0) - 3) < 0.01);
+});
+
+test('the swell holds back early and peaks with the light', () => {
+  assert.ok(swellGain(0) === 0);
+  assert.ok(swellGain(0.5) < swellGain(1) * 0.3);
+  assert.equal(swellGain(2), swellGain(1));
 });
