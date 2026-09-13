@@ -1,4 +1,4 @@
-import { Group, MeshPhysicalMaterial } from 'three';
+import { Color, Group, MeshPhysicalMaterial, MeshStandardMaterial } from 'three';
 import type { Mesh, Object3D } from 'three';
 import { box, disposeGroup, setOpacity, sphere } from '../render/prims.ts';
 import { scriptedLevel } from './scripted.ts';
@@ -17,8 +17,25 @@ const CHARACTER_SCALE = 0.5;
 // The electron end is all but down by here; the pop lands with the impact, not after it.
 const SLAM_AT = 0.92;
 // 2.3's brighten rides the character's own emissive, not a HUD flash.
-const GLOW_PEAK = 2.4;
+const GLOW_PEAK = 2.6;
 const GLOW_SECONDS = 1;
+
+// The warm haze the beat sheet floats the neutrino in: level 1's amber family, two faint
+// shells behind the character so the wash has some falloff. Level-owned; Stage is untouched.
+const HAZE_AMBER = '#ff9f45';
+const HAZE_Z = -2.2;
+const HAZE_SHELLS: [radius: number, opacity: number, emissive: number][] = [
+  [2.4, 0.08, 0.5],
+  [4.2, 0.04, 0.35],
+];
+// Furniture, not a character: a muted cool grey-blue, smooth and a little glossy.
+const PLANK_BLUE = '#8ea6c4';
+const PIVOT_BLUE = '#6d8299';
+const TOY_ROUGHNESS = 0.25;
+const TOY_METALNESS = 0.05;
+// The electron reads as a bright cool bead against the amber haze.
+const ELECTRON_BLUE = '#6aa8ff';
+const ELECTRON_EMISSIVE = 1.2;
 
 export const createLevel2 = scriptedLevel(2, async (s) => {
   const anims: ((dt: number) => boolean)[] = [];
@@ -34,6 +51,10 @@ export const createLevel2 = scriptedLevel(2, async (s) => {
       return t >= seconds;
     });
   };
+
+  for (const [radius, opacity, emissive] of HAZE_SHELLS) {
+    s.group.add(haze(radius, opacity, emissive));
+  }
 
   const ghost = createNeutrino(CONFIG);
   ghost.group.scale.setScalar(CHARACTER_SCALE);
@@ -66,11 +87,11 @@ export const createLevel2 = scriptedLevel(2, async (s) => {
 
   // 2.2
   const seesaw = new Group();
-  const pivot = box(0.2, 0.4, 0.4);
+  const pivot = toy(box(0.2, 0.4, 0.4, { color: PIVOT_BLUE }));
   pivot.position.set(0, PLANK_Y - 0.225, 0);
-  const plank = box(3, 0.05, 0.4);
+  const plank = toy(box(3, 0.05, 0.4, { color: PLANK_BLUE }));
   plank.position.set(0, PLANK_Y, 0);
-  const electron = sphere(0.12, { opacity: 1 });
+  const electron = toy(sphere(0.12, { color: ELECTRON_BLUE }), ELECTRON_EMISSIVE);
   electron.position.set(-ARM + 0.15, 0.145, 0);
   plank.add(electron);
   seesaw.add(pivot, plank);
@@ -123,6 +144,30 @@ export const createLevel2 = scriptedLevel(2, async (s) => {
   s.cues.whoosh();
   await s.hud.fade(1, 0.8);
 });
+
+function haze(radius: number, opacity: number, emissive: number): Mesh {
+  const mesh = sphere(radius, { color: HAZE_AMBER, opacity });
+  const material = mesh.material as MeshStandardMaterial;
+  material.emissive = new Color(HAZE_AMBER);
+  material.emissiveIntensity = emissive;
+  material.roughness = 1;
+  material.depthWrite = false;
+  mesh.position.z = HAZE_Z;
+  mesh.renderOrder = -1;
+  return mesh;
+}
+
+// Toy-like: smooth, slightly glossy (SPEC "Look and feel").
+function toy(mesh: Mesh, emissive = 0): Mesh {
+  const material = mesh.material as MeshStandardMaterial;
+  material.roughness = TOY_ROUGHNESS;
+  material.metalness = TOY_METALNESS;
+  if (emissive > 0) {
+    material.emissive = new Color(material.color);
+    material.emissiveIntensity = emissive;
+  }
+  return mesh;
+}
 
 // The brighten is the body's own material; the rim shell and halo are basic materials and
 // carry no emissive.
