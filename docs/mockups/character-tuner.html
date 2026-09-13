@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ghost Particle — character tuner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html, body { margin: 0; height: 100%; background: #000; color: #cfd8dc; font-family: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif; overflow: hidden; }
+  canvas { display: block; }
+  .note { position: fixed; top: 14px; left: 16px; font-size: 13px; color: #78909c; pointer-events: none; max-width: 40ch; line-height: 1.4; }
+  #out { position: fixed; left: 16px; bottom: 16px; width: 44ch; height: 20vh; background: #05080c; color: #b0bec5; border: 1px solid #1b2730; border-radius: 10px; padding: 10px; font: 12px/1.4 ui-monospace, Menlo, monospace; resize: vertical; }
+  #out:focus { outline: 1px solid #4FC3F7; }
+  .lil-gui { --width: 300px; --font-family: inherit; }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div class="note">Character tuner. Ink-eye bubble with bloom and glow tools. Every change updates the JSON below; copy it and paste it back as the final decision. Settings persist in this browser. Drag to orbit.</div>
+<textarea id="out" spellcheck="false" readonly></textarea>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+const TINTS = { electron: '#4FC3F7', muon: '#B388FF', tau: '#FF8A65' };
+
+const defaults = {
+  flavor: 'electron',
+  body: { scaleX: 1.06, scaleY: 0.96, colorDepth: 1.0, opacity: 0.82, roughness: 0.18, clearcoat: 0.6, clearcoatRoughness: 0.08, sheen: 0.4, sheenColor: '#ffffff', emissiveBoost: 0.0 },
+  eyes: { spacing: 0.062, height: 0.42, width: 30, tall: 48, tilt: 0, color: '#0b1a26', roughness: 0.88, highlight: true, hlSize: 9, hlTall: 12, hlOffsetX: 9, hlOffsetY: -16, hlColor: '#ffffff', squint: 0 },
+  light: { keyIntensity: 1.6, keyX: 3, keyY: 6, keyZ: 5, fillIntensity: 0.35, fillColor: '#9fd8ff', rimIntensity: 1.1, rimX: -3, rimY: 3, rimZ: -5, envIntensity: 0.55, exposure: 1.0 },
+  post: { bloom: true, bloomThreshold: 0.95, bloomStrength: 0.25, bloomRadius: 0.3, eyeGlow: 0.0, rimShell: false, rimOpacity: 0.3, rimScale: 1.035, halo: false, haloSize: 3.5, haloOpacity: 0.3 },
+  view: { turn: false, idleBob: false },
+};
+const saved = localStorage.getItem('ghost-particle-tuner');
+const S = saved ? deepMerge(structuredClone(defaults), JSON.parse(saved)) : structuredClone(defaults);
+function deepMerge(a, b) { for (const k in b) { if (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k])) a[k] = deepMerge(a[k] || {}, b[k]); else a[k] = b[k]; } return a; }
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+document.body.prepend(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+const camera = new THREE.PerspectiveCamera(26, innerWidth / innerHeight, 0.1, 100);
+camera.position.set(0, 0.3, 6.5);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.enablePan = false; controls.minDistance = 3; controls.maxDistance = 12;
+
+const key = new THREE.DirectionalLight(0xffffff, 1); scene.add(key);
+const fill = new THREE.DirectionalLight(0xffffff, 1); scene.add(fill);
+const rim = new THREE.DirectionalLight(0xffffff, 1); scene.add(rim);
+
+// Skin texture. Front of the sphere is u = 0.25, equator v = 0.5; near the equator a canvas circle is a sphere circle.
+const W = 1024, H = 512;
+const scaleHex = (hex, k) => { const c = new THREE.Color(hex); return '#' + c.multiplyScalar(k).getHexString(); };
+function makeSkin(kind) {
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  const e = S.eyes, tint = TINTS[S.flavor];
+  const y = e.height * H, xs = [(0.25 - e.spacing) * W, (0.25 + e.spacing) * W];
+  if (kind === 'map') { g.fillStyle = tint; g.fillRect(0, 0, W, H); }
+  else if (kind === 'emissive') { g.fillStyle = scaleHex(tint, S.body.emissiveBoost); g.fillRect(0, 0, W, H); }
+  else { g.fillStyle = '#000'; g.fillRect(0, 0, W, H); }
+  xs.forEach((x, i) => {
+    const side = i === 0 ? -1 : 1;
+    g.save(); g.translate(x, y); g.rotate(side * e.tilt);
+    // Squint: clip the top of the eye with a lid, 0 = open, 1 = closed.
+    const lid = e.squint * e.tall * 2;
+    g.beginPath(); g.rect(-e.width * 2, -e.tall - 2 + lid, e.width * 4, e.tall * 2 + 4); g.clip();
+    g.fillStyle = kind === 'map' ? e.color : kind === 'emissive' ? '#000000' : '#e0e0e0';
+    g.beginPath(); g.ellipse(0, 0, e.width, e.tall, 0, 0, Math.PI * 2); g.fill();
+    if (e.highlight && (kind === 'map' || kind === 'emissive')) {
+      g.fillStyle = kind === 'map' ? e.hlColor : scaleHex(e.hlColor, S.post.eyeGlow);
+      g.beginPath(); g.ellipse(e.hlOffsetX, e.hlOffsetY, e.hlSize, e.hlTall, 0, 0, Math.PI * 2); g.fill();
+    }
+    g.restore();
+  });
+  if (kind === 'rough') { // body roughness in the red channel, eyes matte
+    const img = g.getImageData(0, 0, W, H); const d = img.data;
+    const bodyR = Math.round(S.body.roughness * 255), eyeR = Math.round(S.eyes.roughness * 255);
+    for (let i = 0; i < d.length; i += 4) { const isEye = d[i] > 100; const r = isEye ? eyeR : bodyR; d[i] = d[i + 1] = d[i + 2] = r; d[i + 3] = 255; }
+    g.putImageData(img, 0, 0);
+  }
+  const t = new THREE.CanvasTexture(c); if (kind === 'map' || kind === 'emissive') t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+
+const geo = new THREE.SphereGeometry(1, 128, 96);
+const mat = new THREE.MeshPhysicalMaterial({ transparent: true, metalness: 0, roughness: 1, emissive: new THREE.Color(0x000000) });
+const body = new THREE.Mesh(geo, mat); scene.add(body);
+const rimMat = new THREE.MeshBasicMaterial({ transparent: true, blending: THREE.AdditiveBlending, side: THREE.BackSide, depthWrite: false });
+const rimShell = new THREE.Mesh(geo, rimMat); body.add(rimShell);
+const haloTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+  const gr = g.createRadialGradient(128,128,0,128,128,128); gr.addColorStop(0,'rgba(255,255,255,1)'); gr.addColorStop(0.35,'rgba(255,255,255,0.35)'); gr.addColorStop(1,'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0,0,256,256); return new THREE.CanvasTexture(c); })();
+const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: haloTex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
+halo.position.z = -0.6; body.add(halo);
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.25, 0.3, 0.95);
+composer.addPass(bloomPass);
+composer.addPass(new OutputPass());
+
+function apply() {
+  const b = S.body, l = S.light, tint = TINTS[S.flavor];
+  body.scale.set(b.scaleX, b.scaleY, 1);
+  if (mat.map) mat.map.dispose(); if (mat.roughnessMap) mat.roughnessMap.dispose();
+  mat.map = makeSkin('map'); mat.roughnessMap = makeSkin('rough');
+  mat.color.set('#ffffff').lerp(new THREE.Color(tint), b.colorDepth);
+  mat.opacity = b.opacity; mat.clearcoat = b.clearcoat; mat.clearcoatRoughness = b.clearcoatRoughness;
+  mat.sheen = b.sheen; mat.sheenColor.set(b.sheenColor);
+  if (mat.emissiveMap) mat.emissiveMap.dispose();
+  mat.emissiveMap = makeSkin('emissive'); mat.emissive.set('#ffffff'); mat.emissiveIntensity = 1;
+  mat.needsUpdate = true;
+  const p = S.post;
+  bloomPass.enabled = p.bloom; bloomPass.threshold = p.bloomThreshold; bloomPass.strength = p.bloomStrength; bloomPass.radius = p.bloomRadius;
+  rimShell.visible = p.rimShell; rimMat.color.set(tint); rimMat.opacity = p.rimOpacity; rimShell.scale.setScalar(p.rimScale);
+  halo.visible = p.halo; halo.material.color.set(tint); halo.material.opacity = p.haloOpacity; halo.scale.setScalar(p.haloSize);
+  key.intensity = l.keyIntensity; key.position.set(l.keyX, l.keyY, l.keyZ);
+  fill.intensity = l.fillIntensity; fill.color.set(l.fillColor); fill.position.set(-5, 1, 3);
+  rim.intensity = l.rimIntensity; rim.position.set(l.rimX, l.rimY, l.rimZ);
+  scene.environmentIntensity = l.envIntensity;
+  renderer.toneMappingExposure = l.exposure;
+  const out = document.getElementById('out');
+  out.value = JSON.stringify(S, null, 2);
+  localStorage.setItem('ghost-particle-tuner', JSON.stringify(S));
+}
+
+const gui = new GUI({ title: 'Ghost Particle tuner' });
+gui.add(S, 'flavor', Object.keys(TINTS)).onChange(apply);
+const fb = gui.addFolder('Body');
+fb.add(S.body, 'scaleX', 0.8, 1.3, 0.01).name('width').onChange(apply);
+fb.add(S.body, 'scaleY', 0.7, 1.2, 0.01).name('height').onChange(apply);
+fb.add(S.body, 'colorDepth', 0, 1, 0.01).name('color depth').onChange(apply);
+fb.add(S.body, 'opacity', 0.2, 1, 0.01).onChange(apply);
+fb.add(S.body, 'roughness', 0, 1, 0.01).onChange(apply);
+fb.add(S.body, 'clearcoat', 0, 1, 0.01).onChange(apply);
+fb.add(S.body, 'clearcoatRoughness', 0, 1, 0.01).name('clearcoat roughness').onChange(apply);
+fb.add(S.body, 'sheen', 0, 1, 0.01).onChange(apply);
+fb.addColor(S.body, 'sheenColor').name('sheen color').onChange(apply);
+fb.add(S.body, 'emissiveBoost', 0, 1, 0.01).name('inner glow').onChange(apply);
+const fe = gui.addFolder('Eyes');
+fe.add(S.eyes, 'spacing', 0.02, 0.12, 0.001).onChange(apply);
+fe.add(S.eyes, 'height', 0.3, 0.6, 0.005).name('height on face').onChange(apply);
+fe.add(S.eyes, 'width', 6, 70, 1).onChange(apply);
+fe.add(S.eyes, 'tall', 6, 90, 1).name('tallness').onChange(apply);
+fe.add(S.eyes, 'tilt', -0.6, 0.6, 0.01).onChange(apply);
+fe.add(S.eyes, 'squint', 0, 1, 0.01).name('lid (0 open, 1 shut)').onChange(apply);
+fe.addColor(S.eyes, 'color').onChange(apply);
+fe.add(S.eyes, 'roughness', 0, 1, 0.01).name('eye matte').onChange(apply);
+fe.add(S.eyes, 'highlight').onChange(apply);
+fe.add(S.eyes, 'hlSize', 1, 30, 1).name('highlight width').onChange(apply);
+fe.add(S.eyes, 'hlTall', 1, 40, 1).name('highlight tallness').onChange(apply);
+fe.add(S.eyes, 'hlOffsetX', -30, 30, 1).name('highlight x').onChange(apply);
+fe.add(S.eyes, 'hlOffsetY', -40, 40, 1).name('highlight y').onChange(apply);
+fe.addColor(S.eyes, 'hlColor').name('highlight color').onChange(apply);
+const fl = gui.addFolder('Light');
+fl.add(S.light, 'keyIntensity', 0, 5, 0.05).name('key').onChange(apply);
+fl.add(S.light, 'keyX', -10, 10, 0.1).name('key x').onChange(apply);
+fl.add(S.light, 'keyY', -10, 10, 0.1).name('key y').onChange(apply);
+fl.add(S.light, 'keyZ', -10, 10, 0.1).name('key z').onChange(apply);
+fl.add(S.light, 'fillIntensity', 0, 3, 0.05).name('fill').onChange(apply);
+fl.addColor(S.light, 'fillColor').name('fill color').onChange(apply);
+fl.add(S.light, 'rimIntensity', 0, 5, 0.05).name('rim').onChange(apply);
+fl.add(S.light, 'rimX', -10, 10, 0.1).name('rim x').onChange(apply);
+fl.add(S.light, 'rimY', -10, 10, 0.1).name('rim y').onChange(apply);
+fl.add(S.light, 'rimZ', -10, 10, 0.1).name('rim z').onChange(apply);
+fl.add(S.light, 'envIntensity', 0, 2, 0.01).name('environment').onChange(apply);
+fl.add(S.light, 'exposure', 0.2, 3, 0.01).onChange(apply);
+const fp = gui.addFolder('Post-processing and glow');
+fp.add(S.post, 'bloom').onChange(apply);
+fp.add(S.post, 'bloomThreshold', 0, 1, 0.01).name('bloom threshold').onChange(apply);
+fp.add(S.post, 'bloomStrength', 0, 3, 0.01).name('bloom strength').onChange(apply);
+fp.add(S.post, 'bloomRadius', 0, 1, 0.01).name('bloom radius').onChange(apply);
+fp.add(S.post, 'eyeGlow', 0, 4, 0.05).name('eye highlight glow').onChange(apply);
+fp.add(S.post, 'rimShell').name('rim shell').onChange(apply);
+fp.add(S.post, 'rimOpacity', 0, 1, 0.01).name('rim opacity').onChange(apply);
+fp.add(S.post, 'rimScale', 1.0, 1.15, 0.001).name('rim scale').onChange(apply);
+fp.add(S.post, 'halo').onChange(apply);
+fp.add(S.post, 'haloSize', 1, 8, 0.1).name('halo size').onChange(apply);
+fp.add(S.post, 'haloOpacity', 0, 1, 0.01).name('halo opacity').onChange(apply);
+const fv = gui.addFolder('View');
+fv.add(S.view, 'turn').name('slow turn');
+fv.add(S.view, 'idleBob').name('idle bob');
+gui.add({ reset() { localStorage.removeItem('ghost-particle-tuner'); location.reload(); } }, 'reset').name('reset to defaults');
+gui.add({ copy() { navigator.clipboard?.writeText(document.getElementById('out').value); } }, 'copy').name('copy settings');
+apply();
+
+addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight); });
+
+function frame(t) {
+  controls.update();
+  body.rotation.y = S.view.turn ? Math.sin(t * 0.0004) * 0.6 : 0;
+  body.position.y = S.view.idleBob ? Math.sin(t * 0.002) * 0.05 : 0;
+  if (S.view.idleBob) { const s = 1 + Math.sin(t * 0.002) * 0.02; body.scale.set(S.body.scaleX * s, S.body.scaleY / s, 1); }
+  composer.render();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

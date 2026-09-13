@@ -40,6 +40,7 @@ How to use:
 | D-026 | BEATS.md is the script | accepted | If a moment isn't in the beat sheet, it isn't built. |
 | D-027 | Cheap rendering for level 5 | accepted | Sensors are one instanced mesh; rings are drawn on a canvas texture on the cylinder wall. |
 | D-028 | Level 6 plots the public dataset | accepted | No rights request for the Sun image; the ending is a chart of Super-K's 22-year public record. |
+| D-029 | Character is a bubble with ink eyes | accepted | Squashed translucent sphere, no antenna, matte dark oval eyes painted into the skin. Final values come from the tuner. |
 
 ## Entries
 
@@ -172,3 +173,7 @@ The 11,129 inner sensors (F-18) are a single `InstancedMesh` of a low-poly disc 
 ### D-028 Level 6 plots the public dataset — accepted
 
 The ending uses Super-Kamiokande's public 5-day solar neutrino record, 1996 to 2018 (F-24, A-02), drawn as a chart from the real data file at build time. The famous neutrino image of the Sun (A-01) is not shipped and no usage request is made; the game mentions it only in words. Rationale: no time for a rights request, and the dataset is public, citable, and tells the same story (neutrinos arrive day and night, through the Earth). The chart follows the `dataviz` skill when built.
+
+### D-029 Character is a bubble with ink eyes — accepted
+
+Chosen from `docs/mockups/character.html` (shape) and `docs/mockups/character-eyes.html` (eyes). The body is a slightly squashed sphere with a glossy translucent material; no antenna. The eyes are matte dark ovals with a painted highlight, drawn into the sphere's own skin texture so they follow the surface and deform with squash and stretch. All reactions in `BEATS.md` are redraws of that texture (lids, tilt, spacing, highlight), not extra geometry. Exact material, eye, light and bloom values are set with `docs/mockups/character-tuner.html`; the tuner's JSON output is the final record and is pasted here once decided.

@@ -39,7 +39,9 @@ Most entries are now verified. Remaining "check" items, none of which change on-
 
 ## 4. Art and reference (no external assets shipped)
 
-- [ ] Character: bubble shape chosen from `docs/mockups/character.html` (no antenna). Eye treatment to pick from `docs/mockups/character-eyes.html` (screenshot `bubble-eye-study.png`), then record as a decision and define the eye shapes for each reaction in the reaction set.
+- [x] Character: bubble with ink eyes, no antenna (D-029).
+- [ ] Final character values: tune in `docs/mockups/character-tuner.html`, paste the JSON into D-029.
+- [ ] Eye shapes per reaction: define lid, tilt, spacing and highlight values for each of the eleven reactions in BEATS.md, using the tuner's eye controls.
 - [ ] Palette: background gradient stops, UI accent, plasma color in L3, sensor "eye" gold in L5 (flavor tints and base are settled in D-011).
 - [ ] Reference board from the Astro Bot screenshots (private, not committed).
 - [ ] Rough layout for the HUD: caption card position, key prompt, meters, mini-game buttons.
