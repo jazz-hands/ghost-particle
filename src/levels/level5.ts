@@ -1,4 +1,6 @@
-import { AdditiveBlending, ConeGeometry, Color, Mesh, MeshBasicMaterial, SphereGeometry } from 'three';
+import {
+  AdditiveBlending, ConeGeometry, Color, Mesh, MeshBasicMaterial, SphereGeometry, Vector3,
+} from 'three';
 import { scriptedLevel } from './scripted.ts';
 import type { Scripted } from './scripted.ts';
 import { CHERENKOV_BLUE, H_TANK, WALL, createTank } from './level5-tank.ts';
@@ -32,6 +34,11 @@ const NU_POS: [number, number, number] = [NU_X, -0.45, -0.6];
 // 5.3 holds its breath: the camera creeps in on the electron while time is slow.
 const HELD_EYE: [number, number, number] = [-1.5, 0.2, -0.7];
 const HIT_SHAKE = 0.035;
+// During the mini-game the camera swings to each ring in turn, so the character travels with
+// it: a third of the way out along the line of sight and a little below it.
+const ESCORT = 0.5;
+const ESCORT_DROP = 0.25;
+const ESCORT_SIDE = 0.7;
 
 type Answer = 'E' | 'M' | 'either';
 
@@ -68,6 +75,18 @@ function animate(s: Scripted, seconds: number, step: (u: number) => void): Promi
 
 function wallPoint(spot: Spot): [number, number, number] {
   return [WALL * Math.cos(spot.theta), spot.y, WALL * Math.sin(spot.theta)];
+}
+
+function escortPoint(target: [number, number, number]): [number, number, number] {
+  const dx = target[0] - EYE[0];
+  const dz = target[2] - EYE[2];
+  const span = Math.hypot(dx, dz) || 1;
+  // Left of the line of sight, so the ring the player is judging stays clear.
+  return [
+    EYE[0] + dx * ESCORT + (dz / span) * ESCORT_SIDE,
+    EYE[1] + (target[1] - EYE[1]) * ESCORT - ESCORT_DROP,
+    EYE[2] + dz * ESCORT - (dx / span) * ESCORT_SIDE,
+  ];
 }
 
 /** The cone of light itself: open-ended, additive, and pointing the way the electron went. */
@@ -226,7 +245,16 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
     shown.push(painted);
     void animate(s, RING_IN, (u) => { painted.alpha = u; repaint(); });
     cues.blip();
-    void rig.moveTo(EYE, wallPoint(item.spot), 0.8);
+    const look = wallPoint(item.spot);
+    void rig.moveTo(EYE, look, 0.8);
+    const seat = escortPoint(look);
+    const was = nu.position.clone();
+    const turn = nu.rotation.y;
+    const facing = Math.atan2(EYE[0] - seat[0], EYE[2] - seat[2]);
+    void animate(s, 0.8, (u) => {
+      nu.position.lerpVectors(was, new Vector3(...seat), u);
+      nu.rotation.y = turn + (facing - turn) * u;
+    });
     ghost.react('peek');
     picked = null;
     accepting = true;
