@@ -1,9 +1,13 @@
 import { AdditiveBlending, ConeGeometry, Color, Mesh, MeshBasicMaterial, SphereGeometry } from 'three';
 import { scriptedLevel } from './scripted.ts';
 import type { Scripted } from './scripted.ts';
-import { neutrino } from '../render/prims.ts';
 import { CHERENKOV_BLUE, H_TANK, WALL, createTank } from './level5-tank.ts';
 import type { PaintedRing, RingStyle } from './level5-tank.ts';
+import { createNeutrino } from '../character/neutrino.ts';
+import { setCurrentNeutrino } from '../character/current.ts';
+import { CONFIG } from '../character/config.ts';
+import type { CharacterConfig } from '../character/config.ts';
+import { prefersReducedMotion } from '../render/rig.ts';
 
 // F-31: cos θ = 1/(nβ) gives 41.2° in water, so a cone of height h has base radius h × tan θ.
 const CHERENKOV = Math.tan((41.2 * Math.PI) / 180);
@@ -21,6 +25,13 @@ const DRIFT = 0.1;
 const ELECTRON_SPEED = 3;
 const RING_IN = 0.35;
 const GLINT_Y = 0.5;
+// The character's body sphere has radius 1. Smaller than in levels 1 and 2: here it shares the
+// frame with its own ring and must not sit on top of it.
+const CHARACTER_SCALE = 0.28;
+const NU_POS: [number, number, number] = [NU_X, -0.45, -0.6];
+// 5.3 holds its breath: the camera creeps in on the electron while time is slow.
+const HELD_EYE: [number, number, number] = [-1.5, 0.2, -0.7];
+const HIT_SHAKE = 0.035;
 
 type Answer = 'E' | 'M' | 'either';
 
@@ -76,6 +87,12 @@ function electronBead(): Mesh<SphereGeometry, MeshBasicMaterial> {
   return new Mesh(new SphereGeometry(0.07, 16, 12), new MeshBasicMaterial({ color: '#e8f6ff' }));
 }
 
+// The beat sheet's reduced-motion rule: the idle bob goes, nothing else changes.
+function characterConfig(): CharacterConfig {
+  if (!prefersReducedMotion()) return CONFIG;
+  return { ...CONFIG, view: { ...CONFIG.view, idleBob: false } };
+}
+
 export const createLevel5 = scriptedLevel(5, async (s) => {
   const { hud, b, rig, group } = s;
   hud.counter.start();
@@ -87,18 +104,34 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   const shown: PaintedRing[] = [];
   const repaint = (): void => tank.paint(shown);
 
-  const nu = neutrino();
-  nu.position.set(NU_X, PATH_Y + 0.1, 0);
+  const ghost = createNeutrino(characterConfig());
+  const nu = ghost.group;
+  nu.scale.setScalar(CHARACTER_SCALE);
+  nu.position.set(...NU_POS);
+  // Its painted face is on the body's +Z side, so it turns to keep the player in front of it.
+  nu.rotation.y = Math.atan2(EYE[0] - NU_POS[0], EYE[2] - NU_POS[2]);
+  setCurrentNeutrino(ghost);
   group.add(nu);
+  // exit() clears the level group, and three.js announces that to each child: the only
+  // teardown hook a scripted level gets.
+  nu.addEventListener('removed', () => {
+    setCurrentNeutrino(null);
+    ghost.dispose();
+  });
+  // F-23: what the detector catches here is an electron-flavor neutrino scattering an electron.
+  ghost.setFlavor('electron');
+  s.onUpdate((dt) => ghost.update(dt));
 
   // 5.1 the tank fades up while the camera tilts down the full height of the cylinder, from
   // the top cap to the sensor wall ahead.
   rig.set(EYE, [0, H_TANK / 2, 0]);
   void rig.moveTo(EYE, AIM, 5);
   void hud.fade(0, 3);
+  ghost.react('wake');
   await b.card('Super-Kamiokande. A tank 39 meters wide and 41 meters tall, holding 50,000 tons of pure water. Running since 1996.', ['F-17', 'F-19']);
 
   // 5.2 a glint runs round the sensor wall, lighting each stretch as it passes.
+  ghost.react('peek');
   void animate(s, 3, (u) => {
     const theta = Math.PI / 2 - u * Math.PI * 2;
     shown[0] = { theta, y: GLINT_Y, radius: 0, style: 'fuzzy', alpha: u === 1 ? 0 : 0.9 };
@@ -114,14 +147,24 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   let drifting = true;
   s.onUpdate((dt) => { if (drifting) electron.position.x += DRIFT * dt; });
   hud.prompt('Press Space');
+  ghost.react('brace');
+  void rig.moveTo(HELD_EYE, AIM, 6);
   await b.key('Space');
   drifting = false;
   hud.prompt(null);
+  void rig.moveTo(EYE, AIM, 0.8);
 
   // 5.4 the nudge, the cone, and the ring it paints on the wall.
   const from = electron.position.x;
   const reach = WALL - from;
-  await animate(s, 0.3, (u) => { nu.position.x = NU_X + 0.2 * u; });
+  const lunge = 0.35 / Math.hypot(from - NU_POS[0], PATH_Y - NU_POS[1], -NU_POS[2]);
+  await animate(s, 0.3, (u) => {
+    nu.position.set(
+      NU_POS[0] + (from - NU_POS[0]) * lunge * u,
+      NU_POS[1] + (PATH_Y - NU_POS[1]) * lunge * u,
+      NU_POS[2] * (1 - lunge * u),
+    );
+  });
   const light = cherenkovCone(reach * CHERENKOV, reach);
   light.position.set(from, PATH_Y, 0);
   group.add(light);
@@ -135,12 +178,17 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
     repaint();
   });
   electron.visible = false;
+  ghost.react('surprised');
+  rig.shake(HIT_SHAKE);
   await animate(s, RING_IN, (u) => {
+    rig.shake(HIT_SHAKE * (1 - u));
     hero.alpha = 1;
     light.material.opacity = 0.28 * (1 - u);
     repaint();
   });
   light.visible = false;
+  rig.shake(0);
+  ghost.react('proud');
 
   await b.card('You hit something. You kicked an electron faster than light moves in water. That makes a cone of light. On the wall: a ring.', ['F-21', 'F-31']);
 
@@ -148,6 +196,7 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   const rival: PaintedRing = { theta: 0.62, y: PATH_Y, radius: reach * CHERENKOV * 0.8, style: 'sharp', alpha: 0 };
   shown.push(rival);
   void animate(s, RING_IN, (u) => { rival.alpha = u; repaint(); });
+  ghost.react('look-at-self');
   await b.card('Your ring is fuzzy, because the electron scatters and showers. A muon would punch straight through and leave a sharp ring.', ['F-22']);
 
   // 5.7 the sorting game.
@@ -156,6 +205,7 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   const buttons = hud.buttons([{ key: 'E', label: 'Electron' }, { key: 'M', label: 'Muon' }], (key) => {
     if (accepting && (key === 'E' || key === 'M')) picked = key;
   });
+  ghost.react('nod');
   await b.card("Now you're the physicist. Five more rings are coming. Sharp or fuzzy? Press E or M to sort them.", ['F-22']);
 
   // 5.8, 5.9 five rings, one at a time, each answered and then explained.
@@ -166,10 +216,12 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
     shown.push(painted);
     void animate(s, RING_IN, (u) => { painted.alpha = u; repaint(); });
     void rig.moveTo(EYE, wallPoint(item.spot), 0.8);
+    ghost.react('peek');
     picked = null;
     accepting = true;
     await b.until(() => picked !== null);
     accepting = false;
+    ghost.react(item.answer === 'either' || picked === item.answer ? 'nod' : 'shrug');
     hud.reveal(item.reveal, 3);
     await b.wait(3);
     shown.length = 0;
@@ -178,6 +230,7 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   buttons.close();
   void rig.moveTo(EYE, AIM, 0.8);
 
+  ghost.react('nod');
   await b.card("Solar neutrinos show up as electron rings pointing away from the Sun. That's how Super-K knows they came from the Sun.", ['F-23']);
   await b.card("These rings are simulated from Super-K's published shape and physics. They are not real recordings.", ['F-24', 'F-17', 'F-18'], { small: true });
 });
