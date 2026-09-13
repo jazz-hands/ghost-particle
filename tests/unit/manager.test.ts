@@ -115,3 +115,14 @@ test('skip before start does nothing', () => {
   assert.equal(m.level, 0);
   assert.deepEqual(log, []);
 });
+
+test('onEnter reports each level as it is entered, not the end', () => {
+  const log: string[] = [];
+  const entered: number[] = [];
+  const m = new LevelManager([fakeLevel(1, log), fakeLevel(2, log)], base, (level) => entered.push(level));
+  m.start();
+  m.next();
+  m.next();
+  assert.equal(m.finished, true);
+  assert.deepEqual(entered, [1, 2]);
+});

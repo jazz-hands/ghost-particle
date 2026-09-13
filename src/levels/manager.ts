@@ -7,10 +7,12 @@ export class LevelManager {
   private readonly base: Omit<LevelContext, 'done'>;
   private current: Level | null = null;
   private index = -1;
+  private readonly onEnter: ((level: number) => void) | undefined;
 
-  constructor(factories: LevelFactory[], base: Omit<LevelContext, 'done'>) {
+  constructor(factories: LevelFactory[], base: Omit<LevelContext, 'done'>, onEnter?: (level: number) => void) {
     this.factories = factories;
     this.base = base;
+    this.onEnter = onEnter;
   }
 
   get level(): number {
@@ -47,6 +49,7 @@ export class LevelManager {
     if (i >= this.factories.length) return;
     const level = this.factories[i]!();
     this.current = level;
+    this.onEnter?.(i + 1);
     level.enter({
       ...this.base,
       done: () => {
