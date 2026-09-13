@@ -22,7 +22,7 @@ How to use:
 | D-008 | Detector events are simulated | accepted | Rings are generated from published geometry, labelled as simulation. |
 | D-009 | Build budget and cut order | accepted | 5 hours; cut L7, then L4 photo, then L3 steering, then L5 ring count. |
 | D-010 | Input scheme | accepted | Keyboard only for v1. |
-| D-011 | Flavor tints | accepted | The body takes the flavor color, in neon: electron cyan, muon violet, tau orange. Disclosed as a design choice. |
+| D-011 | Flavor tints | accepted | The body takes the flavor color: electron cyan, muon violet, tau orange. Disclosed as a design choice. |
 | D-012 | Dodging has no consequence | accepted | Superseded by D-020: nothing can be hit, no fail state. |
 | D-013 | Mini-game feedback timing | accepted | Reveal answer and one-line reason after each ring. |
 | D-014 | Hosting | accepted | Static build hosted on exe.dev. |
@@ -95,7 +95,7 @@ Keyboard only for v1: Space to hold and to advance, arrow keys to steer in level
 
 ### D-011 Flavor tints — accepted
 
-The body takes the current flavor's color, as in the approved mockups (an earlier "white base with blue glow" wording is withdrawn). Neon palette: electron flavor cyan `#00E5FF`, muon flavor violet `#B026FF`, tau flavor orange `#FF5C00`. The tuner's "color depth" sets how fully the body takes the color; a flavor change is a material color lerp, no texture rebuild. These are design choices with no physical meaning; the credits say so. The three are far apart in hue and readable against the navy background, and the flavor icon under the counter repeats the tint so colour alone is not the only cue.
+The body takes the current flavor's color, as in the approved mockups (an earlier "white base with blue glow" wording is withdrawn). Palette: electron flavor cyan `#5ee3ff`, muon flavor violet `#b58cff`, tau flavor orange `#ff9f6b`. The tuner's "color depth" sets how fully the body takes the color; a flavor change is a material color lerp, no texture rebuild. These are design choices with no physical meaning; the credits say so. The three are far apart in hue and readable against the navy background, and the flavor icon under the counter repeats the tint so colour alone is not the only cue.
 
 ### D-012 Dodging has no consequence — accepted
 
@@ -176,4 +176,70 @@ The ending uses Super-Kamiokande's public 5-day solar neutrino record, 1996 to 2
 
 ### D-029 Character is a bubble with ink eyes — accepted
 
-Chosen from `docs/mockups/character.html` (shape) and `docs/mockups/character-eyes.html` (eyes). The body is a slightly squashed sphere with a glossy translucent material; no antenna. The eyes are matte dark ovals with a painted highlight, drawn into the sphere's own skin texture so they follow the surface and deform with squash and stretch. All reactions in `BEATS.md` are redraws of that texture (lids, tilt, spacing, highlight), not extra geometry. Exact material, eye, light and bloom values are set with `docs/mockups/character-tuner.html`; the tuner's JSON output is the final record and is pasted here once decided.
+Chosen from `docs/mockups/character.html` (shape) and `docs/mockups/character-eyes.html` (eyes). The body is a slightly squashed sphere with a glossy translucent material; no antenna. The eyes are matte dark ovals with a painted highlight, drawn into the sphere's own skin texture so they follow the surface and deform with squash and stretch. All reactions in `BEATS.md` are redraws of that texture (lids, tilt, spacing, highlight), not extra geometry. Exact material, eye, light and bloom values were set with `docs/mockups/character-tuner.html`. The tuner's JSON output, the final record and the content of `src/character/config.json`:
+
+```json
+{
+  "flavor": "tau",
+  "body": {
+    "scaleX": 1.06,
+    "scaleY": 0.96,
+    "colorDepth": 1,
+    "opacity": 0.33,
+    "roughness": 0.32,
+    "clearcoat": 1,
+    "clearcoatRoughness": 0.42,
+    "sheen": 0,
+    "sheenColor": "#ffffff",
+    "emissiveBoost": 1
+  },
+  "eyes": {
+    "spacing": 0.062,
+    "height": 0.42,
+    "width": 30,
+    "tall": 43,
+    "tilt": 0,
+    "color": "#0b1a26",
+    "roughness": 0.61,
+    "highlight": true,
+    "hlSize": 9,
+    "hlTall": 13,
+    "hlOffsetX": 9,
+    "hlOffsetY": -16,
+    "hlColor": "#ffffff",
+    "squint": 0,
+    "lowerLid": 0
+  },
+  "light": {
+    "keyIntensity": 1.2,
+    "keyX": 3,
+    "keyY": 6,
+    "keyZ": 5,
+    "fillIntensity": 0.25,
+    "fillColor": "#9fd8ff",
+    "rimIntensity": 1,
+    "rimX": -3,
+    "rimY": 3,
+    "rimZ": -5,
+    "envIntensity": 0.12,
+    "exposure": 0.72
+  },
+  "post": {
+    "bloom": true,
+    "bloomThreshold": 0.71,
+    "bloomStrength": 0.35,
+    "bloomRadius": 0.42,
+    "eyeGlow": 4,
+    "rimShell": true,
+    "rimOpacity": 0.05,
+    "rimScale": 1.006,
+    "halo": false,
+    "haloSize": 3.5,
+    "haloOpacity": 0.29
+  },
+  "view": {
+    "turn": true,
+    "idleBob": true
+  }
+}
+```
