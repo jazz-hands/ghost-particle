@@ -66,7 +66,7 @@ html, body {
 .hud-prompt {
   position: absolute;
   left: 50%;
-  top: 58%;
+  bottom: 14vh;
   transform: translateX(-50%);
   font-size: 1.1rem;
   color: #9fb0c1;
@@ -75,7 +75,7 @@ html, body {
 .hud-title {
   position: absolute;
   left: 50%;
-  top: 32%;
+  top: 12%;
   transform: translateX(-50%);
   font-size: 2rem;
   text-align: center;
@@ -84,8 +84,8 @@ html, body {
 .hud-big {
   position: absolute;
   left: 50%;
-  top: 45%;
-  transform: translate(-50%, -50%);
+  bottom: 20vh;
+  transform: translateX(-50%);
   font-size: 2.6rem;
   text-align: center;
 }

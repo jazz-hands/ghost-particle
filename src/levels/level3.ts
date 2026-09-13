@@ -84,7 +84,7 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
     if (s.keys.isDown('ArrowRight')) lane += STEER * dt;
     lane = Math.min(Math.max(lane, -LANE), LANE);
     ghost.position.x = lane;
-    if (follow) s.rig.set({ x: lane * 0.5, y: 0.6, z: 4 }, ghost.position);
+    if (follow) s.rig.set({ x: lane * 0.5, y: 0.5, z: 6 }, { x: ghost.position.x, y: ghost.position.y - 0.6, z: 0 });
 
     if (spawning) {
       spawnIn -= dt * rate;
