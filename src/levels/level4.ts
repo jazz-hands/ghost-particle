@@ -1,5 +1,8 @@
-import { Group, Vector3 } from 'three';
-import type { Mesh } from 'three';
+import {
+  AdditiveBlending, BufferAttribute, BufferGeometry, CanvasTexture, Color, Points, PointsMaterial,
+  SRGBColorSpace, Sprite, SpriteMaterial, Vector3,
+} from 'three';
+import type { Mesh, MeshStandardMaterial } from 'three';
 import { cycleFlavor } from '../content/flavors.ts';
 import { cardSeconds } from './beats.ts';
 import type { Flavor } from '../content/flavors.ts';
@@ -16,10 +19,51 @@ const GRID_AT = 0.4;
 const DASH_SECONDS = 3;
 const KM = 149_597_870.7;
 const LIGHT_SECONDS = 499;
-const STREAKS = 200;
 const HOP = 0.5;
 // The character's body sphere has radius 1; the blockout's ghost was half that.
 const CHARACTER_SCALE = 0.5;
+
+// The starfield is one Points draw call. Cool white-blue against the stage's navy; each star
+// keeps its own layer speed, so the near ones sweep past while the far ones barely move.
+const STAR_COUNT = 900;
+const STAR_BLUE = '#cfe4ff';
+const STAR_SIZE = 0.07;
+const STAR_OPACITY = 0.85;
+const STAR_SPREAD_X = 18;
+const STAR_SPREAD_Y = 11;
+const STAR_DEPTH = 70;
+const STAR_AHEAD = 10;
+const STAR_DRIFT = 2;
+const STAR_RUSH = 40;
+const STAR_SLOWEST = 0.4;
+
+// The Sun keeps levels 1 and 2's amber family, so the star left behind is the one you were born
+// in: a warm emissive disc inside a soft additive halo, both shrinking together.
+const SUN_RADIUS = 4;
+const SUN_CORE = '#ffe6bd';
+const SUN_GLOW = '#ff9f45';
+const SUN_EMISSIVE = 1.6;
+const SUN_GLOW_SIZE = 26;
+const SUN_GLOW_OPACITY = 0.5;
+const SUN_SHRINK = 0.85;
+
+// Earth is procedural: a deep ocean blue body under a slightly larger translucent white shell
+// that reads as cloud once it fills the view. No textures, two draw calls.
+const EARTH_RADIUS = 0.2;
+const EARTH_GROW = 29;
+const EARTH_BLUE = '#2f6bd8';
+const EARTH_EMISSIVE = 0.3;
+const CLOUD_WHITE = '#eef4ff';
+const CLOUD_SHELL = 1.07;
+const CLOUD_OPACITY = 0.3;
+
+// The dive: soft white sheets, then cool dark rock lit only by an emissive rim, so the ground
+// and the mountain still have an edge against the navy as the plunge goes through them.
+const DIVE_CLOUD_WHITE = '#dce8f5';
+const DIVE_CLOUD_OPACITY = 0.3;
+const ROCK_GREY = '#3a4550';
+const ROCK_RIM = '#6fa8d6';
+const ROCK_RIM_EMISSIVE = 0.45;
 
 // F-16: the Standard Model, four rows of six columns; the three neutrinos hide behind a "?".
 const TILES: GridTile[] = [
@@ -74,25 +118,34 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   s.onUpdate((dt) => ghost.update(dt));
   s.rig.set({ x: 4, y: 1.5, z: 5 }, { x: 0, y: 0, z: 0 });
 
-  const sun = sphere(4);
+  const sun = glow(sphere(SUN_RADIUS, { color: SUN_CORE }), SUN_CORE, SUN_EMISSIVE);
+  const halo = new Sprite(new SpriteMaterial({
+    map: glowTexture(),
+    color: new Color(SUN_GLOW),
+    transparent: true,
+    opacity: SUN_GLOW_OPACITY,
+    blending: AdditiveBlending,
+    depthWrite: false,
+  }));
+  halo.scale.setScalar(SUN_GLOW_SIZE);
+  sun.add(halo);
   sun.position.set(-6, 0, 25);
   s.group.add(sun);
+  // Sprite materials go with the level group; the texture they share does not.
+  sun.addEventListener('removed', () => halo.material.map?.dispose());
 
-  const earth = sphere(0.2);
+  const earth = glow(sphere(EARTH_RADIUS, { color: EARTH_BLUE }), EARTH_BLUE, EARTH_EMISSIVE);
+  const clouds = sphere(EARTH_RADIUS, { color: CLOUD_WHITE, opacity: CLOUD_OPACITY });
+  clouds.scale.setScalar(CLOUD_SHELL);
+  (clouds.material as MeshStandardMaterial).depthWrite = false;
+  earth.add(clouds);
   const earthFrom = new Vector3(6, 0, -30);
   const earthTo = new Vector3(0, 0, -4);
   earth.position.copy(earthFrom);
   s.group.add(earth);
 
-  const streaks = new Group();
-  const bars: Mesh[] = [];
-  for (let i = 0; i < STREAKS; i += 1) {
-    const bar = box(0.02, 0.02, 0.6);
-    bar.position.set((Math.random() * 2 - 1) * 14, (Math.random() * 2 - 1) * 8, -60 + Math.random() * 70);
-    streaks.add(bar);
-    bars.push(bar);
-  }
-  s.group.add(streaks);
+  const stars = starfield();
+  s.group.add(stars.points);
 
   let p = 0;
   let paused = false;
@@ -112,15 +165,17 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
       readout();
     }
 
-    sun.scale.setScalar(1 - 0.85 * p);
-    earth.scale.setScalar(1 + 29 * p);
+    sun.scale.setScalar(1 - SUN_SHRINK * p);
+    earth.scale.setScalar(1 + EARTH_GROW * p);
     earth.position.lerpVectors(earthFrom, earthTo, p);
 
-    const drift = (2 + 40 * speed) * dt;
-    for (const bar of bars) {
-      bar.position.z += drift;
-      if (bar.position.z > 10) bar.position.z -= 70;
+    const drift = (STAR_DRIFT + STAR_RUSH * speed) * dt;
+    for (let i = 0; i < STAR_COUNT; i += 1) {
+      const z = i * 3 + 2;
+      stars.positions[z] += drift * stars.layers[i]!;
+      if (stars.positions[z]! > STAR_AHEAD) stars.positions[z] -= STAR_DEPTH;
     }
+    stars.points.geometry.attributes.position!.needsUpdate = true;
 
     const f = cycleFlavor(s.time);
     if (f !== shown) {
@@ -199,15 +254,16 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
 
   // 4.8: down through cloud layers, over the ground, into the mountain.
   for (let i = 0; i < 3; i += 1) {
-    const cloud = plane(6, 3, { opacity: 0.4 });
+    const cloud = plane(6, 3, { color: DIVE_CLOUD_WHITE, opacity: DIVE_CLOUD_OPACITY });
+    (cloud.material as MeshStandardMaterial).depthWrite = false;
     cloud.rotation.x = -Math.PI / 2;
     cloud.position.set((i - 1) * 1.5, 6 - i * 2, -8 - i * 4);
     s.group.add(cloud);
   }
-  const ground = box(8, 0.2, 4);
+  const ground = rock(box(8, 0.2, 4, { color: ROCK_GREY }));
   ground.position.set(0, -2, -18);
   s.group.add(ground);
-  const mountain = cone(3, 4);
+  const mountain = rock(cone(3, 4, { color: ROCK_GREY }));
   mountain.position.set(0, 0, -18);
   s.group.add(mountain);
 
@@ -221,3 +277,61 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   await dive;
   await s.b.card("Arriving: Kamioka mine, Japan. 1,000 meters underground. Rock doesn't stop you either.", ['F-19']);
 });
+
+interface Starfield { points: Points; positions: Float32Array; layers: Float32Array }
+
+function starfield(): Starfield {
+  const positions = new Float32Array(STAR_COUNT * 3);
+  const layers = new Float32Array(STAR_COUNT);
+  for (let i = 0; i < STAR_COUNT; i += 1) {
+    positions[i * 3] = (Math.random() * 2 - 1) * STAR_SPREAD_X;
+    positions[i * 3 + 1] = (Math.random() * 2 - 1) * STAR_SPREAD_Y;
+    positions[i * 3 + 2] = STAR_AHEAD - Math.random() * STAR_DEPTH;
+    layers[i] = STAR_SLOWEST + Math.random() * (1 - STAR_SLOWEST);
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new BufferAttribute(positions, 3));
+  const points = new Points(geometry, new PointsMaterial({
+    color: STAR_BLUE,
+    size: STAR_SIZE,
+    sizeAttenuation: true,
+    transparent: true,
+    opacity: STAR_OPACITY,
+    depthWrite: false,
+  }));
+  return { points, positions, layers };
+}
+
+function glowTexture(): CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 256;
+  const g = canvas.getContext('2d')!;
+  const gradient = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+  gradient.addColorStop(0, 'rgba(255,255,255,1)');
+  gradient.addColorStop(0.35, 'rgba(255,255,255,0.35)');
+  gradient.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gradient;
+  g.fillRect(0, 0, 256, 256);
+  const tex = new CanvasTexture(canvas);
+  tex.colorSpace = SRGBColorSpace;
+  return tex;
+}
+
+function glow(mesh: Mesh, color: string, intensity: number): Mesh {
+  const material = mesh.material as MeshStandardMaterial;
+  material.emissive = new Color(color);
+  material.emissiveIntensity = intensity;
+  material.roughness = 0.4;
+  material.metalness = 0;
+  return mesh;
+}
+
+// Dark and matte, with the rim colour carried as a faint emissive so the silhouette survives.
+function rock(mesh: Mesh): Mesh {
+  const material = mesh.material as MeshStandardMaterial;
+  material.emissive = new Color(ROCK_RIM);
+  material.emissiveIntensity = ROCK_RIM_EMISSIVE;
+  material.roughness = 0.95;
+  material.metalness = 0;
+  return mesh;
+}
