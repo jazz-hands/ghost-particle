@@ -4,6 +4,8 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { portraitFov, DESKTOP_FOV } from './fov.ts';
+import { isTouch } from '../input/device.ts';
 
 export interface LightSettings {
   keyIntensity: number; keyX: number; keyY: number; keyZ: number;
@@ -21,7 +23,7 @@ export const BACKGROUND = '#070b1a';
 export class Stage {
   readonly renderer: THREE.WebGLRenderer;
   readonly scene = new THREE.Scene();
-  readonly camera = new THREE.PerspectiveCamera(26, 1, 0.1, 100);
+  readonly camera = new THREE.PerspectiveCamera(DESKTOP_FOV, 1, 0.1, 100);
   readonly key = new THREE.DirectionalLight(0xffffff, 1);
   readonly fill = new THREE.DirectionalLight(0xffffff, 1);
   readonly rim = new THREE.DirectionalLight(0xffffff, 1);
@@ -30,7 +32,7 @@ export class Stage {
 
   constructor(container: HTMLElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(devicePixelRatio, isTouch() ? 1.5 : 2));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     container.append(this.renderer.domElement);
 
@@ -75,9 +77,11 @@ export class Stage {
     const w = innerWidth;
     const h = innerHeight;
     this.camera.aspect = w / h;
+    this.camera.fov = portraitFov(this.camera.aspect);
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(w, h);
     this.composer.setSize(w, h);
+    if (isTouch()) this.bloom.setSize(w / 2, h / 2);
   }
 
   render(): void {
