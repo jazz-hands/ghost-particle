@@ -463,7 +463,7 @@ export class Hud {
   private buildCard(className: string, text: string, facts: string[] | undefined, small: boolean): HTMLDivElement {
     const box = div(small ? `${className} hud-card-small` : className, this.layer);
     div('hud-card-text', box).textContent = text;
-    if (facts && facts.length > 0) div('hud-card-facts', box).textContent = facts.join(' ');
+    void facts;
     return box;
   }
 
