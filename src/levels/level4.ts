@@ -169,7 +169,8 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   };
 
   s.onUpdate((dt) => {
-    let speed = paused ? 0 : 1;
+    // The trip waits while a card is being read, so Earth cannot fill the view under the text.
+    let speed = paused || s.hud.cardUp ? 0 : 1;
     if (rushing) speed *= ((1 - GRID_AT) * TRIP_SECONDS) / DASH_SECONDS;
     if (speed > 0 && p < 1) {
       p = Math.min(p + (dt * speed) / TRIP_SECONDS, 1);
@@ -241,7 +242,6 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
     if (found || !hunting) return;
     if (!NEUTRINO_TILES.includes(i)) {
       wrong += 1;
-      grid.wiggle(i, 2);
       ghost.react('shrug');
       s.cues.buzz();
       s.hud.note(TILES[i]!.label, ['F-16']);
