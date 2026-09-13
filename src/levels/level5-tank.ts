@@ -1,6 +1,7 @@
 import {
-  AdditiveBlending, CircleGeometry, Color, CylinderGeometry, DoubleSide, FogExp2, Group,
-  InstancedMesh, Mesh, MeshBasicMaterial, MeshStandardMaterial, Object3D,
+  AdditiveBlending, BackSide, CanvasTexture, CircleGeometry, Color, CylinderGeometry, DoubleSide,
+  FogExp2, Group, InstancedMesh, Mesh, MeshBasicMaterial, MeshStandardMaterial, Object3D,
+  RepeatWrapping, SRGBColorSpace,
 } from 'three';
 
 // 1 unit = 5 m. F-17: the tank is 39 m wide and 41 m tall.
@@ -14,7 +15,7 @@ const SENSOR_COUNT = 11129;
 const WALL_COLUMNS = 151;
 const WALL_ROWS = 50;
 const SENSOR_RADIUS = 0.05;
-const GLINT_RADIUS = 0.11;
+const GLINT_RADIUS = 0.055;
 const MAX_GLINTS = 1400;
 
 // Deep blue-black water, lit only by what the sensors and the rings put into it.
@@ -31,14 +32,69 @@ const SENSOR_EMISSIVE_INTENSITY = 0.6;
 const SENSOR_SPREAD = 0.3;
 // Cherenkov blue-white: what a lit sensor and every ring share.
 export const CHERENKOV_BLUE = '#bfe6ff';
-const GLINT_OPACITY = 0.85;
+const GLINT_OPACITY = 0.95;
+// A sharp ring is thinner than the sensors are wide, so its glints get a floor to sit on.
+const GLINT_BAND = 0.14;
+
+// D-027: every ring is painted onto one canvas mapped to the inside of the cylinder, never
+// built as geometry. The canvas is square-pixelled: as many pixels round as the wall is wide.
+const CANVAS_W = 1024;
+const CANVAS_H = Math.round((CANVAS_W * H_TANK) / (2 * Math.PI * R_TANK));
+const PX = CANVAS_W / (2 * Math.PI * R_TANK);
+const RING_SHELL = WALL - 0.06;
+
+// Ring edges (F-22): an electron scatters and showers, so its edge is wide and soft; a muon
+// punches through, so its edge is thin and crisp; ring 5 sits between the two on purpose.
+const EDGES: Record<RingStyle, { width: number; core: number }> = {
+  fuzzy: { width: 0.36, core: 0.42 },
+  sharp: { width: 0.09, core: 1 },
+  ambiguous: { width: 0.18, core: 0.62 },
+};
+
+export type RingStyle = 'fuzzy' | 'sharp' | 'ambiguous';
+
+export interface PaintedRing {
+  theta: number;
+  y: number;
+  radius: number;
+  style: RingStyle;
+  alpha: number;
+}
 
 export interface Tank {
   group: Group;
   fog: FogExp2;
-  /** Lights the sensors sitting under a ring drawn at (theta, y) with this radius. */
-  lightRing(theta: number, y: number, radius: number, band: number, strength: number): void;
-  clearLights(): void;
+  /** Repaints the wall: every ring on the canvas, and the sensors under each one brightened. */
+  paint(rings: PaintedRing[]): void;
+}
+
+/** Canvas u runs round the wall the way the cylinder's own UVs do; v runs bottom to top. */
+function canvasX(theta: number): number {
+  const u = (Math.PI / 2 - theta) / (2 * Math.PI);
+  return (u - Math.floor(u)) * CANVAS_W;
+}
+
+function canvasY(y: number): number {
+  return (1 - (y + H_TANK / 2) / H_TANK) * CANVAS_H;
+}
+
+/** One ring: a soft annulus whose edge width and core brightness carry the particle (F-22). */
+function paintRing(g: CanvasRenderingContext2D, ring: PaintedRing, cx: number): void {
+  const { width, core } = EDGES[ring.style];
+  const r = ring.radius * PX;
+  const half = (width * PX) / 2;
+  const outer = r + half;
+  if (outer <= 0) return;
+  const cy = canvasY(ring.y);
+  const grad = g.createRadialGradient(cx, cy, 0, cx, cy, outer);
+  const inner = Math.max((r - half) / outer, 0);
+  const peak = r / outer;
+  grad.addColorStop(0, 'rgba(191,230,255,0)');
+  grad.addColorStop(inner, 'rgba(191,230,255,0)');
+  grad.addColorStop(peak, `rgba(226,246,255,${core * ring.alpha})`);
+  grad.addColorStop(1, 'rgba(191,230,255,0)');
+  g.fillStyle = grad;
+  g.fillRect(cx - outer, cy - outer, outer * 2, outer * 2);
 }
 
 function water(): MeshStandardMaterial {
@@ -133,7 +189,7 @@ export function createTank(): Tank {
   group.add(sensors);
 
   const glints = new InstancedMesh(
-    new CircleGeometry(GLINT_RADIUS, 8),
+    new CircleGeometry(GLINT_RADIUS, 12),
     new MeshBasicMaterial({
       color: new Color(CHERENKOV_BLUE),
       transparent: true,
@@ -147,32 +203,59 @@ export function createTank(): Tank {
   glints.frustumCulled = false;
   group.add(glints);
 
+  const canvas = document.createElement('canvas');
+  canvas.width = CANVAS_W;
+  canvas.height = CANVAS_H;
+  const paper = canvas.getContext('2d')!;
+  const texture = new CanvasTexture(canvas);
+  texture.colorSpace = SRGBColorSpace;
+  texture.wrapS = RepeatWrapping;
+  const wall = new Mesh(
+    new CylinderGeometry(RING_SHELL, RING_SHELL, H_TANK, 64, 1, true),
+    new MeshBasicMaterial({
+      map: texture,
+      transparent: true,
+      blending: AdditiveBlending,
+      side: BackSide,
+      depthWrite: false,
+    }),
+  );
+  wall.addEventListener('removed', () => texture.dispose());
+  group.add(wall);
+
   return {
     group,
     fog: new FogExp2(WATER_HAZE, WATER_FOG),
-    lightRing(theta, y, radius, band, strength) {
+    paint(rings) {
+      paper.clearRect(0, 0, CANVAS_W, CANVAS_H);
+      for (const ring of rings) {
+        const cx = canvasX(ring.theta);
+        // The seam is just another x: paint each ring three times so it can cross it.
+        for (const offset of [-CANVAS_W, 0, CANVAS_W]) paintRing(paper, ring, cx + offset);
+      }
+      texture.needsUpdate = true;
+
       let lit = 0;
-      for (let s = 0; s < wallCount && lit < MAX_GLINTS; s += 1) {
-        let da = wallTheta[s]! - theta;
-        da = Math.atan2(Math.sin(da), Math.cos(da));
-        const d = Math.hypot(da * WALL, wallY[s]! - y);
-        const off = Math.abs(d - radius) / band;
-        if (off >= 1) continue;
-        const t = wallTheta[s]!;
-        at.position.set(WALL * Math.cos(t), wallY[s]!, WALL * Math.sin(t));
-        at.lookAt(0, wallY[s]!, 0);
-        at.updateMatrix();
-        glints.setMatrixAt(lit, at.matrix);
-        const b = (1 - off) * strength;
-        glints.setColorAt(lit, shade.set(CHERENKOV_BLUE).multiplyScalar(b));
-        lit += 1;
+      for (const ring of rings) {
+        const band = Math.max(EDGES[ring.style].width, GLINT_BAND);
+        for (let s = 0; s < wallCount && lit < MAX_GLINTS; s += 1) {
+          let da = wallTheta[s]! - ring.theta;
+          da = Math.atan2(Math.sin(da), Math.cos(da));
+          const d = Math.hypot(da * WALL, wallY[s]! - ring.y);
+          const off = Math.abs(d - ring.radius) / band;
+          if (off >= 1) continue;
+          const t = wallTheta[s]!;
+          at.position.set(WALL * Math.cos(t), wallY[s]!, WALL * Math.sin(t));
+          at.lookAt(0, wallY[s]!, 0);
+          at.updateMatrix();
+          glints.setMatrixAt(lit, at.matrix);
+          glints.setColorAt(lit, shade.set(CHERENKOV_BLUE).multiplyScalar((1 - off) * ring.alpha));
+          lit += 1;
+        }
       }
       glints.count = lit;
       glints.instanceMatrix.needsUpdate = true;
       if (glints.instanceColor) glints.instanceColor.needsUpdate = true;
-    },
-    clearLights() {
-      glints.count = 0;
     },
   };
 }
