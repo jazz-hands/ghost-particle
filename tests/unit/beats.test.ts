@@ -102,19 +102,18 @@ test('card resolves when the host card resolves, and next() resolves it early', 
   assert.equal(second(), true);
 });
 
-test('a card closes on its own after its reading time', async () => {
+test('a card waits for the host however long the clock runs', async () => {
   const h = host();
   const b = new Beats(h, pressHost());
   const text = 'one two three four five';
   const done = settled(b.card(text));
   assert.equal(cardSeconds(text), 2.1);
-  b.update(2);
+  b.update(60);
   await tick();
   assert.equal(done(), false);
-  b.update(0.2);
+  h.resolvers[0]!();
   await tick();
   assert.equal(done(), true);
-  assert.equal(h.resolvers.length, 0);
 });
 
 test('key resolves on that key and unsubscribes afterwards', async () => {

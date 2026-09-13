@@ -57,11 +57,20 @@ html, body {
 }
 
 .hud-card-hint {
-  margin-top: 0.6rem;
-  font-size: 0.75rem;
-  font-style: italic;
-  color: #5c6a78;
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-indent: 0.18em;
+  text-transform: uppercase;
+  color: #cfd8dc;
   text-align: center;
+  animation: hud-hint-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes hud-hint-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
 }
 
 .hud-note { cursor: default; }

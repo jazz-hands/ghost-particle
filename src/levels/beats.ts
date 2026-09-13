@@ -3,7 +3,7 @@ export interface CardHost {
   closeCard(): void;
 }
 
-// Reading time for a caption: cards are timed, Space only dismisses one early.
+// A reading-time estimate for a caption; cards wait for Space, so this only sizes sounds played under them.
 export function cardSeconds(text: string): number {
   const words = text.trim().split(/\s+/).filter(Boolean).length;
   return 1 + 0.22 * words;
@@ -53,18 +53,11 @@ export class Beats {
     }));
   }
 
-  card(text: string, facts?: string[], opts?: { small?: boolean; seconds?: number }): Promise<void> {
+  card(text: string, facts?: string[], opts?: { small?: boolean }): Promise<void> {
     return this.begin((finish) => {
       let live = true;
-      let left = opts?.seconds ?? cardSeconds(text);
-      void this.host.card(text, facts, { small: opts?.small }).then(() => { if (live) finish(); });
-      return {
-        tick: (dt) => {
-          left -= dt;
-          if (left <= 0 && live) this.host.closeCard();
-        },
-        off: () => { live = false; },
-      };
+      void this.host.card(text, facts, opts).then(() => { if (live) finish(); });
+      return { off: () => { live = false; } };
     });
   }
 

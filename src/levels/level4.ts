@@ -4,7 +4,6 @@ import {
 } from 'three';
 import type { Mesh, MeshStandardMaterial } from 'three';
 import { cycleFlavor } from '../content/flavors.ts';
-import { cardSeconds } from './beats.ts';
 import type { Flavor } from '../content/flavors.ts';
 import { box, cone, plane, sphere } from '../render/prims.ts';
 import type { GridTile } from '../hud/hud.ts';
@@ -105,8 +104,9 @@ const ASIDE = new Vector3(1.25, -0.35, -0.6);
 const ASIDE_SCALE = 0.85;
 const REVEALED = 'Ghost particles. Almost no mass, no charge, three flavors.';
 const FOUND = "Found you. You're one of the three neutrinos, in the lepton family, next to the electron.";
-// Family cards get a second over the reading time: the new tiles are read alongside them.
-const FAMILY_EXTRA = 1;
+// Wrong guesses allowed before the neutrino tiles shake, and how long they shake.
+const HINT_AFTER = 2;
+const HINT_SECONDS = 1.2;
 // Halfway down the plunge, where the mountain takes over from the clouds.
 const ROCK_AT = 1.8;
 // The plunge is the only shake in the level; CameraRig drops it under reduced motion. The star
@@ -230,19 +230,23 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
     grid.show(row);
     ghost.react('peek');
     s.cues[cue]();
-    await s.b.card(line, ['F-16'], { seconds: cardSeconds(line) + FAMILY_EXTRA });
+    await s.b.card(line, ['F-16']);
   }
   hunting = true;
   ghost.react('wave');
   s.hud.note('This is the Standard Model, the list of everything matter is made of. Find yourself: arrow keys to move, Space to pick.', ['F-16']);
   let found = false;
+  let wrong = 0;
   grid.onPick((i) => {
     if (found || !hunting) return;
     if (!NEUTRINO_TILES.includes(i)) {
+      wrong += 1;
       grid.wiggle(i, 2);
       ghost.react('shrug');
       s.cues.buzz();
       s.hud.note(TILES[i]!.label, ['F-16']);
+      // After two wrong guesses the three neutrino tiles shake as the hint.
+      if (wrong >= HINT_AFTER) for (const n of NEUTRINO_TILES) grid.wiggle(n, HINT_SECONDS);
       return;
     }
     found = true;
