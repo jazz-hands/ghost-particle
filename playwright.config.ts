@@ -6,14 +6,14 @@ export default defineConfig({
   reporter: 'list',
   use: {
     ...devices['Desktop Chrome'],
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:5174',
     // Headless Chromium has no GPU; SwiftShader gives it a software WebGL context.
     launchOptions: { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] },
   },
   webServer: {
-    command: 'npm run dev -- --port 5173 --strictPort',
-    url: 'http://localhost:5173',
-    reuseExistingServer: true,
+    command: 'npm run dev -- --port 5174 --strictPort',
+    url: 'http://localhost:5174',
+    reuseExistingServer: false,
     timeout: 30_000,
   },
 });
