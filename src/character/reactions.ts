@@ -95,6 +95,16 @@ export const REACTIONS: Record<string, Keyframe[]> = {
     { t: 1.45, offsetY: 0.02, scaleX: 1.01, scaleY: 1.01, squint: 0.3, ease: 'inOut' },
     { t: 1.75, ease: 'inOut' },
   ],
+  // Lean in and rock, smiling with the lower lids up: a whole-body goodbye.
+  wave: [
+    { t: 0 },
+    { t: 0.2, rotZ: -0.26, offsetX: 0.11, lowerLid: 0.3, ease: 'out' },
+    { t: 0.44, rotZ: 0.22, offsetX: -0.09, lowerLid: 0.36, ease: 'inOut' },
+    { t: 0.66, rotZ: -0.24, offsetX: 0.1, lowerLid: 0.36, ease: 'inOut' },
+    { t: 0.88, rotZ: 0.18, offsetX: -0.07, lowerLid: 0.34, ease: 'inOut' },
+    { t: 1.12, rotZ: -0.1, offsetX: 0.04, lowerLid: 0.28, ease: 'inOut' },
+    { t: 1.4, ease: 'inOut' },
+  ],
 };
 
 export const NAMES = [
