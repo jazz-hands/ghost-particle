@@ -24,9 +24,9 @@ See `DECISIONS.md` for the full list. The ones that matter most:
 
 ## The character
 
-The neutrino is a small, rounded, ghost-like, toy-like character. Roughly 50% opacity with a soft glow, two expressive eyes, and simple squash-and-stretch animation. It reacts to captions using a small set of named expressions listed in `BEATS.md`. It has no arms or legs; motion and eyes carry the personality.
+The neutrino is a small, rounded, ghost-like, toy-like character: a slightly squashed translucent sphere with matte dark oval eyes painted into its skin (D-029, mockups in `docs/mockups/`). Simple squash-and-stretch animation. It reacts to captions using a small set of named expressions listed in `BEATS.md`; every expression is a redraw of the eye texture plus a body squash, never extra geometry. It has no arms or legs; motion and eyes carry the personality. Final material, eye, light and bloom values come from `docs/mockups/character-tuner.html` and are recorded in D-029.
 
-The hero is a boron-8 neutrino (D-001, F-02). Flavor is shown as a tint and a small icon: electron-flavor, muon-flavor, tau-flavor. Exact colors are a design decision, not a physics one, and the credits say so.
+The hero is a boron-8 neutrino (D-001, F-02). Flavor is shown as the body's color plus a small icon: electron-flavor, muon-flavor, tau-flavor (D-011). Exact colors are a design decision, not a physics one, and the credits say so.
 
 ## The story arc
 
@@ -113,7 +113,7 @@ Deep navy and violet space, soft nebula gradients, bright saturated accents, rou
 
 ## Performance and cheap rendering choices
 
-Target 60 fps on a mid-range laptop. Few draw calls: instanced meshes for plasma, nuclei, and sensor "eyes"; no post-processing beyond one bloom pass; textures at 1k or below. Level 5 rings are drawn onto a canvas texture mapped to the inside of the cylinder, not by lighting individual sensors. The character is two spheres and eye sprites, no custom shaders.
+Target 60 fps on a mid-range laptop. Few draw calls: instanced meshes for plasma, nuclei, and sensor "eyes"; one bloom pass (UnrealBloomPass through EffectComposer with an OutputPass, proven in the tuner) and nothing else; textures at 1k or below. Level 5 rings are drawn onto a canvas texture mapped to the inside of the cylinder, not by lighting individual sensors, the same canvas-texture technique the character's eyes use. The character is one sphere with a canvas skin, no custom shaders.
 
 ## Build order and budget (5 hours)
 

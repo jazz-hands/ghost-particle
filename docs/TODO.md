@@ -33,7 +33,6 @@ Most entries are now verified. Remaining "check" items, none of which change on-
 - [x] Reaction set and sound cue set: defined in BEATS.md.
 - [x] Level 4 family photo: 17 tile labels written in BEATS.md.
 - [x] Level 5 mini-game: five ring answers and reveal lines written in BEATS.md.
-- [ ] Level 5 final card: the honesty note on simulated rings.
 - [ ] Level 7 side-panel text (only after everything else).
 - [ ] Credits page copy: sources, dataset credit, "made with" list, tint disclaimer, counter reference-person disclosure.
 
@@ -54,7 +53,7 @@ Most entries are now verified. Remaining "check" items, none of which change on-
 - [ ] Playwright with Chromium headless renders WebGL (may need `--use-angle=swiftshader` or `--enable-unsafe-swiftshader`; confirm at scaffold with a one-line canvas test).
 - [ ] Node v26.8.2 and npm are installed at `/opt/homebrew/bin` but that directory is not on PATH in non-interactive shells, which is why `npx` was missing and the Context7 and Playwright MCP servers failed to connect. Fix: add `/opt/homebrew/bin` to PATH in `~/.zshenv` (not only `~/.zshrc`).
 - [ ] Install `poppler` (`brew install poppler`) so PDFs can be read for the remaining fact checks.
-- [ ] Bloom approach: three.js UnrealBloomPass via EffectComposer, or skip post-processing and fake glow with sprites.
+- [x] Bloom: UnrealBloomPass through EffectComposer with an OutputPass, proven in `character-tuner.html`; gentle defaults recorded there.
 - [ ] Web Audio: confirm the autoplay policy needs a user gesture first (the level 1 Space hold can be that gesture).
 
 ## 6. Scaffold (first coding step, after the above)

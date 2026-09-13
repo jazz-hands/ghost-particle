@@ -20,9 +20,9 @@ How to use:
 | D-006 | Style reference, not assets | accepted | Astro Bot is tone reference only; nothing from it ships. |
 | D-007 | Tech stack | accepted | TypeScript, Vite, three.js WebGLRenderer, lil-gui + Stats, GSAP, Playwright. |
 | D-008 | Detector events are simulated | accepted | Rings are generated from published geometry, labelled as simulation. |
-| D-009 | Build budget and cut order | accepted | 5 hours; cut L7, then L4 photo, then L3 dodging, then L5 ring count. |
+| D-009 | Build budget and cut order | accepted | 5 hours; cut L7, then L4 photo, then L3 steering, then L5 ring count. |
 | D-010 | Input scheme | accepted | Keyboard only for v1. |
-| D-011 | Flavor tints | accepted | Electron sky-blue, muon violet, tau coral; base white with blue glow. Disclosed as a design choice. |
+| D-011 | Flavor tints | accepted | The body takes the flavor color: electron sky-blue, muon violet, tau coral. Disclosed as a design choice. |
 | D-012 | Dodging has no consequence | accepted | Superseded by D-020: nothing can be hit, no fail state. |
 | D-013 | Mini-game feedback timing | accepted | Reveal answer and one-line reason after each ring. |
 | D-014 | Hosting | accepted | Static build hosted on exe.dev. |
@@ -83,11 +83,11 @@ TypeScript, Vite, three.js with WebGLRenderer, lil-gui and Stats from three.js a
 
 ### D-008 Detector events are simulated — accepted
 
-Super-K raw per-event data is not public (F-24). Level 5 rings are generated from published detector geometry (F-17, F-18) and Cherenkov physics (F-21, F-31), with fuzziness chosen to illustrate F-22. A caption states this. The public 5-day flux dataset may be plotted in level 6 or credits if the real image (A-01) can't be licensed.
+Super-K raw per-event data is not public (F-24). Level 5 rings are generated from published detector geometry (F-17, F-18) and Cherenkov physics (F-21, F-31), with fuzziness chosen to illustrate F-22. A caption states this. Level 6 plots the public 5-day flux dataset (D-028).
 
 ### D-009 Build budget and cut order — accepted
 
-Five hours of build time, allocated per the table in `SPEC.md`. If behind, cut in this order: level 7 panels, level 4 family photo (to one static card), level 3 dodging (to auto-scroll), level 5 ring count (to three).
+Five hours of build time, allocated per the table in `SPEC.md`. If behind, cut in this order: level 7 panels, level 4 family photo (to one static card), level 3 steering (to auto-scroll), level 5 ring count (to three). The hero's hit (D-022) is never cut.
 
 ### D-010 Input scheme — accepted
 
@@ -95,7 +95,7 @@ Keyboard only for v1: Space to hold and to advance, arrow keys to steer in level
 
 ### D-011 Flavor tints — accepted
 
-Base body white with a cool blue glow. Electron flavor sky-blue `#4FC3F7`, muon flavor violet `#B388FF`, tau flavor coral `#FF8A65`. These are design choices with no physical meaning; the credits say so. The three are far apart in hue and readable against the navy background, and the flavor icon under the counter repeats the tint so colour alone is not the only cue.
+The body takes the current flavor's color, as in the approved mockups (an earlier "white base with blue glow" wording is withdrawn). Electron flavor sky-blue `#4FC3F7`, muon flavor violet `#B388FF`, tau flavor coral `#FF8A65`. The tuner's "color depth" sets how fully the body takes the color; a flavor change is a material color lerp, no texture rebuild. These are design choices with no physical meaning; the credits say so. The three are far apart in hue and readable against the navy background, and the flavor icon under the counter repeats the tint so colour alone is not the only cue.
 
 ### D-012 Dodging has no consequence — accepted
 
@@ -168,7 +168,7 @@ All sound is generated with the Web Audio API from a small set of named cues lis
 
 ### D-027 Cheap rendering for level 5 — accepted
 
-The 11,129 inner sensors (F-18) are a single `InstancedMesh` of a low-poly disc or sphere. The 1,885 outer sensors are not rendered; the player is inside the tank. Rings, the hero's cone hit, and the "sensors lighting up" effect are drawn on a 2D canvas texture mapped to the inside of the cylinder, not by lighting individual instances. Ring radius comes from F-31. The character stays two spheres plus eye sprites with no custom shaders. Rationale: keeps level 5 inside its 1h 30 budget and well under the draw-call ceiling.
+The 11,129 inner sensors (F-18) are a single `InstancedMesh` of a low-poly disc or sphere. The 1,885 outer sensors are not rendered; the player is inside the tank. Rings, the hero's cone hit, and the "sensors lighting up" effect are drawn on a 2D canvas texture mapped to the inside of the cylinder, not by lighting individual instances. Ring radius comes from F-31. The character is one sphere with a canvas skin (D-029), no custom shaders. Rationale: keeps level 5 inside its 1h 30 budget and well under the draw-call ceiling.
 
 ### D-028 Level 6 plots the public dataset — accepted
 

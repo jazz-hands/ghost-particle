@@ -186,8 +186,9 @@ Each entry: plain-language wording (what the player reads), precise statement (f
 ### F-24 Public Super-K solar data
 - What exists: an official public dataset of the ⁸B solar neutrino flux in 5-day bins, 5,804 live days from 31 May 1996 to 30 May 2018 (SK-I to SK-IV), about 1,100 rows, 10 columns: mean time (Unix seconds), offsets to bin start and end, flux and its upper/lower errors (10⁶ cm⁻² s⁻¹), Sun–Earth distance squared (au²), and distance-corrected flux with errors. Also a full SK-IV solar data release. Raw per-event data are not public; the site states event-level data need proprietary software.
 - Sources: Super-Kamiokande public data page, https://www-sk.icrr.u-tokyo.ac.jp/en/sk/for-reseacher/ ; 5-day file, https://www-sk.icrr.u-tokyo.ac.jp/sk/publications/data/sksolartimevariation5804d.txt ; companion paper, Super-Kamiokande Collaboration, "Search for Periodic Time Variations of the Solar ⁸B Neutrino Flux between 1996 and 2018 in Super-Kamiokande", *Phys. Rev. Lett.* 132, 241803 (2024), arXiv:2311.01159; full SK-IV solar release, https://www-sk.icrr.u-tokyo.ac.jp/sk/publications/data/sksolarfull.zip with *Phys. Rev. D* 109, 092001 (2024).
+- What the flux column means: Super-K measures a handful of neutrino-electron scatters per day and reports them as an equivalent ⁸B flux at Earth. Because the detector is mostly sensitive to electron flavor, and only about a third of ⁸B neutrinos arrive as electron flavor (F-14), the reported number (about 2.3 × 10⁶ cm⁻² s⁻¹) is well below the total ⁸B flux (F-07). The chart must not label this as "neutrinos reaching Earth"; label it as Super-K's measurement.
 - Licence: none stated on the page. Cite the collaboration and the companion paper.
-- Status: verified.
+- Status: verified (file and columns); check (confirm the column definition against the file header and the PRL paper before writing the axis label).
 - Used: L5 honesty note, L6, credits.
 
 ---
