@@ -39,7 +39,7 @@ Most entries are now verified. Remaining "check" items, none of which change on-
 
 ## 4. Art and reference (no external assets shipped)
 
-- [ ] Character sketch: silhouette, eye shapes for each reaction, opacity and glow target.
+- [ ] Character: three styles rendered in `docs/mockups/character.html` (screenshot `character-study.png`). Pick one, then record it as a decision and define the eye shapes for each reaction in the reaction set.
 - [ ] Palette: background gradient stops, UI accent, plasma color in L3, sensor "eye" gold in L5 (flavor tints and base are settled in D-011).
 - [ ] Reference board from the Astro Bot screenshots (private, not committed).
 - [ ] Rough layout for the HUD: caption card position, key prompt, meters, mini-game buttons.
