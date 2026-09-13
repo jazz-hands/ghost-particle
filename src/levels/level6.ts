@@ -18,7 +18,8 @@ const FREEZE_CHIME_AFTER = 0.9;
 const COUNTER_SECONDS = 4;
 // 6.5: the character sees the player off from the lower right of whatever view the credits
 // arrive in. It is placed along a line out of the camera, so the camera itself never moves.
-const GOODBYE_NDC = { x: 0.7, y: -0.52 };
+// Outside the credits panel (60vw centred), low right.
+const GOODBYE_NDC = { x: 0.82, y: -0.6 };
 const GOODBYE_DEPTH = 7;
 const GOODBYE_CLEARING = 0.17;
 // The character's body sphere has radius 1. Half of that is the size it plays levels at; this
