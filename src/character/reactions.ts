@@ -80,6 +80,13 @@ export const REACTIONS: Record<string, Keyframe[]> = {
     { t: 0.72, rotZ: -0.23, offsetX: 0.19, eyeShiftX: 0.014, leftEye: 1.28, rightEye: 0.84, ease: 'inOut' },
     { t: 1.1, ease: 'inOut' },
   ],
+  // The eyes travel down the face to look at the body, with a small dip to match.
+  'look-at-self': [
+    { t: 0 },
+    { t: 0.3, eyeShiftY: 0.06, squint: 0.16, offsetY: -0.03, scaleY: 0.98, scaleX: 1.02, ease: 'out' },
+    { t: 0.8, eyeShiftY: 0.08, squint: 0.2, offsetY: -0.04, scaleY: 0.98, scaleX: 1.02, ease: 'inOut' },
+    { t: 1.15, ease: 'inOut' },
+  ],
 };
 
 export const NAMES = [
