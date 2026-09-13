@@ -58,11 +58,12 @@ Most entries are now verified. Remaining "check" items, none of which change on-
 
 ## 6. Scaffold (first coding step, after the above)
 
-- [ ] `npm create vite@latest` with the vanilla TypeScript template. Add `server: { host: true, allowedHosts: ['.exe.xyz'] }` to `vite.config.ts` so the dev server answers through the exe.dev proxy (D-014).
-- [ ] Add three, gsap, @playwright/test. Record what each pulls in.
-- [ ] Folder layout per SPEC.md architecture.
-- [ ] `src/content/facts.ts` hand-mirrored from FACTS.md with the same IDs, plus `scripts/check-facts.mjs` that fails when a referenced F-ID has no entry in FACTS.md.
-- [ ] `src/character/config.json` from the tuner's JSON; port the tuner's material and skin-texture code into `src/character/`.
+- [x] Vite vanilla TypeScript project, written by hand to the template's shape. `vite.config.ts` has `server: { host: true, allowedHosts: ['.exe.xyz'] }` (D-014).
+- [x] three, @types/three and @playwright/test added at exact versions; what each pulls in is in the commit that added it. gsap comes with the character port.
+- [x] Folder layout per SPEC.md architecture for the modules that exist; the character port, `src/hud`, `src/audio` and `src/rail` arrive with the spine.
+- [x] `src/content/facts.ts` mirrors FACTS.md; `scripts/check-facts.mjs` runs with `npm test`.
+- [x] `src/character/config.json` holds the final tuner JSON (D-029).
+- [ ] Port the tuner's material and skin-texture code into `src/character/`.
 - [ ] Download A-02 (`sksolartimevariation5804d.txt`) into `public/data/`, confirm the flux column definition against its header and the PRL paper, then write the level 6 axis label (F-24).
-- [ ] One Playwright smoke test: app boots, no console errors, screenshot; uses `?level=N` and `window.ghost.next()`.
-- [ ] First commit.
+- [x] Playwright smoke test: boots, no console errors, WebGL, `?level=N`, `window.ghost.next()`, `?debug`, screenshot per level.
+- [x] First commit.

@@ -57,3 +57,10 @@ test('every level renders and the run steps to the end', async ({ page }, testIn
   await expect.poll(() => page.evaluate(() => window.ghost.finished)).toBe(true);
   expect(errors).toEqual([]);
 });
+
+test('debug tools mount only with ?debug (D-017)', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.lil-gui')).toHaveCount(0);
+  await page.goto('/?debug');
+  await expect(page.locator('.lil-gui')).toHaveCount(1);
+});
