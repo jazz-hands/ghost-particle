@@ -1,6 +1,7 @@
 import { Group, Vector3 } from 'three';
 import type { Mesh } from 'three';
 import { cycleFlavor } from '../content/flavors.ts';
+import { cardSeconds } from './beats.ts';
 import type { Flavor } from '../content/flavors.ts';
 import { box, cone, neutrino, plane, sphere, tint } from '../render/prims.ts';
 import type { GridTile } from '../hud/hud.ts';
@@ -48,6 +49,9 @@ const FAMILIES: [string, string][] = [
 const ASIDE = new Vector3(1.1, -0.3, -0.9);
 const ASIDE_SCALE = 0.5;
 const REVEALED = 'Ghost particles. Almost no mass, no charge, three flavors.';
+const FOUND = "Found you. You're one of the three neutrinos, in the lepton family, next to the electron.";
+// Family cards get a second over the reading time: the new tiles are read alongside them.
+const FAMILY_EXTRA = 1;
 
 export const createLevel4 = scriptedLevel(4, async (s) => {
   const ghost = neutrino();
@@ -136,7 +140,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   let hunting = false;
   for (const [row, line] of FAMILIES) {
     grid.show(row);
-    await s.b.card(line, ['F-16']);
+    await s.b.card(line, ['F-16'], { seconds: cardSeconds(line) + FAMILY_EXTRA });
   }
   hunting = true;
   s.hud.note('This is the Standard Model, the list of everything matter is made of. Find yourself.', ['F-16']);
@@ -151,14 +155,13 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
     found = true;
     grid.mark(i);
     hopLeft = HOP;
-    s.hud.note("Found you. You're one of the three neutrinos, in the lepton family, next to the electron.", ['F-16']);
+    s.hud.note(null);
     for (const n of NEUTRINO_TILES) grid.setLabel(n, REVEALED);
   });
   await s.b.until(() => found);
 
-  await s.b.key('Space');
+  await s.b.card(FOUND, ['F-16']);
   grid.close();
-  s.hud.note(null);
   paused = false;
 
   rushing = true;
