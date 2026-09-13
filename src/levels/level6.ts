@@ -76,15 +76,14 @@ export const createLevel6 = scriptedLevel(6, async (s) => {
   await map.glow(GLOW_SECONDS);
 
   // 6.4: the through-line counter stops and grows.
+  // 6.4 (F-32): the counter's own label is the caption; no extra card.
   hud.counter.freezeLarge();
   cues.tick();
-  hud.note('And through you, since you pressed start:', ['F-32']);
   await b.wait(FREEZE_CHIME_AFTER);
   cues.chime();
   await b.wait(COUNTER_SECONDS - FREEZE_CHIME_AFTER);
 
   // 6.5: credits, Play again reloads.
-  hud.note(null);
   hud.counter.setVisible(false);
   cues.tada();
   hud.credits(creditLines(), () => { location.assign(location.pathname); });
