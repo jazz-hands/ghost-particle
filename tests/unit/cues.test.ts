@@ -1,6 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { humFrequency, humVolume, tickSeconds } from '../../src/audio/cues.ts';
+import {
+  BLIP_HZ, BLIP_PEAK, BUZZ_HZ, BUZZ_PEAK, THWIP_HZ, THWIP_PEAK,
+  humFrequency, humVolume, tadaDelay, tadaHz, tickSeconds,
+} from '../../src/audio/cues.ts';
 
 test('the hum rises in pitch across the hold', () => {
   assert.ok(humFrequency(0) < humFrequency(0.5));
@@ -35,4 +38,28 @@ test('a rate that is not a positive number falls back to the base pace', () => {
   assert.equal(tickSeconds(0), tickSeconds(1));
   assert.equal(tickSeconds(-2), tickSeconds(1));
   assert.equal(tickSeconds(Number.NaN), tickSeconds(1));
+});
+
+test('the fanfare is three notes, rising to an octave over its root', () => {
+  assert.ok(tadaHz(0) < tadaHz(1));
+  assert.ok(tadaHz(1) < tadaHz(2));
+  assert.ok(Math.abs(tadaHz(2) - tadaHz(0) * 2) < 0.001);
+});
+
+test('the fanfare plays its notes one after another, and clamps to the three', () => {
+  assert.equal(tadaDelay(0), 0);
+  assert.ok(tadaDelay(1) > tadaDelay(0));
+  assert.ok(tadaDelay(2) > tadaDelay(1));
+  assert.equal(tadaDelay(9), tadaDelay(2));
+  assert.equal(tadaHz(-3), tadaHz(0));
+});
+
+test('the wrong-answer buzz is gentle: lower and quieter than the UI confirm', () => {
+  assert.ok(BUZZ_HZ < BLIP_HZ);
+  assert.ok(BUZZ_PEAK < BLIP_PEAK);
+});
+
+test('the pass-through thwip is a tinier, higher blip', () => {
+  assert.ok(THWIP_HZ > BLIP_HZ);
+  assert.ok(THWIP_PEAK < BLIP_PEAK);
 });

@@ -7,6 +7,21 @@ const NOISE_SECONDS = 1;
 const TICK_BASE_SECONDS = 0.5;
 const TICK_MIN_SECONDS = 0.06;
 const WHOOSH_SECONDS = 0.9;
+// The UI confirm sets the scale the two new one-shots are measured against: the pass-through
+// thwip is higher and tinier, the wrong-answer buzz is lower and quieter (BEATS "Sound cue set").
+export const BLIP_HZ = 1320;
+export const BLIP_PEAK = 0.2;
+export const THWIP_HZ = 3000;
+export const THWIP_PEAK = 0.09;
+export const BUZZ_HZ = 190;
+export const BUZZ_PEAK = 0.07;
+const BUZZ_PULSES = 2;
+const BUZZ_GAP = 0.11;
+// A three-note fanfare on C: root, major third, octave.
+const TADA_ROOT = 523.25;
+const TADA_STEPS = [0, 4, 12];
+const TADA_GAP = 0.11;
+const TADA_PEAK = 0.2;
 
 const clamp01 = (v: number): number => Math.min(Math.max(v, 0), 1);
 
@@ -25,6 +40,18 @@ export function humVolume(level: number): number {
 export function tickSeconds(rate: number): number {
   const r = Number.isFinite(rate) && rate > 0 ? rate : 1;
   return Math.max(TICK_BASE_SECONDS / r, TICK_MIN_SECONDS);
+}
+
+/** The pitch of the fanfare's note `step`, equal-tempered from the root. */
+export function tadaHz(step: number): number {
+  const i = Math.min(Math.max(Math.round(step), 0), TADA_STEPS.length - 1);
+  return TADA_ROOT * 2 ** (TADA_STEPS[i]! / 12);
+}
+
+/** When the fanfare's note `step` starts, relative to the cue. */
+export function tadaDelay(step: number): number {
+  const i = Math.min(Math.max(Math.round(step), 0), TADA_STEPS.length - 1);
+  return i * TADA_GAP;
 }
 
 export class Cues {
@@ -124,9 +151,9 @@ export class Cues {
     const t = ctx.currentTime;
     const osc = ctx.createOscillator();
     osc.type = 'triangle';
-    osc.frequency.setValueAtTime(1320, t);
+    osc.frequency.setValueAtTime(BLIP_HZ, t);
     const gain = ctx.createGain();
-    envelope(gain, t, 0.2, 0.004, 0.06);
+    envelope(gain, t, BLIP_PEAK, 0.004, 0.06);
     osc.connect(gain).connect(out);
     osc.start(t);
     osc.stop(t + 0.1);
@@ -215,6 +242,66 @@ export class Cues {
     for (let i = 0; i < samples.length; i += 1) samples[i] = Math.random() * 2 - 1;
     this.noise = buffer;
     return buffer;
+  }
+  /** The wrong answer (4.5): two short low pulses, softened and kept under the blip. */
+  buzz(): void {
+    const ctx = this.ctx;
+    const out = this.out;
+    if (!ctx || !out) return;
+    const t = ctx.currentTime;
+    for (let i = 0; i < BUZZ_PULSES; i += 1) {
+      const at = t + i * BUZZ_GAP;
+      const osc = ctx.createOscillator();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(BUZZ_HZ, at);
+      const soften = ctx.createBiquadFilter();
+      soften.type = 'lowpass';
+      soften.frequency.value = 900;
+      const gain = ctx.createGain();
+      envelope(gain, at, BUZZ_PEAK, 0.006, 0.08);
+      osc.connect(soften).connect(gain).connect(out);
+      osc.start(at);
+      osc.stop(at + 0.14);
+    }
+  }
+
+  /** The right answer (4.6): a three-note fanfare, the last note held. */
+  tada(): void {
+    const ctx = this.ctx;
+    const out = this.out;
+    if (!ctx || !out) return;
+    const t = ctx.currentTime;
+    for (let i = 0; i < 3; i += 1) {
+      const at = t + tadaDelay(i);
+      const decay = i === 2 ? 0.7 : 0.18;
+      for (const [partial, share] of [[1, 1], [2, 0.3]] as const) {
+        const osc = ctx.createOscillator();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(tadaHz(i) * partial, at);
+        const gain = ctx.createGain();
+        envelope(gain, at, TADA_PEAK * share, 0.008, decay);
+        osc.connect(gain).connect(out);
+        osc.start(at);
+        osc.stop(at + decay + 0.2);
+      }
+    }
+  }
+
+  /** The pass-through (4.8): a tiny high blip that drops away as it goes. */
+  thwip(): void {
+    const ctx = this.ctx;
+    const out = this.out;
+    if (!ctx || !out) return;
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(THWIP_HZ, t);
+    osc.frequency.exponentialRampToValueAtTime(THWIP_HZ / 3, t + 0.07);
+    const gain = ctx.createGain();
+    envelope(gain, t, THWIP_PEAK, 0.003, 0.05);
+    osc.connect(gain).connect(out);
+    osc.start(t);
+    osc.stop(t + 0.12);
   }
 }
 

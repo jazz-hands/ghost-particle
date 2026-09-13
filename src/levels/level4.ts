@@ -137,6 +137,8 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
 
   // F-15, F-30: the travel meter reads kilometres and light-seconds.
   readout();
+  // One soft tick as the meter appears (4.1). The trip has no tick loop.
+  s.cues.tick();
   ghost.react('nod');
   await s.b.card('150 million kilometers to Earth. Light takes about 8 minutes 20 seconds. So do you.', ['F-15']);
 
@@ -144,6 +146,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   await s.b.until(() => p >= GRID_AT);
   paused = true;
   ghost.react('nod');
+  s.cues.blip();
   await s.b.card('Halfway to Earth. Before you arrive, meet the family: every particle matter is made of, on one chart.', ['F-16']);
 
   let aside = 0;
@@ -160,6 +163,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   for (const [row, line] of FAMILIES) {
     grid.show(row);
     ghost.react('peek');
+    s.cues.blip();
     await s.b.card(line, ['F-16'], { seconds: cardSeconds(line) + FAMILY_EXTRA });
   }
   hunting = true;
@@ -171,6 +175,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
     if (!NEUTRINO_TILES.includes(i)) {
       grid.wiggle(i, 2);
       ghost.react('shrug');
+      s.cues.buzz();
       s.hud.note(TILES[i]!.label, ['F-16']);
       return;
     }
@@ -178,6 +183,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
     grid.mark(i);
     hopLeft = HOP;
     ghost.react('cheer');
+    s.cues.tada();
     s.hud.note(null);
     for (const n of NEUTRINO_TILES) grid.setLabel(n, REVEALED);
   });
@@ -207,9 +213,11 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
 
   s.hud.readout(null);
   ghost.react('brace');
+  s.cues.whoosh();
   const dive = s.rig.moveTo({ x: 0, y: -0.5, z: -18 }, { x: 0, y: -2, z: -24 }, 3);
   await s.b.wait(ROCK_AT);
   ghost.react('surprised');
+  s.cues.thwip();
   await dive;
   await s.b.card("Arriving: Kamioka mine, Japan. 1,000 meters underground. Rock doesn't stop you either.", ['F-19']);
 });
