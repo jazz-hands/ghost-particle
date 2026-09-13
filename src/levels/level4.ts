@@ -226,7 +226,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
     ghost.group.scale.setScalar(CHARACTER_SCALE * (1 - (1 - ASIDE_SCALE) * u));
   });
 
-  const grid = s.hud.grid(TILES, 6, { reveal: true });
+  const grid = s.hud.grid(TILES, innerWidth < innerHeight ? 3 : 6, { reveal: true });
   let hunting = false;
   for (const [row, line, cue] of FAMILIES) {
     grid.show(row);

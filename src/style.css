@@ -426,3 +426,47 @@ html, body {
 .hud-touch-arrow-right { right: 8vw; }
 
 .hud-credits-play:hover { background: rgba(255, 206, 138, 0.22); }
+
+/* Phones: everything fits a 360 px portrait or 640 px tall landscape screen (D-030). */
+@media (max-width: 720px) {
+  .hud-card {
+    width: 92vw;
+    bottom: calc(3vh + env(safe-area-inset-bottom));
+    padding: 0.8rem 0.9rem;
+  }
+  .hud-card-small { width: 92vw; }
+  .hud-card-text { font-size: 1rem; line-height: 1.4; }
+  .hud-card-hint { margin-top: 0.6rem; font-size: 0.7rem; }
+
+  .hud-counter { right: 3vw; top: calc(1.5vh + env(safe-area-inset-top)); font-size: 0.8rem; }
+  .hud-sub { right: 3vw; top: calc(5vh + env(safe-area-inset-top)); font-size: 0.7rem; }
+  .hud-flavor { right: 3vw; top: calc(9vh + env(safe-area-inset-top)); }
+  .hud-readout { left: 3vw; top: calc(1.5vh + env(safe-area-inset-top)); font-size: 0.85rem; }
+
+  .hud-prompt { font-size: 0.8rem; letter-spacing: 0.2em; text-indent: 0.2em; }
+  .hud-big { font-size: 1.8rem; }
+  .hud-title { letter-spacing: 0.16em; text-indent: 0.16em; }
+
+  .hud-button, .hud-tile { min-height: 2.75rem; }
+  .hud-buttons { bottom: calc(16vh + env(safe-area-inset-bottom)); }
+  .hud-reveal { white-space: normal; width: 88vw; text-align: center; font-size: 1rem; }
+
+  .hud-grid { left: 4vw; width: 92vw; gap: 0.3rem; }
+  .hud-tile { padding: 0.4rem 0.2rem; }
+  .hud-tile-name { font-size: 1.1rem; }
+  .hud-tile-label { font-size: 0.7rem; }
+
+  .hud-credits { width: 92vw; padding: 1.1rem 1rem; }
+  .hud-credits-scroll { height: 11em; }
+
+  .hud-skymap .hud-chart-note { bottom: calc(6vh + env(safe-area-inset-bottom)); left: 3vw; right: 3vw; }
+  .hud-skymap .hud-chart-credit { bottom: calc(2vh + env(safe-area-inset-bottom)); left: 3vw; }
+  .hud-counter-large { padding: 0.9rem 1.2rem 1.1rem; width: 84vw; box-sizing: border-box; }
+}
+
+@media (orientation: portrait) and (max-width: 720px) {
+  .hud-grid { top: 6vh; }
+  .hud-meter { width: 70vw; }
+  .hud-prompt { bottom: 18vh; }
+  .hud-touch-arrow { bottom: 24vh; }
+}
