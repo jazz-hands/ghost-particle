@@ -125,6 +125,8 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   });
   s.onUpdate((dt) => ghost.update(dt));
   s.rig.set({ x: 4, y: 1.5, z: 5 }, { x: 0, y: 0, z: 0 });
+  // Level 3 ends faded to black; open on the stars.
+  void s.hud.fade(0, 0.8);
 
   const sun = glow(sphere(SUN_RADIUS, { color: SUN_CORE }), SUN_CORE, SUN_EMISSIVE);
   const halo = new Sprite(new SpriteMaterial({
