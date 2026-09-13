@@ -87,7 +87,6 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
       : Math.max(charge - dt / DRAIN_SECONDS, 0);
     bounce = Math.max(bounce - dt / BOUNCE_SECONDS, 0);
     s.cues.hum(charge);
-    s.hud.meter(charge);
     const gap = TOGETHER + (APART - TOGETHER) * (1 - charge) + bounce * 0.6;
     proton.position.x = -gap;
     beryllium.position.x = gap;
@@ -97,7 +96,6 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
   // 1.5
   charging = false;
   s.hud.touch.clear();
-  s.hud.meter(null);
   glowing = false;
   s.hud.prompt(null);
   s.cues.hum(0);

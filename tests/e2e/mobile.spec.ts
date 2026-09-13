@@ -1,4 +1,9 @@
 import { test, expect, type Page } from '@playwright/test';
+import type { GhostHook } from '../../src/debug/ghost.ts';
+
+declare global {
+  interface Window { ghost: GhostHook }
+}
 
 function collectErrors(page: Page): string[] {
   const errors: string[] = [];
@@ -43,7 +48,7 @@ test('cards say tap, and a tap continues', async ({ page }) => {
   await expect(page.locator('.hud-card-text').first()).not.toHaveText(before ?? '');
 });
 
-test('holding the stage charges the level 1 meter', async ({ page }) => {
+test('holding the stage starts the level 1 charge', async ({ page }) => {
   await page.goto('/?level=1');
   await expect(page.locator('.hud-prompt')).toHaveText('Hold anywhere');
   const box = (await page.locator('.hud-layer').boundingBox())!;
@@ -51,9 +56,6 @@ test('holding the stage charges the level 1 meter', async ({ page }) => {
   const y = box.y + box.height / 2;
   await page.mouse.move(x, y);
   await page.mouse.down();
-  await expect.poll(async () => {
-    const w = await page.locator('.hud-meter-fill').evaluate((el) => (el as HTMLElement).getBoundingClientRect().width);
-    return w;
-  }, { timeout: 4000 }).toBeGreaterThan(0);
+  await expect(page.locator('.hud-prompt')).toHaveCount(0);
   await page.mouse.up();
 });
