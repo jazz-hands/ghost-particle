@@ -46,6 +46,16 @@ export const REACTIONS: Record<string, Keyframe[]> = {
     { t: 0.6, scaleX: 0.95, scaleY: 1.07, offsetY: 0.05, eyeWidth: 1.3, eyeTall: 1.3, ease: 'inOut' },
     { t: 0.92, ease: 'out' },
   ],
+  // Crouch, launch with a stretch, land with a squash; the lower lids ride up into arcs.
+  cheer: [
+    { t: 0 },
+    { t: 0.11, scaleX: 1.14, scaleY: 0.84, offsetY: -0.08, ease: 'out' },
+    { t: 0.36, scaleX: 0.86, scaleY: 1.22, offsetY: 0.44, lowerLid: 0.55, ease: 'out' },
+    { t: 0.64, scaleX: 1, scaleY: 1, offsetY: 0, lowerLid: 0.5, ease: 'in' },
+    { t: 0.75, scaleX: 1.16, scaleY: 0.86, offsetY: -0.06, lowerLid: 0.5, ease: 'out' },
+    { t: 1, scaleX: 1, scaleY: 1.02, offsetY: 0.02, lowerLid: 0.42, ease: 'back' },
+    { t: 1.3, ease: 'inOut' },
+  ],
 };
 
 export const NAMES = [
