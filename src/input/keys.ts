@@ -4,7 +4,7 @@ type Handler = () => void;
 
 export class Keys {
   private readonly target: EventTarget;
-  private readonly down = new Set<string>();
+  private readonly down_ = new Set<string>();
   private readonly presses = new Map<string, Set<Handler>>();
   private readonly releases = new Map<string, Set<Handler>>();
 
@@ -12,11 +12,11 @@ export class Keys {
     const code = (e as KeyboardEvent).code;
     if (PREVENTED.has(code)) e.preventDefault();
     if ((e as KeyboardEvent).repeat) return;
-    this.handleDown(code);
+    this.down(code);
   };
 
   private readonly keyup = (e: Event): void => {
-    this.handleUp((e as KeyboardEvent).code);
+    this.up((e as KeyboardEvent).code);
   };
 
   constructor(target: EventTarget = window) {
@@ -26,7 +26,7 @@ export class Keys {
   }
 
   isDown(code: string): boolean {
-    return this.down.has(code);
+    return this.down_.has(code);
   }
 
   onPress(code: string, fn: Handler): () => void {
@@ -38,26 +38,26 @@ export class Keys {
   }
 
   press(code: string): void {
-    this.handleDown(code);
-    this.handleUp(code);
+    this.down(code);
+    this.up(code);
   }
 
   dispose(): void {
     this.target.removeEventListener('keydown', this.keydown);
     this.target.removeEventListener('keyup', this.keyup);
-    this.down.clear();
+    this.down_.clear();
     this.presses.clear();
     this.releases.clear();
   }
 
-  private handleDown(code: string): void {
-    if (this.down.has(code)) return;
-    this.down.add(code);
+  down(code: string): void {
+    if (this.down_.has(code)) return;
+    this.down_.add(code);
     fire(this.presses, code);
   }
 
-  private handleUp(code: string): void {
-    if (!this.down.delete(code)) return;
+  up(code: string): void {
+    if (!this.down_.delete(code)) return;
     fire(this.releases, code);
   }
 }
