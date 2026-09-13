@@ -104,6 +104,8 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   const shown: PaintedRing[] = [];
   const repaint = (): void => tank.paint(shown);
 
+  // Reduced motion takes the push-in and the shake; the hit itself is untouched.
+  const calm = prefersReducedMotion();
   const ghost = createNeutrino(characterConfig());
   const nu = ghost.group;
   nu.scale.setScalar(CHARACTER_SCALE);
@@ -151,7 +153,7 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   hud.prompt('Press Space');
   ghost.react('brace');
   cues.swell();
-  void rig.moveTo(HELD_EYE, AIM, 6);
+  if (!calm) void rig.moveTo(HELD_EYE, AIM, 6);
   await b.key('Space');
   drifting = false;
   hud.prompt(null);
