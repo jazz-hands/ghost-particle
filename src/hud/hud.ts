@@ -483,20 +483,42 @@ export class Hud {
   }
 
   credits(lines: string[], onPlayAgain: () => void): { close(): void } {
+    // A line marked with a leading '## ' is a section heading, not a credit.
+    const HEAD = '## ';
+    // The roll, in pixels a second: slow enough to read. It only nudges a real scroll box
+    // along, so the wheel can take it over or run ahead of it at any point.
+    const ROLL_PER_SECOND = 26;
+
     const box = div('hud-credits', this.layer);
     const scroll = div('hud-credits-scroll', box);
-    for (const line of lines) div('hud-credits-line', scroll).textContent = line;
-    scroll.animate(
-      [{ transform: 'translateY(0)' }, { transform: `translateY(-${Math.max(lines.length - 6, 0) * 1.8}em)` }],
-      { duration: Math.max(lines.length, 1) * 2000, fill: 'forwards', easing: 'linear' },
-    );
+    for (const line of lines) {
+      const head = line.startsWith(HEAD);
+      div(head ? 'hud-credits-head' : 'hud-credits-line', scroll).textContent = head ? line.slice(HEAD.length) : line;
+    }
     const button = document.createElement('button');
-    button.className = 'hud-button hud-play-again';
+    button.className = 'hud-button hud-play-again hud-credits-play';
     button.type = 'button';
     button.textContent = 'Play again';
     button.addEventListener('click', onPlayAgain);
     box.append(button);
+
+    let raf = 0;
+    let carry = 0;
+    let last = performance.now();
+    const roll = (now: number): void => {
+      carry += Math.min((now - last) / 1000, 0.25) * ROLL_PER_SECOND;
+      last = now;
+      const step = Math.floor(carry);
+      if (step >= 1) {
+        carry -= step;
+        scroll.scrollTop += step;
+      }
+      raf = scroll.scrollTop < scroll.scrollHeight - scroll.clientHeight ? requestAnimationFrame(roll) : 0;
+    };
+    raf = requestAnimationFrame(roll);
+
     const close = (): void => {
+      if (raf !== 0) cancelAnimationFrame(raf);
       box.remove();
       this.closers.delete(close);
     };
