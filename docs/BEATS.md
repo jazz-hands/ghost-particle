@@ -107,10 +107,9 @@ Camera behind the neutrino, rushing outward through orange-white haze. The neutr
 | 3.4 | A run of obstacles over ~20 s: dense knots of nuclei, more plasma walls, a wall of light. Some have gaps, most don't. Tally climbs on each. | steers freely | brace/surprised on the first two, then just wiggle | none | | thwip each, tick |
 | 3.5 | Card, mid-climb. Haze thins slightly. | Space | nod | "Light from the core takes tens of thousands of years or more to get out. It keeps bumping into things. You take about 2 seconds." | F-08, F-09 | |
 | 3.6 | The neutrino's tint begins to shift. Flavor icon under the counter changes with it. | watches | look-at-self | "Neutrinos come in three flavors: electron, muon, and tau. You were born electron-flavor. But look. You're changing." | F-12 | rising tone |
-| 3.7 | Card. Tint keeps cycling. | Space | shrug | "A neutrino can only change flavor if it has some mass. That's how we know you aren't weightless." | F-05 | |
-| 3.8 | Card. Obstacles thin out; haze brightens toward the surface. | Space | nod | "Of boron-8 neutrinos born electron-flavor like you, only about a third still look that way when they reach Earth." | F-14 | |
-| 3.9 | Burst out of the surface into black space. The Sun glares behind. Tally final value shown once, big. | | cheer | none | | whoosh, ta-da |
-| 3.10 | Corner button "Want more?" (level 7): who proved flavor change. | | | | F-13 | |
+| 3.7 | Card. Tint keeps cycling. Obstacles thin out; haze brightens toward the surface. | Space | shrug | "A neutrino can only change flavor if it has some mass. That's how we know you aren't weightless." | F-05 | |
+| 3.8 | Burst out of the surface into black space. The Sun glares behind. Tally final value shown once, big. | | cheer | none | | whoosh, ta-da |
+| 3.9 | Corner button "Want more?" (level 7): who proved flavor change. | | | | F-13 | |
 
 ---
 
