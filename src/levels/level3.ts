@@ -10,7 +10,7 @@ const STEER = 3;
 const RAIL = 12;
 const SPAWN_Z = -60;
 const HALT_Z = -5;
-const TRY_Z = -30;
+const TRY_Z = -20;
 const SURFACE = '#c9d2da';
 
 interface Obstacle {
@@ -146,12 +146,12 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   await s.b.card('Nothing happened. The Sun is opaque to light, but almost transparent to you. Almost nothing can stop a neutrino.', ['F-10']);
 
   spawning = true;
-  spawnIn = 1;
-  await s.b.wait(5);
+  spawnIn = 0.5;
+  await s.b.wait(3);
 
   fog.density = 0.03;
   await s.b.card('Light from the core takes tens of thousands of years or more to get out. It keeps bumping into things. You take about 2 seconds.', ['F-08', 'F-09']);
-  await s.b.wait(5);
+  await s.b.wait(3);
 
   cycling = true;
   await s.b.card("Neutrinos come in three flavors: electron, muon, and tau. You were born electron-flavor. But look. You're changing.", ['F-12']);
