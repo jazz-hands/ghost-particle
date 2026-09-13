@@ -9,7 +9,7 @@ const TICK_MIN_SECONDS = 0.06;
 const WHOOSH_SECONDS = 0.9;
 // The pass-through blip: high and short, stepping through a few pitches so a run of
 // obstacles does not read as one repeated sample.
-const THWIP_HZ = 2400;
+export const THWIP_HZ = 2400;
 const THWIP_STEPS = [1, 1.122, 1.26, 1.122];
 const THWIP_SECONDS = 0.045;
 // The flavor card's climb (3.6): a low pad walking up an octave and a half.
@@ -22,6 +22,15 @@ const TADA_NOTES = [
   { hz: 659.25, delay: 0.12, decay: 0.22 },
   { hz: 783.99, delay: 0.24, decay: 0.9 },
 ] as const;
+// The UI confirm sets the scale the two new one-shots are measured against: the pass-through
+// thwip is higher and tinier, the wrong-answer buzz is lower and quieter (BEATS "Sound cue set").
+export const BLIP_HZ = 1320;
+export const BLIP_PEAK = 0.2;
+export const BUZZ_HZ = 190;
+export const BUZZ_PEAK = 0.07;
+const BUZZ_PULSES = 2;
+const BUZZ_GAP = 0.11;
+export const THWIP_PEAK = 0.09;
 
 const clamp01 = (v: number): number => Math.min(Math.max(v, 0), 1);
 
@@ -156,9 +165,9 @@ export class Cues {
     const t = ctx.currentTime;
     const osc = ctx.createOscillator();
     osc.type = 'triangle';
-    osc.frequency.setValueAtTime(1320, t);
+    osc.frequency.setValueAtTime(BLIP_HZ, t);
     const gain = ctx.createGain();
-    envelope(gain, t, 0.2, 0.004, 0.06);
+    envelope(gain, t, BLIP_PEAK, 0.004, 0.06);
     osc.connect(gain).connect(out);
     osc.start(t);
     osc.stop(t + 0.1);
@@ -298,7 +307,28 @@ export class Cues {
     this.noise = buffer;
     return buffer;
   }
-}
+  /** The wrong answer (4.5): two short low pulses, softened and kept under the blip. */
+  buzz(): void {
+    const ctx = this.ctx;
+    const out = this.out;
+    if (!ctx || !out) return;
+    const t = ctx.currentTime;
+    for (let i = 0; i < BUZZ_PULSES; i += 1) {
+      const at = t + i * BUZZ_GAP;
+      const osc = ctx.createOscillator();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(BUZZ_HZ, at);
+      const soften = ctx.createBiquadFilter();
+      soften.type = 'lowpass';
+      soften.frequency.value = 900;
+      const gain = ctx.createGain();
+      envelope(gain, at, BUZZ_PEAK, 0.006, 0.08);
+      osc.connect(soften).connect(gain).connect(out);
+      osc.start(at);
+      osc.stop(at + 0.14);
+    }
+  }
+  /** The pass-through (4.8): a tiny high blip that drops away as it goes. */}
 
 function envelope(gain: GainNode, t: number, peak: number, attack: number, decay: number): void {
   gain.gain.setValueAtTime(0.0001, t);

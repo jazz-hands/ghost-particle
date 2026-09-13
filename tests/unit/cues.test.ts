@@ -1,6 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { humFrequency, humVolume, risingToneFrequency, thwipPitch, tadaNotes, tickSeconds } from '../../src/audio/cues.ts';
+import {
+  BLIP_HZ, BLIP_PEAK, BUZZ_HZ, BUZZ_PEAK, THWIP_HZ, THWIP_PEAK,
+  humFrequency, humVolume, risingToneFrequency, thwipPitch, tadaNotes, tickSeconds,
+} from '../../src/audio/cues.ts';
 
 test('the hum rises in pitch across the hold', () => {
   assert.ok(humFrequency(0) < humFrequency(0.5));
@@ -70,4 +73,14 @@ test('the fanfare is three ascending notes, staggered, the last ringing on', () 
     assert.ok(notes[i]!.delay > notes[i - 1]!.delay);
   }
   assert.ok(notes[2]!.decay > notes[1]!.decay);
+});
+
+test('the wrong-answer buzz is gentle: lower and quieter than the UI confirm', () => {
+  assert.ok(BUZZ_HZ < BLIP_HZ);
+  assert.ok(BUZZ_PEAK < BLIP_PEAK);
+});
+
+test('the pass-through thwip is a tinier, higher blip', () => {
+  assert.ok(THWIP_HZ > BLIP_HZ);
+  assert.ok(THWIP_PEAK < BLIP_PEAK);
 });

@@ -119,7 +119,7 @@ Open space. Sun shrinking behind, Earth a dot ahead. Travel meter shows kilomete
 | # | Player sees | Player does | Neutrino | Caption | Facts | Cue |
 |---|---|---|---|---|---|---|
 | 4.1 | Meter appears: "0 km, 0 light-seconds". Card. | Space | nod | "150 million kilometers to Earth. Light takes about 8 minutes 20 seconds. So do you." | F-15 | tick |
-| 4.2 | Meter ticks for about four flavor shifts (~6 s). Star streaks. Sun shrinks. | watches | wiggle | none | F-30 | tick |
+| 4.2 | Meter ticks for about two flavor shifts (~3 s). Star streaks. Sun shrinks. | watches | wiggle | none | F-30 | tick |
 | 4.3 | At ~40% of the trip the meter pauses. Card. | reads | nod | "Halfway to Earth. Before you arrive, meet the family: every particle matter is made of, on one chart." | F-16 | blip |
 | 4.4 | After the card the neutrino drifts to the right and shrinks, as if zoomed out, to watch. A "family photo" grid builds on the left, one family row at a time (6 quarks, 6 leptons, 4 force carriers, Higgs), each row colour-coded (quarks rose, leptons cyan, force carriers green, Higgs gold) and announced by a one-line timed card (family lines below). Each tile has a name and a plain one-line label (table below); the three neutrino tiles show only a question mark. Then the card below appears; a highlight sits on the first tile, arrows move it, Space picks. Clicking a tile also works. | reads | peek at the grid, then wave | "This is the Standard Model, the list of everything matter is made of. Find yourself." | F-16 | blip |
 | 4.5 | Wrong tile picked: it wiggles and its one-line label enlarges for 2 s. | picks | shrug | (the tile's own label) | F-16 | buzz |
