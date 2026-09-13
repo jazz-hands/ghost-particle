@@ -4,6 +4,9 @@ import type { Material, Object3D } from 'three';
 import { scriptedLevel } from './scripted.ts';
 import { createNeutrino } from '../character/neutrino.ts';
 import { setCurrentNeutrino } from '../character/current.ts';
+import { CONFIG } from '../character/config.ts';
+import type { CharacterConfig } from '../character/config.ts';
+import { prefersReducedMotion } from '../render/rig.ts';
 
 const CHARGE_SECONDS = 2.5;
 const DRAIN_SECONDS = 0.8;
@@ -119,7 +122,7 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
 
   s.cues.pop();
 
-  const ghost = createNeutrino();
+  const ghost = createNeutrino(characterConfig());
   ghost.group.scale.setScalar(CHARACTER_SCALE);
   const skin = fadeTargets(ghost.group);
   fadeTo(skin, 0);
@@ -162,6 +165,12 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
   s.hud.prompt(null);
   await s.b.wait(0.7);
 });
+
+// The beat sheet's reduced-motion rule: the idle bob goes, nothing else changes.
+function characterConfig(): CharacterConfig {
+  if (!prefersReducedMotion()) return CONFIG;
+  return { ...CONFIG, view: { ...CONFIG.view, idleBob: false } };
+}
 
 function blob(radius: number, color: string, opacity: number, emissive: number): Mesh {
   return new Mesh(new SphereGeometry(radius, 32, 16), new MeshStandardMaterial({
