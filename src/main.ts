@@ -19,9 +19,9 @@ stage.applyLighting(CONFIG.light);
 stage.setBloom(CONFIG.post);
 
 const keys = new Keys();
-const hud = new Hud(document.getElementById('hud')!, keys);
-const rig = new CameraRig(stage.camera);
 const cues = new Cues();
+const hud = new Hud(document.getElementById('hud')!, keys, () => cues.unlock());
+const rig = new CameraRig(stage.camera);
 keys.onPress('Space', () => cues.unlock());
 
 const manager = new LevelManager(LEVELS, { scene: stage.scene, camera: stage.camera, hud, keys, rig, cues });

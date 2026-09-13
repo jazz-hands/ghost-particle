@@ -58,6 +58,7 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
 
   // 1.1
   await s.b.wait(2);
+  s.hud.touch.hold('Space');
   s.hud.prompt(hint('hold'));
   await s.b.key('Space');
 
@@ -94,6 +95,7 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
 
   // 1.5
   charging = false;
+  s.hud.touch.clear();
   glowing = false;
   s.hud.prompt(null);
   s.cues.hum(0);
@@ -164,12 +166,14 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
 
   // 1.7
   s.hud.title('GHOST PARTICLE');
+  s.hud.touch.hold('Space');
   s.hud.prompt(hint('press'));
   await s.b.key('Space');
   s.cues.blip();
   ghost.react('wiggle');
   s.hud.title(null);
   s.hud.prompt(null);
+  s.hud.touch.clear();
   await s.b.wait(0.7);
 });
 

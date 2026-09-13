@@ -274,6 +274,7 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
   s.cues.whoosh();
   ghost.react('nod');
   await s.b.card(`You're leaving the Sun. Everything in here is packed tight. Try to hit something. ${hint('steer')}.`);
+  s.hud.touch.halves('ArrowLeft', 'ArrowRight');
 
   // 3.2
   for (const gap of [false, true]) {
@@ -283,6 +284,7 @@ export const createLevel3 = scriptedLevel(3, async (s) => {
     await s.b.until(() => tally > before);
     s.hud.prompt(null);
   }
+  s.hud.touch.clear();
 
   // 3.3
   ghost.react('surprised');

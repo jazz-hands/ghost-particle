@@ -410,4 +410,19 @@ html, body {
   color: #ffe6bd;
 }
 
+/* Touch: the HUD layer takes pointer events only on coarse-pointer devices (D-030). */
+.hud-touch { pointer-events: auto; touch-action: none; }
+.hud-touch .hud-button kbd { display: none; }
+
+.hud-touch-arrow {
+  position: absolute;
+  bottom: 30vh;
+  font-size: 2.4rem;
+  color: rgba(207, 216, 220, 0.35);
+  pointer-events: none;
+  user-select: none;
+}
+.hud-touch-arrow-left { left: 8vw; }
+.hud-touch-arrow-right { right: 8vw; }
+
 .hud-credits-play:hover { background: rgba(255, 206, 138, 0.22); }

@@ -173,12 +173,14 @@ export const createLevel5 = scriptedLevel(5, async (s) => {
   let drifting = true;
   // The drift stops short of the wall, so a long wait on the prompt cannot carry the electron past it.
   s.onUpdate((dt) => { if (drifting) electron.position.x = Math.min(electron.position.x + DRIFT * dt, DRIFT_STOP); });
+  hud.touch.hold('Space');
   hud.prompt(hint('hit'));
   ghost.react('brace');
   if (!calm) void rig.moveTo(HELD_EYE, AIM, 6);
   await b.key('Space');
   drifting = false;
   hud.prompt(null);
+  hud.touch.clear();
   void rig.moveTo(EYE, AIM, 0.8);
 
   // 5.4 the nudge, the cone, and the ring it paints on the wall.

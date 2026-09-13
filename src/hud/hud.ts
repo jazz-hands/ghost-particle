@@ -3,6 +3,8 @@ import type { Keys } from '../input/keys.ts';
 import { TINTS } from '../content/flavors.ts';
 import type { Flavor } from '../content/flavors.ts';
 import { hint } from './hints.ts';
+import { Touch } from '../input/touch.ts';
+import { isTouch } from '../input/device.ts';
 
 export interface GridTile { row: string; name: string; label: string }
 
@@ -55,6 +57,7 @@ function ended(anim: Animation): Promise<void> {
 
 export class Hud {
   readonly counter: Counter;
+  readonly touch: Touch;
   private readonly keys: Keys;
   private readonly layer: HTMLDivElement;
   private readonly slots = new Map<string, HTMLElement>();
@@ -63,10 +66,12 @@ export class Hud {
   private cardFinish: (() => void) | null = null;
   private fadeEl: HTMLElement | null = null;
 
-  constructor(root: HTMLElement, keys: Keys) {
+  constructor(root: HTMLElement, keys: Keys, onGesture: () => void = () => {}) {
     this.keys = keys;
     this.layer = div('hud-layer', root);
     this.counter = new Counter(root);
+    this.touch = new Touch(keys, this.layer, onGesture);
+    if (isTouch()) this.layer.classList.add('hud-touch');
   }
 
   get cardUp(): boolean {
@@ -553,6 +558,7 @@ export class Hud {
 
   clear(): void {
     for (const close of [...this.closers]) close();
+    this.touch.clear();
     this.closers.clear();
     this.slots.clear();
     this.cardEl = null;
