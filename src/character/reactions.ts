@@ -87,6 +87,14 @@ export const REACTIONS: Record<string, Keyframe[]> = {
     { t: 0.8, eyeShiftY: 0.08, squint: 0.2, offsetY: -0.04, scaleY: 0.98, scaleX: 1.02, ease: 'inOut' },
     { t: 1.15, ease: 'inOut' },
   ],
+  // Puff up and ride one slow swell with the eyes content and half shut.
+  proud: [
+    { t: 0 },
+    { t: 0.45, offsetY: 0.1, scaleX: 1.04, scaleY: 1.05, squint: 0.42, ease: 'inOut' },
+    { t: 0.95, offsetY: 0.13, scaleX: 1.05, scaleY: 1.06, squint: 0.48, ease: 'inOut' },
+    { t: 1.45, offsetY: 0.02, scaleX: 1.01, scaleY: 1.01, squint: 0.3, ease: 'inOut' },
+    { t: 1.75, ease: 'inOut' },
+  ],
 };
 
 export const NAMES = [
