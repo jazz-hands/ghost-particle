@@ -40,7 +40,7 @@ Most entries are now verified. Remaining "check" items, none of which change on-
 
 - [x] Character: bubble with ink eyes, no antenna (D-029).
 - [ ] Final character values: tune in `docs/mockups/character-tuner.html`, paste the JSON into D-029.
-- [ ] Eye shapes per reaction: define lid, tilt, spacing and highlight values for each of the eleven reactions in BEATS.md, using the tuner's eye controls.
+- [ ] Eye shapes per reaction: define lid, tilt, spacing and highlight values for each of the eleven reactions in BEATS.md, using the tuner's eye controls. Add a lower-lid control to the tuner first so "cheer" (upward arcs) can be expressed.
 - [ ] Palette: background gradient stops, UI accent, plasma color in L3, sensor "eye" gold in L5 (flavor tints and base are settled in D-011).
 - [ ] Reference board from the Astro Bot screenshots (private, not committed).
 - [ ] Rough layout for the HUD: caption card position, key prompt, meters, mini-game buttons.
@@ -54,13 +54,15 @@ Most entries are now verified. Remaining "check" items, none of which change on-
 - [ ] Node v26.8.2 and npm are installed at `/opt/homebrew/bin` but that directory is not on PATH in non-interactive shells, which is why `npx` was missing and the Context7 and Playwright MCP servers failed to connect. Fix: add `/opt/homebrew/bin` to PATH in `~/.zshenv` (not only `~/.zshrc`).
 - [ ] Install `poppler` (`brew install poppler`) so PDFs can be read for the remaining fact checks.
 - [x] Bloom: UnrealBloomPass through EffectComposer with an OutputPass, proven in `character-tuner.html`; gentle defaults recorded there.
-- [ ] Web Audio: confirm the autoplay policy needs a user gesture first (the level 1 Space hold can be that gesture).
+- [x] Web Audio: the first Space hold in level 1 is the unlocking gesture; beat 1.1 is silent by design.
 
 ## 6. Scaffold (first coding step, after the above)
 
 - [ ] `npm create vite@latest` with the vanilla TypeScript template. Add `server: { host: true, allowedHosts: ['.exe.xyz'] }` to `vite.config.ts` so the dev server answers through the exe.dev proxy (D-014).
 - [ ] Add three, gsap, @playwright/test. Record what each pulls in.
 - [ ] Folder layout per SPEC.md architecture.
-- [ ] `src/content/facts.ts` generated or hand-mirrored from FACTS.md with the same IDs.
-- [ ] One Playwright smoke test: app boots, no console errors, screenshot.
+- [ ] `src/content/facts.ts` hand-mirrored from FACTS.md with the same IDs, plus `scripts/check-facts.mjs` that fails when a referenced F-ID has no entry in FACTS.md.
+- [ ] `src/character/config.json` from the tuner's JSON; port the tuner's material and skin-texture code into `src/character/`.
+- [ ] Download A-02 (`sksolartimevariation5804d.txt`) into `public/data/`, confirm the flux column definition against its header and the PRL paper, then write the level 6 axis label (F-24).
+- [ ] One Playwright smoke test: app boots, no console errors, screenshot; uses `?level=N` and `window.ghost.next()`.
 - [ ] First commit.

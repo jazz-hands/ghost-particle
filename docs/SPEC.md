@@ -34,7 +34,7 @@ The whole game is one joke with a payoff: the neutrino touches nothing, level af
 
 ## Through-line HUD
 
-One small counter runs from the moment the player starts: how many solar neutrinos have passed through the player's own body since they pressed start (F-32, D-024). It appears from level 2 onward and is frozen and shown large at the end.
+One small counter runs from the first key hold in level 1: how many solar neutrinos have passed through the player's own body since then (F-32, D-024). It appears from level 2 onward, shows three significant figures with a word scale, and is frozen and shown large at the end.
 
 ## Level progression
 
@@ -45,13 +45,13 @@ Each level is one scene with one mechanic and a handful of captions (at most 25 
 - Scene: black, quiet, a faint warm glow. Two soft glowing blobs, a proton and a beryllium-7 nucleus, drift toward the center.
 - Mechanic: hold a key. A meter fills while held. Release at full: a flash, a wobbling boron-8 nucleus, then it pops and the neutrino blinks into existence.
 - Learn (by doing, no text except the key prompt and the title): the Sun makes neutrinos by squeezing nuclei together.
-- Facts: F-01, F-02 (visual only; wording arrives in level 2).
+- Facts: F-01, F-02 (visual only; the wording is card 2.3).
 
 ### 2. Meet the neutrino (three cards)
 
 - Scene: same dark core, camera pulls back to reveal the neutrino floating in a warm haze.
 - Mechanic: press to advance through exactly three cards. Each triggers a reaction. Card two is a seesaw gag: the neutrino is weighed against an electron and floats up.
-- Facts: F-03, F-04, F-06, F-02. The counter (F-32) appears here.
+- Facts: F-03, F-04, F-06, F-01, F-02. The counter (F-32) appears here.
 - Optional side panel ("Want more?"): F-26, F-27.
 
 ### 3. Escaping the Sun: "try to hit something"
@@ -63,22 +63,22 @@ Each level is one scene with one mechanic and a handful of captions (at most 25 
 
 ### 4. The trip to Earth
 
-- Scene: open space, the Sun shrinking behind, Earth growing ahead. A travel meter shows kilometers and light-seconds covered. Real trip time is compressed to about 40 seconds; holding a key fast-forwards the meter (it never claims the neutrino goes faster than light).
-- Mechanic: the Standard Model "family photo" slides in as a grid of tiles with plain one-line labels. The player clicks the tile that is them (D-021). Wrong tiles wiggle and explain themselves; the right tile makes the neutrino jump in and cheer.
+- Scene: open space, the Sun shrinking behind, Earth growing ahead. A travel meter shows kilometers and light-seconds covered. Real trip time is compressed to about 40 seconds; holding the right arrow fast-forwards the meter (it never claims the neutrino goes faster than light).
+- Mechanic: the Standard Model "family photo" slides in as a grid of tiles with plain one-line labels. The player moves a highlight with the arrow keys and picks the tile that is them with Space; clicking also works (D-021). Wrong tiles wiggle and explain themselves; the right tile makes the neutrino jump in and cheer.
 - Facts: F-15, F-16, F-19. Formula F-30 drives the meter.
 
 ### 5. Super-Kamiokande
 
 - Scene: dive 1,000 meters underground into a giant cylinder of dark water lined with thousands of glowing gold "eyes" (light sensors).
 - Beat one is the hero's own hit (D-022): the neutrino drifts toward a single electron in slow motion, the player presses, the electron shoots forward, a cone of light blooms, and a fuzzy ring appears on the wall. This is the climax of the game.
-- Mechanic: then the identification mini-game. Five more rings appear one at a time. Sharp-edged rings were made by muons, fuzzy rings by electrons. The player labels each; the answer and a one-line reason are revealed after each (D-013). Feedback only, no fail state.
+- Mechanic: then the identification mini-game. Five more rings appear one at a time. Sharp-edged rings were made by muons, fuzzy rings by electrons. The player labels each with the E or M key (buttons also clickable); the answer and a one-line reason are revealed after each (D-013). Feedback only, no fail state.
 - Facts: F-17, F-18, F-19, F-20, F-21, F-22, F-23. Formula F-31 sizes the rings.
 - Honesty note on screen: rings are simulated from the published detector geometry and ring physics (F-24). They are not real event records.
 
 ### 6. Twenty-two years of watching
 
 - Scene: the tank fades to black and a chart draws itself in: Super-Kamiokande's public solar neutrino record, one point for every five days from 1996 to 2018 (A-02, F-24). The neutrino floats beside it. The chart is built from the real data file at build time; nothing is hand-drawn.
-- Captions: what the dots are, that many arrived at night through the whole Earth, and that the only pattern in all those years is the yearly wobble from Earth's slightly oval orbit (F-33).
+- Captions: what the dots are, that many arrived at night through the whole Earth, and that the only pattern in all those years is the yearly wobble from Earth's slightly oval orbit (F-33), shown as an expected curve computed from the dataset's own distance column rather than read off the noisy points.
 - The through-line counter freezes and is shown large.
 - Facts: F-24, F-25 (text mention only, no image), F-33, F-32. The famous neutrino image of the Sun is not shipped (D-028).
 - Ends with a credits roll generated from `FACTS.md` sources and asset credits.
@@ -98,12 +98,13 @@ Keep it small. One TypeScript app, one renderer, one scene graph, levels swapped
 - `src/main.ts` — creates the renderer, the level manager, the HUD, the audio, the debug GUI.
 - `src/levels/` — one file per level. Each exports an object implementing `Level`: `enter()`, `update(dt)`, `exit()`. Levels own their three.js objects and dispose them on exit.
 - `src/rail/` — a reusable "rail" scene: camera moving along a path past instanced obstacles or scenery, with hooks for steering and for spawning things. Levels 3 and 4 are configurations of it.
-- `src/character/neutrino.ts` — builds the character mesh, exposes `setFlavor()`, `react(name)`, `moveTo()`. GSAP drives the animations.
+- `src/character/neutrino.ts` — builds the character mesh from `src/character/config.json`, whose shape is exactly the tuner's JSON output, so tuned values load without transcription. The material and skin-texture code is ported from `docs/mockups/character-tuner.html`. Exposes `setFlavor()` (a material color lerp), `react(name)` (an eye-texture redraw plus a GSAP body squash), `moveTo()`.
 - `src/hud/` — DOM overlay (HTML/CSS, not 3D text): caption cards, key prompts, meters, the through-line counter, mini-game buttons, credits.
 - `src/audio/` — Web Audio cue functions keyed by the names in `BEATS.md`.
 - `src/content/facts.ts` — the code mirror of `docs/FACTS.md`: every caption as data `{ id, text, sources, reaction, cue }`. Keyed by the same F-xx IDs. Credits render from this.
-- `src/debug/` — lil-gui and Stats, only mounted when `?debug` is in the URL. A `?level=N` flag jumps to a level.
-- `tests/` — Playwright: app boots, each level can be entered by URL flag, no console errors, a screenshot per level.
+- `src/debug/` — lil-gui and Stats, only mounted when `?debug` is in the URL. A `?level=N` flag jumps to a level, and a small `window.ghost` hook exposes `next()` (advance one beat) and `react(name)` so tests can drive the game deterministically.
+- `scripts/check-facts.mjs` — a few lines that collect every `F-xx` referenced under `src/` and fail if any is missing from `docs/FACTS.md`. Runs with the tests.
+- `tests/` — Playwright: app boots, each level can be entered by URL flag and stepped with the debug hook, no console errors, a screenshot per level.
 
 State flow: level manager holds the current level index. Levels signal `done` to advance. Captions are a queue the HUD drains on key press. The counter is a single clock started at level 1. No global store beyond that.
 
@@ -131,6 +132,8 @@ Build the spine, then the ending, then the middle (D-023). If time runs out the 
 | 8 | Playwright smoke test, polish | 0h 20 |
 
 Add if time remains, in this order: level 7 panels, cinematic soundtrack, touch input.
+
+The character's material and skin code already exists in the tuner, so step 1's character work is porting plus the reaction redraws, not design.
 
 ## Cut order
 

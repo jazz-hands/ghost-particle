@@ -249,7 +249,7 @@ Each entry: plain-language wording (what the player reads), precise statement (f
 
 ### F-32 Neutrinos through the player since pressing start
 - Player wording: "Neutrinos through you since you started: about N trillion."
-- Precise: N(t) = Φ × A × t, where Φ is the total solar neutrino flux at Earth (F-07, ≈ 6 × 10¹⁰ cm⁻² s⁻¹), A is the body's cross-sectional area as seen from the Sun, and t is seconds since start. Displayed to two significant figures with the word "about". The flux is the same day or night; at night the neutrinos arrive through the Earth (F-25).
+- Precise: N(t) = Φ × A × t, where Φ is the total solar neutrino flux at Earth (F-07, ≈ 6 × 10¹⁰ cm⁻² s⁻¹), A is the body's cross-sectional area as seen from the Sun, and t is seconds since start. Displayed to three significant figures with a word scale (trillion, quadrillion, quintillion) and the word "about", updated ten times a second. The flux is the same day or night; at night the neutrinos arrive through the Earth (F-25).
 - Reference person (decided): 150 lb (68 kg), 5 ft 7 in (170 cm), standing and facing the Sun.
 - A is built from two sourced pieces:
   1. Skin surface area by the DuBois formula, BSA = 0.007184 × W^0.425 × H^0.725 with W in kg and H in cm: 0.007184 × 68^0.425 × 170^0.725 = 1.79 m².
