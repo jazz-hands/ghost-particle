@@ -107,8 +107,8 @@ test('a card closes on its own after its reading time', async () => {
   const b = new Beats(h, pressHost());
   const text = 'one two three four five';
   const done = settled(b.card(text));
-  assert.equal(cardSeconds(text), 3);
-  b.update(2.9);
+  assert.equal(cardSeconds(text), 2.1);
+  b.update(2);
   await tick();
   assert.equal(done(), false);
   b.update(0.2);

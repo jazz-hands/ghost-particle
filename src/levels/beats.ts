@@ -6,7 +6,7 @@ export interface CardHost {
 // Reading time for a caption: cards are timed, Space only dismisses one early.
 export function cardSeconds(text: string): number {
   const words = text.trim().split(/\s+/).filter(Boolean).length;
-  return 1.5 + 0.3 * words;
+  return 1 + 0.22 * words;
 }
 
 export interface PressHost {
