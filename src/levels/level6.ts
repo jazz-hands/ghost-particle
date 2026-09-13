@@ -20,6 +20,7 @@ const COUNTER_SECONDS = 4;
 // arrive in. It is placed along a line out of the camera, so the camera itself never moves.
 const GOODBYE_NDC = { x: 0.7, y: -0.52 };
 const GOODBYE_DEPTH = 7;
+const GOODBYE_CLEARING = 0.17;
 // The character's body sphere has radius 1. Half of that is the size it plays levels at; this
 // is a goodbye from the corner, so it is smaller again and clear of the screen edge.
 const CHARACTER_SCALE = 0.22;
@@ -88,6 +89,9 @@ export const createLevel6 = scriptedLevel(6, async (s) => {
   // 6.5: credits, Play again reloads.
   hud.counter.setVisible(false);
   cues.tada();
+  // The disclaimer lines are in the credits roll; the field keeps a soft hole where the character stands.
+  map.notes(false);
+  map.clearing(GOODBYE_NDC.x, GOODBYE_NDC.y, GOODBYE_CLEARING);
   hud.credits(creditLines(), () => { location.assign(location.pathname); }, BYLINE);
   goodbye(s);
   await b.key('Space');

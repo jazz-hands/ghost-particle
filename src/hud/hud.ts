@@ -18,6 +18,8 @@ export interface ChartPoint { x: number; y: number; err: number }
 export interface SkyMapHandle {
   drop(points: { x: number; y: number; color: string }[]): void;   // events in field degrees, centre (0, 0)
   glow(seconds: number): Promise<void>;                           // brightens the field into one light
+  notes(visible: boolean): void;                                  // the simulated/credit lines under the field
+  clearing(ndcX: number, ndcY: number, radius: number): void;     // soft hole so a 3D object shows through; radius as a fraction of height
   close(): void;
 }
 
@@ -322,8 +324,10 @@ export class Hud {
     settled.width = fresh.width = innerWidth;
     settled.height = fresh.height = innerHeight;
     box.append(settled, fresh);
-    div('hud-chart-note', box).textContent = opts.note;
-    div('hud-chart-credit', box).textContent = opts.credit;
+    const noteEl = div('hud-chart-note', box);
+    noteEl.textContent = opts.note;
+    const creditEl = div('hud-chart-credit', box);
+    creditEl.textContent = opts.credit;
 
     const back = settled.getContext('2d');
     const front = fresh.getContext('2d');
@@ -378,6 +382,25 @@ export class Hud {
           front.globalCompositeOperation = 'source-over';
         }
         if (flares) stamp(front, points, FLARE_RADIUS, FLARE_ALPHA);
+      },
+      notes(visible) {
+        noteEl.hidden = !visible;
+        creditEl.hidden = !visible;
+      },
+      clearing(ndcX, ndcY, radius) {
+        const cx = ((ndcX + 1) / 2) * settled.width;
+        const cy = ((1 - ndcY) / 2) * settled.height;
+        const r = radius * settled.height;
+        for (const ctx of [back, front]) {
+          if (!ctx) continue;
+          const hole = ctx.createRadialGradient(cx, cy, r * 0.7, cx, cy, r);
+          hole.addColorStop(0, 'rgba(0, 0, 0, 1)');
+          hole.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.globalCompositeOperation = 'destination-out';
+          ctx.fillStyle = hole;
+          ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+          ctx.globalCompositeOperation = 'source-over';
+        }
       },
       glow(seconds) {
         const light = div('hud-skymap-glow', box);
