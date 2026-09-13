@@ -186,6 +186,7 @@ html, body {
 .hud-tile-name { font-size: 1.1rem; }
 .hud-tile-label { font-size: 0.7rem; color: #8fa0b1; }
 .hud-tile-on { border-color: #cfd8dc; }
+.hud-tile[data-row="Higgs"] { grid-column: 1; }
 .hud-tile-marked { background: #37444f; }
 .hud-tile-loud .hud-tile-label { font-size: 0.95rem; color: #cfd8dc; }
 
