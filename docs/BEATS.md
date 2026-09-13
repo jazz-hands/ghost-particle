@@ -59,14 +59,14 @@ Wordless except the key prompt and the title.
 | 1.3 | While held: blobs move together, meter fills over 2.5 s, gentle screen shake grows. | keeps holding | | none | | hum |
 | 1.4 | If released early: blobs bounce apart, meter drains, glow dims. Prompt returns. After two early releases the prompt reads "Hold Space until the meter is full". | tries again | | none | | hum falls |
 | 1.5 | Released at full: white flash. A single nucleus remains, jittering and wobbling (boron-8). | watches | | none | F-02 | crackle |
-| 1.6 | After 1 s it pops into sparks. In the sparks, the neutrino fades in at 50% opacity. | watches | wake | none | | pop, then chime |
+| 1.6 | After 1 s it pops into sparks. In the sparks, the neutrino fades in at its normal translucency (D-029). | watches | wake | none | | pop, then chime |
 | 1.7 | Title fades in above it: "GHOST PARTICLE". Below: "Press Space". | presses Space | wiggle | none | | blip |
 
 ---
 
 ## Level 2 — Meet the neutrino
 
-Camera pulls back; the neutrino floats in warm haze. The through-line counter fades in at the top corner and starts ticking (F-32). Exactly three cards.
+Camera pulls back; the neutrino floats in warm haze. The through-line counter fades in at the top corner, already counting since the first hold in level 1 (F-32). Exactly three cards.
 
 | # | Player sees | Player does | Neutrino | Caption | Facts | Cue |
 |---|---|---|---|---|---|---|

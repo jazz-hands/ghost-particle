@@ -37,7 +37,7 @@ const TINTS = { electron: '#4FC3F7', muon: '#B388FF', tau: '#FF8A65' };
 const defaults = {
   flavor: 'electron',
   body: { scaleX: 1.06, scaleY: 0.96, colorDepth: 1.0, opacity: 0.82, roughness: 0.18, clearcoat: 0.6, clearcoatRoughness: 0.08, sheen: 0.4, sheenColor: '#ffffff', emissiveBoost: 0.0 },
-  eyes: { spacing: 0.062, height: 0.42, width: 30, tall: 48, tilt: 0, color: '#0b1a26', roughness: 0.88, highlight: true, hlSize: 9, hlTall: 12, hlOffsetX: 9, hlOffsetY: -16, hlColor: '#ffffff', squint: 0 },
+  eyes: { spacing: 0.062, height: 0.42, width: 30, tall: 48, tilt: 0, color: '#0b1a26', roughness: 0.88, highlight: true, hlSize: 9, hlTall: 12, hlOffsetX: 9, hlOffsetY: -16, hlColor: '#ffffff', squint: 0, lowerLid: 0 },
   light: { keyIntensity: 1.6, keyX: 3, keyY: 6, keyZ: 5, fillIntensity: 0.35, fillColor: '#9fd8ff', rimIntensity: 1.1, rimX: -3, rimY: 3, rimZ: -5, envIntensity: 0.55, exposure: 1.0 },
   post: { bloom: true, bloomThreshold: 0.95, bloomStrength: 0.25, bloomRadius: 0.3, eyeGlow: 0.0, rimShell: false, rimOpacity: 0.3, rimScale: 1.035, halo: false, haloSize: 3.5, haloOpacity: 0.3 },
   view: { turn: false, idleBob: false },
@@ -81,8 +81,8 @@ function makeSkin(kind) {
     const side = i === 0 ? -1 : 1;
     g.save(); g.translate(x, y); g.rotate(side * e.tilt);
     // Squint: clip the top of the eye with a lid, 0 = open, 1 = closed.
-    const lid = e.squint * e.tall * 2;
-    g.beginPath(); g.rect(-e.width * 2, -e.tall - 2 + lid, e.width * 4, e.tall * 2 + 4); g.clip();
+    const lid = e.squint * e.tall * 2, lower = e.lowerLid * e.tall * 2;
+    g.beginPath(); g.rect(-e.width * 2, -e.tall - 2 + lid, e.width * 4, e.tall * 2 + 4 - lid - lower); g.clip();
     g.fillStyle = kind === 'map' ? e.color : kind === 'emissive' ? '#000000' : '#e0e0e0';
     g.beginPath(); g.ellipse(0, 0, e.width, e.tall, 0, 0, Math.PI * 2); g.fill();
     if (e.highlight && (kind === 'map' || kind === 'emissive')) {
@@ -161,7 +161,8 @@ fe.add(S.eyes, 'height', 0.3, 0.6, 0.005).name('height on face').onChange(apply)
 fe.add(S.eyes, 'width', 6, 70, 1).onChange(apply);
 fe.add(S.eyes, 'tall', 6, 90, 1).name('tallness').onChange(apply);
 fe.add(S.eyes, 'tilt', -0.6, 0.6, 0.01).onChange(apply);
-fe.add(S.eyes, 'squint', 0, 1, 0.01).name('lid (0 open, 1 shut)').onChange(apply);
+fe.add(S.eyes, 'squint', 0, 1, 0.01).name('upper lid (0 open, 1 shut)').onChange(apply);
+fe.add(S.eyes, 'lowerLid', 0, 1, 0.01).name('lower lid (cheer arcs)').onChange(apply);
 fe.addColor(S.eyes, 'color').onChange(apply);
 fe.add(S.eyes, 'roughness', 0, 1, 0.01).name('eye matte').onChange(apply);
 fe.add(S.eyes, 'highlight').onChange(apply);
