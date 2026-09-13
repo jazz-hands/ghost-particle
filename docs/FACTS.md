@@ -286,6 +286,7 @@ Each entry: plain-language wording (what the player reads), precise statement (f
 |---|---|---|---|---|
 | A-01 | Super-K neutrino image of the Sun | R. Svoboda and K. Gordan (LSU), Super-Kamiokande Collaboration | not shipped (D-028); mentioned in text only | n/a |
 | A-02 | Super-K 5-day solar flux dataset, plotted in level 6 | Super-Kamiokande Collaboration, *Phys. Rev. Lett.* 132, 241803 (2024); file `sksolartimevariation5804d.txt` | public download, no licence stated; cite the collaboration and paper in credits | verified |
+| A-04 | Manrope typeface, all on-screen text | The Manrope Project Authors, https://github.com/sharanda/manrope | SIL Open Font License 1.1; licence text shipped at `public/fonts/OFL.txt` | verified |
 | A-03 | Astro Bot screenshots | Sony Interactive Entertainment / Team Asobi | reference only, never shipped | n/a |
 
 Everything else on screen is drawn procedurally by the app and needs no external credit.

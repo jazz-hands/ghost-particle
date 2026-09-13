@@ -1,10 +1,19 @@
+/* Manrope, self-hosted under the SIL Open Font License (public/fonts/OFL.txt, A-04). */
+@font-face {
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("/fonts/manrope-latin.woff2") format("woff2");
+}
+
 html, body {
   margin: 0;
   height: 100%;
   overflow: hidden;
   background: #070b1a;
   color: #cfd8dc;
-  font-family: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif;
+  font-family: "Manrope", ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
 }
 
 #stage canvas { display: block; }
