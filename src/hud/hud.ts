@@ -297,8 +297,8 @@ export class Hud {
   skymap(opts: { degrees: number; note: string; credit: string }): SkyMapHandle {
     const box = div('hud-skymap', this.layer);
     const canvas = document.createElement('canvas');
-    canvas.width = 720;
-    canvas.height = 720;
+    canvas.width = innerWidth;
+    canvas.height = innerHeight;
     box.append(canvas);
     div('hud-chart-note', box).textContent = opts.note;
     div('hud-chart-credit', box).textContent = opts.credit;
@@ -317,12 +317,15 @@ export class Hud {
         if (!ctx) return;
         const scale = canvas.width / opts.degrees;
         const half = opts.degrees / 2;
+        const midY = canvas.height / 2;
         ctx.globalCompositeOperation = 'lighter';
         ctx.globalAlpha = 0.55;
         for (const p of points) {
+          const y = midY - p.y * scale;
+          if (y < 0 || y > canvas.height) continue;
           ctx.fillStyle = p.color;
           ctx.beginPath();
-          ctx.arc((p.x + half) * scale, (half - p.y) * scale, 1.6, 0, Math.PI * 2);
+          ctx.arc((p.x + half) * scale, y, 1.6, 0, Math.PI * 2);
           ctx.fill();
         }
         ctx.globalAlpha = 1;

@@ -1,5 +1,4 @@
 import { scriptedLevel } from './scripted.ts';
-import { neutrino } from '../render/prims.ts';
 import { FACTS } from '../content/facts.ts';
 import { FIELD_DEGREES, sampleEvent, seeded } from '../content/skymap.ts';
 import { TINTS } from '../content/flavors.ts';
@@ -23,17 +22,13 @@ function creditLines(): string[] {
 }
 
 export const createLevel6 = scriptedLevel(6, async (s) => {
-  const { hud, b, rig, group } = s;
+  const { hud, b } = s;
   hud.counter.start();
   hud.counter.setVisible(true);
 
   await hud.fade(1, 1);
-  const nu = neutrino();
-  nu.position.set(2.8, 0, 0);
-  group.add(nu);
-  rig.set([0, 0, 8], [0.6, 0, 0]);
 
-  // 6.1: the field fills with event directions until the Sun stands out.
+  // 6.1: the whole view is the field; it fills with event directions until the Sun stands out.
   const map = hud.skymap({
     degrees: FIELD_DEGREES,
     note: 'Simulated from the scattering physics (F-34); not the real 503-day map.',
@@ -70,7 +65,6 @@ export const createLevel6 = scriptedLevel(6, async (s) => {
 
   // 6.5: credits, Play again reloads.
   hud.note(null);
-  map.close();
   hud.counter.setVisible(false);
   hud.credits(creditLines(), () => { location.assign(location.pathname); });
   await b.key('Space');
