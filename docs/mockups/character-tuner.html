@@ -36,10 +36,10 @@ const TINTS = { electron: '#00E5FF', muon: '#B026FF', tau: '#FF5C00' };
 
 const defaults = {
   flavor: 'electron',
-  body: { scaleX: 1.06, scaleY: 0.96, colorDepth: 1.0, opacity: 0.82, roughness: 0.18, clearcoat: 0.6, clearcoatRoughness: 0.08, sheen: 0.4, sheenColor: '#ffffff', emissiveBoost: 0.0 },
+  body: { scaleX: 1.06, scaleY: 0.96, colorDepth: 1.0, opacity: 0.85, roughness: 0.22, clearcoat: 0.6, clearcoatRoughness: 0.1, sheen: 0.1, sheenColor: '#ffffff', emissiveBoost: 0.35 },
   eyes: { spacing: 0.062, height: 0.42, width: 30, tall: 48, tilt: 0, color: '#0b1a26', roughness: 0.88, highlight: true, hlSize: 9, hlTall: 12, hlOffsetX: 9, hlOffsetY: -16, hlColor: '#ffffff', squint: 0, lowerLid: 0 },
-  light: { keyIntensity: 1.6, keyX: 3, keyY: 6, keyZ: 5, fillIntensity: 0.35, fillColor: '#9fd8ff', rimIntensity: 1.1, rimX: -3, rimY: 3, rimZ: -5, envIntensity: 0.55, exposure: 1.0 },
-  post: { bloom: true, bloomThreshold: 0.95, bloomStrength: 0.25, bloomRadius: 0.3, eyeGlow: 0.0, rimShell: false, rimOpacity: 0.3, rimScale: 1.035, halo: false, haloSize: 3.5, haloOpacity: 0.3 },
+  light: { keyIntensity: 1.2, keyX: 3, keyY: 6, keyZ: 5, fillIntensity: 0.25, fillColor: '#9fd8ff', rimIntensity: 1.0, rimX: -3, rimY: 3, rimZ: -5, envIntensity: 0.3, exposure: 1.0 },
+  post: { bloom: true, bloomThreshold: 0.8, bloomStrength: 0.35, bloomRadius: 0.4, eyeGlow: 0.0, rimShell: false, rimOpacity: 0.3, rimScale: 1.035, halo: false, haloSize: 3.5, haloOpacity: 0.3 },
   view: { turn: false, idleBob: false },
 };
 const saved = localStorage.getItem('ghost-particle-tuner');
