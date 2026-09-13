@@ -14,6 +14,8 @@ const SEAT = 0.525;
 const RISE = 0.6;
 // The character's body sphere has radius 1; the blockout's ghost was half that.
 const CHARACTER_SCALE = 0.5;
+// The electron end is all but down by here; the pop lands with the impact, not after it.
+const SLAM_AT = 0.92;
 // 2.3's brighten rides the character's own emissive, not a HUD flash.
 const GLOW_PEAK = 2.4;
 const GLOW_SECONDS = 1;
@@ -55,6 +57,8 @@ export const createLevel2 = scriptedLevel(2, async (s) => {
   s.hud.counter.start();
   s.hud.counter.setVisible(true);
   ghost.react('wiggle');
+  s.cues.blip();
+  s.cues.startTicking();
   await s.b.card(
     'Meet a neutrino. Born a moment ago in the Sun\'s core, where it\'s about 15 million degrees.',
     ['F-03'],
@@ -85,9 +89,13 @@ export const createLevel2 = scriptedLevel(2, async (s) => {
   const upX = Math.cos(TILT) * seatX;
   const upY = PLANK_Y + Math.sin(TILT) * seatX + SEAT + RISE;
   ghost.react('shrug');
+  let slammed = false;
   tween(0.6, (u) => {
     plank.rotation.z = TILT * u;
     ghost.group.position.set(seatX + (upX - seatX) * u, restY + (upY - restY) * u, 0);
+    if (slammed || u < SLAM_AT) return;
+    slammed = true;
+    s.cues.pop();
   });
   await s.b.card(
     'It has almost no mass. Weighed against an electron, it\'s over a million times lighter.',
@@ -104,12 +112,15 @@ export const createLevel2 = scriptedLevel(2, async (s) => {
   await s.b.wait(0.5);
   disposeGroup(seesaw);
   ghost.react('cheer');
+  s.cues.chime();
   await s.b.card(
     'No electric charge. Most solar neutrinos come from two protons squeezed together; you came from a rarer squeeze, with extra energy a detector can catch.',
     ['F-06', 'F-01', 'F-02'],
   );
 
   // 2.4
+  s.cues.stopTicking();
+  s.cues.whoosh();
   await s.hud.fade(1, 0.8);
 });
 

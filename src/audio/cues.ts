@@ -4,6 +4,9 @@ const HUM_LOW_HZ = 46;
 const HUM_HIGH_HZ = 138;
 const HUM_PEAK = 0.16;
 const NOISE_SECONDS = 1;
+const TICK_BASE_SECONDS = 0.5;
+const TICK_MIN_SECONDS = 0.06;
+const WHOOSH_SECONDS = 0.9;
 
 const clamp01 = (v: number): number => Math.min(Math.max(v, 0), 1);
 
@@ -18,12 +21,19 @@ export function humVolume(level: number): number {
   return l === 0 ? 0 : HUM_PEAK * (0.3 + 0.7 * l);
 }
 
+/** The counter's click spacing. Rate 1 is the level 2 loop; level 4 speeds it with the meter. */
+export function tickSeconds(rate: number): number {
+  const r = Number.isFinite(rate) && rate > 0 ? rate : 1;
+  return Math.max(TICK_BASE_SECONDS / r, TICK_MIN_SECONDS);
+}
+
 export class Cues {
   private ctx: AudioContext | null = null;
   private out: GainNode | null = null;
   private noise: AudioBuffer | null = null;
   private hums: { osc: OscillatorNode; sub: OscillatorNode; filter: BiquadFilterNode; gain: GainNode } | null = null;
   private humLevel = -1;
+  private ticker: ReturnType<typeof setInterval> | null = null;
 
   /** The first Space keydown is the only gesture allowed to start audio (1.1). */
   unlock(): void {
@@ -120,6 +130,46 @@ export class Cues {
     osc.connect(gain).connect(out);
     osc.start(t);
     osc.stop(t + 0.1);
+  }
+
+  /** A soft click for counters and meters: one narrow, quiet noise tap. */
+  tick(): void {
+    this.noiseBurst({ hz: 2200, q: 2.4, peak: 0.055, decay: 0.03 });
+  }
+
+  /** The counter's click loop. Rate multiplies the pace; calling it again re-paces it. */
+  startTicking(rate = 1): void {
+    this.stopTicking();
+    this.tick();
+    this.ticker = setInterval(() => this.tick(), tickSeconds(rate) * 1000);
+  }
+
+  stopTicking(): void {
+    if (this.ticker === null) return;
+    clearInterval(this.ticker);
+    this.ticker = null;
+  }
+
+  /** A filtered noise sweep: the pass between levels. */
+  whoosh(seconds = WHOOSH_SECONDS): void {
+    const ctx = this.ctx;
+    const out = this.out;
+    if (!ctx || !out) return;
+    const t = ctx.currentTime;
+    const src = ctx.createBufferSource();
+    src.buffer = this.noiseBuffer(ctx);
+    src.loop = true;
+    const band = ctx.createBiquadFilter();
+    band.type = 'bandpass';
+    band.Q.value = 1.1;
+    band.frequency.setValueAtTime(280, t);
+    band.frequency.exponentialRampToValueAtTime(3000, t + seconds * 0.55);
+    band.frequency.exponentialRampToValueAtTime(400, t + seconds);
+    const gain = ctx.createGain();
+    envelope(gain, t, 0.22, seconds * 0.4, seconds * 0.6);
+    src.connect(band).connect(gain).connect(out);
+    src.start(t);
+    src.stop(t + seconds + 0.05);
   }
 
   private bell(hz: number, delay: number, peak: number): void {
