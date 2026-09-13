@@ -2,7 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   BLIP_HZ, BLIP_PEAK, BUZZ_HZ, BUZZ_PEAK, THWIP_HZ, THWIP_PEAK,
-  humFrequency, humVolume, risingToneFrequency, thwipPitch, tadaNotes, tickSeconds,
+  buzzNotes, deepHumLevel, humFrequency, humVolume, risingToneFrequency, sweepOffsets, swellFrequency,
+  thwipPitch, tadaNotes, tickSeconds,
 } from '../../src/audio/cues.ts';
 
 test('the hum rises in pitch across the hold', () => {
@@ -83,4 +84,48 @@ test('the wrong-answer buzz is gentle: lower and quieter than the UI confirm', (
 test('the pass-through thwip is a tinier, higher blip', () => {
   assert.ok(THWIP_HZ > BLIP_HZ);
   assert.ok(THWIP_PEAK < BLIP_PEAK);
+});
+
+test('the deep hum swells from silence and settles back to it', () => {
+  assert.equal(deepHumLevel(0), 0);
+  assert.equal(deepHumLevel(1), 0);
+  assert.ok(deepHumLevel(0.2) > 0);
+  assert.ok(deepHumLevel(0.35) > deepHumLevel(0.2));
+  assert.ok(deepHumLevel(0.9) < deepHumLevel(0.6));
+});
+
+test('the deep hum clamps outside its own length', () => {
+  assert.equal(deepHumLevel(-1), deepHumLevel(0));
+  assert.equal(deepHumLevel(2), deepHumLevel(1));
+});
+
+test('a tick sweep is single ticks spread across its seconds', () => {
+  const offsets = sweepOffsets(6, 3);
+  assert.equal(offsets.length, 6);
+  assert.equal(offsets[0], 0);
+  assert.ok(offsets.every((v, i) => i === 0 || v > offsets[i - 1]!));
+  assert.ok(offsets.at(-1)! < 3);
+});
+
+test('a sweep of nothing still ticks once, and never before it starts', () => {
+  assert.deepEqual(sweepOffsets(0, 3), [0]);
+  assert.deepEqual(sweepOffsets(1, -2), [0]);
+});
+
+test('the swell opens its filter all the way, and only upward', () => {
+  assert.ok(swellFrequency(0) < swellFrequency(0.5));
+  assert.ok(swellFrequency(0.5) < swellFrequency(1));
+  assert.equal(swellFrequency(2), swellFrequency(1));
+  assert.equal(swellFrequency(-1), swellFrequency(0));
+});
+
+test('the swell spends its first half low, so the peak is the event', () => {
+  const span = swellFrequency(1) - swellFrequency(0);
+  assert.ok(swellFrequency(0.5) - swellFrequency(0) < span * 0.3);
+});
+
+test('the wrong answer falls rather than rises', () => {
+  const [first, second] = buzzNotes();
+  assert.ok(second < first);
+  assert.ok(second > first * 0.5);
 });

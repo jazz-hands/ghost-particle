@@ -28,9 +28,19 @@ export const BLIP_HZ = 1320;
 export const BLIP_PEAK = 0.2;
 export const BUZZ_HZ = 190;
 export const BUZZ_PEAK = 0.07;
-const BUZZ_PULSES = 2;
-const BUZZ_GAP = 0.11;
 export const THWIP_PEAK = 0.09;
+// 5.1's deep watery hum: two low sines a fifth apart, swelling and settling.
+const DEEP_HUM_HZ = [34, 51];
+const DEEP_HUM_SECONDS = 6;
+const DEEP_HUM_PEAK = 0.13;
+const DEEP_HUM_RISE = 0.35;
+// 5.3's swell: a pad that opens from a hum to a bright pad and is released by the ring.
+const SWELL_LOW_HZ = 320;
+const SWELL_HIGH_HZ = 2600;
+const SWELL_SECONDS = 8;
+const SWELL_PEAK = 0.14;
+// 5.9's wrong answer: two short low notes falling away. Gentle, never a rasp.
+const BUZZ_FALL = 0.84;
 
 const clamp01 = (v: number): number => Math.min(Math.max(v, 0), 1);
 
@@ -68,6 +78,31 @@ export function tadaNotes(): readonly { hz: number; delay: number; decay: number
   return TADA_NOTES;
 }
 
+/** The deep hum's shape over its own length: up to a plateau, then back to silence. */
+export function deepHumLevel(u: number): number {
+  const x = clamp01(u);
+  return x < DEEP_HUM_RISE ? x / DEEP_HUM_RISE : 1 - (x - DEEP_HUM_RISE) / (1 - DEEP_HUM_RISE);
+}
+
+/** When each tick of a sweep lands, in seconds from its start. Single ticks, never a loop. */
+export function sweepOffsets(count: number, seconds: number): number[] {
+  const n = Math.max(Math.floor(count), 1);
+  const span = Math.max(seconds, 0);
+  const offsets: number[] = [];
+  for (let i = 0; i < n; i += 1) offsets.push((i / n) * span);
+  return offsets;
+}
+
+/** The swell's filter opening as the hit approaches: slow at first, then quickly bright. */
+export function swellFrequency(u: number): number {
+  return SWELL_LOW_HZ + (SWELL_HIGH_HZ - SWELL_LOW_HZ) * clamp01(u) ** 2;
+}
+
+/** The two notes of the wrong-answer buzz, the second below the first. */
+export function buzzNotes(): [number, number] {
+  return [BUZZ_HZ, BUZZ_HZ * BUZZ_FALL];
+}
+
 export class Cues {
   private ctx: AudioContext | null = null;
   private out: GainNode | null = null;
@@ -75,6 +110,7 @@ export class Cues {
   private hums: { osc: OscillatorNode; sub: OscillatorNode; filter: BiquadFilterNode; gain: GainNode } | null = null;
   private humLevel = -1;
   private ticker: ReturnType<typeof setInterval> | null = null;
+  private swelling: { voices: OscillatorNode[]; filter: BiquadFilterNode; gain: GainNode } | null = null;
 
   /** The first Space keydown is the only gesture allowed to start audio (1.1). */
   unlock(): void {
@@ -280,11 +316,11 @@ export class Cues {
     }
   }
 
-  private noiseBurst(o: { hz: number; q: number; peak: number; decay: number }): void {
+  private noiseBurst(o: { hz: number; q: number; peak: number; decay: number }, at = 0): void {
     const ctx = this.ctx;
     const out = this.out;
     if (!ctx || !out) return;
-    const t = ctx.currentTime;
+    const t = ctx.currentTime + Math.max(at, 0);
     const src = ctx.createBufferSource();
     src.buffer = this.noiseBuffer(ctx);
     src.loop = true;
@@ -299,6 +335,111 @@ export class Cues {
     src.stop(t + o.decay + 0.05);
   }
 
+  /** The tank's voice at 5.1: a low watery drone that swells once and settles. */
+  deepHum(seconds = DEEP_HUM_SECONDS): void {
+    const ctx = this.ctx;
+    const out = this.out;
+    if (!ctx || !out) return;
+    const t = ctx.currentTime;
+    const gain = ctx.createGain();
+    const curve = new Float32Array(48);
+    for (let i = 0; i < curve.length; i += 1) {
+      curve[i] = Math.max(deepHumLevel(i / (curve.length - 1)) * DEEP_HUM_PEAK, 0.0001);
+    }
+    gain.gain.setValueCurveAtTime(curve, t, seconds);
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 210;
+    filter.Q.value = 3;
+    filter.connect(gain).connect(out);
+    for (const hz of DEEP_HUM_HZ) {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(hz, t);
+      osc.connect(filter);
+      osc.start(t);
+      osc.stop(t + seconds + 0.1);
+    }
+    const water = ctx.createBufferSource();
+    water.buffer = this.noiseBuffer(ctx);
+    water.loop = true;
+    const bed = ctx.createGain();
+    bed.gain.value = 0.05;
+    water.connect(bed).connect(filter);
+    water.start(t);
+    water.stop(t + seconds + 0.1);
+  }
+
+  /** 5.2's run of sensors: a handful of single ticks spread across the sweep. */
+  tickSweep(count: number, seconds: number): void {
+    for (const at of sweepOffsets(count, seconds)) {
+      this.noiseBurst({ hz: 2200, q: 2.4, peak: 0.055, decay: 0.03 }, at);
+    }
+  }
+
+  /** The rising pad under the hit. It holds at the top until swellPeak releases it. */
+  swell(seconds = SWELL_SECONDS): void {
+    const ctx = this.ctx;
+    const out = this.out;
+    if (!ctx || !out || this.swelling) return;
+    const t = ctx.currentTime;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.Q.value = 4;
+    const curve = new Float32Array(48);
+    for (let i = 0; i < curve.length; i += 1) curve[i] = swellFrequency(i / (curve.length - 1));
+    filter.frequency.setValueCurveAtTime(curve, t, seconds);
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(SWELL_PEAK * 0.5, t + seconds * 0.6);
+    filter.connect(gain).connect(out);
+    const voices: OscillatorNode[] = [];
+    for (const [hz, type] of [[98, 'sawtooth'], [147, 'sawtooth'], [196, 'triangle']] as const) {
+      const osc = ctx.createOscillator();
+      osc.type = type;
+      osc.frequency.setValueAtTime(hz, t);
+      osc.connect(filter);
+      osc.start(t);
+      voices.push(osc);
+    }
+    this.swelling = { voices, filter, gain };
+  }
+
+  /** The gentle wrong answer: two soft notes, the second a step down. */
+  buzz(): void {
+    const ctx = this.ctx;
+    const out = this.out;
+    if (!ctx || !out) return;
+    const [first, second] = buzzNotes();
+    for (const [hz, delay] of [[first, 0], [second, 0.12]] as const) {
+      const t = ctx.currentTime + delay;
+      const osc = ctx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(hz, t);
+      const gain = ctx.createGain();
+      envelope(gain, t, 0.11, 0.01, 0.16);
+      osc.connect(gain).connect(out);
+      osc.start(t);
+      osc.stop(t + 0.3);
+    }
+  }
+
+
+  /** The ring lands: the pad flares and lets go. Safe to call with no swell running. */
+  swellPeak(): void {
+    const ctx = this.ctx;
+    const live = this.swelling;
+    if (!ctx || !live) return;
+    this.swelling = null;
+    const t = ctx.currentTime;
+    live.filter.frequency.cancelScheduledValues(t);
+    live.filter.frequency.setTargetAtTime(SWELL_HIGH_HZ, t, 0.05);
+    live.gain.gain.cancelScheduledValues(t);
+    live.gain.gain.setValueAtTime(Math.max(live.gain.gain.value, 0.0001), t);
+    live.gain.gain.exponentialRampToValueAtTime(SWELL_PEAK, t + 0.12);
+    live.gain.gain.exponentialRampToValueAtTime(0.0001, t + 1.4);
+    for (const osc of live.voices) osc.stop(t + 1.5);
+  }
   private noiseBuffer(ctx: AudioContext): AudioBuffer {
     if (this.noise) return this.noise;
     const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * NOISE_SECONDS), ctx.sampleRate);
@@ -306,27 +447,6 @@ export class Cues {
     for (let i = 0; i < samples.length; i += 1) samples[i] = Math.random() * 2 - 1;
     this.noise = buffer;
     return buffer;
-  }
-  /** The wrong answer (4.5): two short low pulses, softened and kept under the blip. */
-  buzz(): void {
-    const ctx = this.ctx;
-    const out = this.out;
-    if (!ctx || !out) return;
-    const t = ctx.currentTime;
-    for (let i = 0; i < BUZZ_PULSES; i += 1) {
-      const at = t + i * BUZZ_GAP;
-      const osc = ctx.createOscillator();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(BUZZ_HZ, at);
-      const soften = ctx.createBiquadFilter();
-      soften.type = 'lowpass';
-      soften.frequency.value = 900;
-      const gain = ctx.createGain();
-      envelope(gain, at, BUZZ_PEAK, 0.006, 0.08);
-      osc.connect(soften).connect(gain).connect(out);
-      osc.start(at);
-      osc.stop(at + 0.14);
-    }
   }
   /** The pass-through (4.8): a tiny high blip that drops away as it goes. */}
 
