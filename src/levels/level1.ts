@@ -1,5 +1,6 @@
-import { disposeGroup, setOpacity, sphere } from '../render/prims.ts';
-import type { Material, Mesh, Object3D } from 'three';
+import { disposeGroup } from '../render/prims.ts';
+import { Color, Mesh, MeshStandardMaterial, SphereGeometry } from 'three';
+import type { Material, Object3D } from 'three';
 import { scriptedLevel } from './scripted.ts';
 import { createNeutrino } from '../character/neutrino.ts';
 import { setCurrentNeutrino } from '../character/current.ts';
@@ -14,8 +15,24 @@ const TOGETHER = 0.25;
 // The character's body sphere has radius 1; the blockout's ghost was half that.
 const CHARACTER_SCALE = 0.5;
 
+// One warm amber family on the stage's navy (SPEC "Look and feel"). Emissive intensities are
+// set against the stage's existing bloom threshold of 0.71.
+const GLOW_AMBER = '#ffb454';
+const GLOW_OPACITY = 0.28;
+const GLOW_EMISSIVE = 1.1;
+const GLOW_PULSE = 2.4;
+const PROTON_AMBER = '#ffd9a0';
+const BERYLLIUM_AMBER = '#ff9f45';
+const NUCLEUS_AMBER = '#ffb454';
+const SPARK_AMBER = '#ffe6bd';
+const BLOB_OPACITY = 0.82;
+const BLOB_EMISSIVE = 1.3;
+const NUCLEUS_EMISSIVE = 1.9;
+const SPARK_EMISSIVE = 2.2;
+const FLASH_SECONDS = 0.5;
+
 export const createLevel1 = scriptedLevel(1, async (s) => {
-  const glow = sphere(0.35, { opacity: 0.25 });
+  const glow = blob(0.35, GLOW_AMBER, GLOW_OPACITY, GLOW_EMISSIVE);
   s.group.add(glow);
 
   let charge = 0;
@@ -24,7 +41,11 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
   s.onUpdate((dt) => {
     if (!glowing) return;
     pulse += dt;
-    setOpacity(glow, 0.25 + 0.1 * Math.sin(pulse * 2.4) + 0.3 * charge);
+    const breath = Math.sin(pulse * GLOW_PULSE);
+    const material = skinOf(glow);
+    material.opacity = GLOW_OPACITY + 0.1 * breath + 0.3 * charge;
+    material.emissiveIntensity = GLOW_EMISSIVE + 0.35 * breath + 0.9 * charge;
+    glow.scale.setScalar(1 + 0.06 * breath + 0.25 * charge);
   });
 
   // 1.1
@@ -35,9 +56,9 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
   // 1.2
   s.hud.prompt(null);
   s.hud.counter.start();
-  const proton = sphere(0.18);
+  const proton = blob(0.18, PROTON_AMBER, BLOB_OPACITY, BLOB_EMISSIVE);
   proton.position.x = -APART;
-  const beryllium = sphere(0.3);
+  const beryllium = blob(0.3, BERYLLIUM_AMBER, BLOB_OPACITY, BLOB_EMISSIVE);
   beryllium.position.x = APART;
   s.group.add(proton, beryllium);
 
@@ -69,15 +90,18 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
   s.hud.prompt(null);
   s.cues.hum(0);
   s.cues.crackle();
-  s.hud.flash(0.4);
+  s.hud.flash(FLASH_SECONDS);
   for (const mesh of [glow, proton, beryllium]) disposeGroup(mesh);
 
-  const nucleus = sphere(0.25);
+  const nucleus = blob(0.25, NUCLEUS_AMBER, 0.92, NUCLEUS_EMISSIVE);
   s.group.add(nucleus);
   let jittering = true;
-  s.onUpdate(() => {
+  let wobble = 0;
+  s.onUpdate((dt) => {
     if (!jittering) return;
+    wobble += dt;
     nucleus.position.set(jitter(), jitter(), jitter());
+    nucleus.scale.set(1 + 0.08 * Math.sin(wobble * 11), 1 - 0.08 * Math.sin(wobble * 11), 1);
   });
   await s.b.wait(1);
   jittering = false;
@@ -86,7 +110,7 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
   // 1.6
   const sparks: Mesh[] = [];
   for (let i = 0; i < SPARK_COUNT; i += 1) {
-    const spark = sphere(0.05, { opacity: 0.6 });
+    const spark = blob(0.05, SPARK_AMBER, 0.7, SPARK_EMISSIVE);
     const angle = (i / SPARK_COUNT) * Math.PI * 2;
     spark.userData.dir = [Math.cos(angle), Math.sin(angle) * 0.7, Math.sin(angle * 2) * 0.4];
     sparks.push(spark);
@@ -118,7 +142,7 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
     for (const spark of sparks) {
       const dir = spark.userData.dir as number[];
       spark.position.set(dir[0]! * u * 1.8, dir[1]! * u * 1.8, dir[2]! * u * 1.8);
-      setOpacity(spark, 0.6 * (1 - u));
+      skinOf(spark).opacity = 0.7 * (1 - u);
     }
     fadeTo(skin, born);
   });
@@ -138,6 +162,22 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
   s.hud.prompt(null);
   await s.b.wait(0.7);
 });
+
+function blob(radius: number, color: string, opacity: number, emissive: number): Mesh {
+  return new Mesh(new SphereGeometry(radius, 32, 16), new MeshStandardMaterial({
+    color,
+    emissive: new Color(color),
+    emissiveIntensity: emissive,
+    roughness: 0.3,
+    metalness: 0,
+    transparent: true,
+    opacity,
+  }));
+}
+
+function skinOf(mesh: Mesh): MeshStandardMaterial {
+  return mesh.material as MeshStandardMaterial;
+}
 
 interface FadeTarget { material: Material; opacity: number }
 

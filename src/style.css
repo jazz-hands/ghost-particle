@@ -68,8 +68,14 @@ html, body {
   left: 50%;
   bottom: 14vh;
   transform: translateX(-50%);
-  font-size: 1.1rem;
-  color: #9fb0c1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  /* Trailing letter-spacing would otherwise pull the centred line left. */
+  text-indent: 0.3em;
+  text-transform: uppercase;
+  color: #a8b8c9;
+  animation: hud-settle 0.9s ease both;
 }
 
 .hud-title {
@@ -77,8 +83,20 @@ html, body {
   left: 50%;
   top: 12%;
   transform: translateX(-50%);
-  font-size: 2rem;
+  font-size: clamp(2rem, 7vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: 0.26em;
+  text-indent: 0.26em;
+  line-height: 1;
   text-align: center;
+  color: #f2f6ff;
+  text-shadow: 0 0 1.8rem rgba(255, 180, 84, 0.4);
+  animation: hud-settle 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes hud-settle {
+  from { opacity: 0; transform: translate(-50%, 0.6rem); }
+  to { opacity: 1; transform: translate(-50%, 0); }
 }
 
 .hud-big {
