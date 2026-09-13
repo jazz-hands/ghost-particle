@@ -1,4 +1,9 @@
 import { test, expect, type Page } from '@playwright/test';
+import type { GhostHook } from '../../src/debug/ghost.ts';
+
+declare global {
+  interface Window { ghost: GhostHook }
+}
 
 function collectErrors(page: Page): string[] {
   const errors: string[] = [];
@@ -29,5 +34,26 @@ test('mounts a full-window canvas', async ({ page }) => {
   const viewport = page.viewportSize()!;
   expect(box?.width).toBe(viewport.width);
   expect(box?.height).toBe(viewport.height);
+  expect(errors).toEqual([]);
+});
+
+test('?level=N enters that level and window.ghost.next() advances it', async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.goto('/?level=3');
+  await expect.poll(() => page.evaluate(() => window.ghost.level)).toBe(3);
+  await page.evaluate(() => window.ghost.next());
+  await expect.poll(() => page.evaluate(() => window.ghost.level)).toBe(4);
+  expect(errors).toEqual([]);
+});
+
+test('every level renders and the run steps to the end', async ({ page }, testInfo) => {
+  const errors = collectErrors(page);
+  for (let n = 1; n <= 6; n++) {
+    await page.goto(`/?level=${n}`);
+    await expect.poll(() => page.evaluate(() => window.ghost.level)).toBe(n);
+    await page.screenshot({ path: testInfo.outputPath(`level-${n}.png`) });
+  }
+  await page.evaluate(() => window.ghost.next());
+  await expect.poll(() => page.evaluate(() => window.ghost.finished)).toBe(true);
   expect(errors).toEqual([]);
 });
