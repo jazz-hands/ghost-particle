@@ -34,6 +34,16 @@ const TILES: GridTile[] = [
 ];
 
 const NEUTRINO_TILES = [9, 10, 11];
+// One line per family as its row of tiles arrives (F-16).
+const FAMILIES: [string, string][] = [
+  ['Quarks', 'Quarks: the pieces inside protons and neutrons.'],
+  ['Leptons', 'Leptons: the electron and its cousins.'],
+  ['Force carriers', 'Force carriers: what pushes and pulls.'],
+  ['Higgs', 'The Higgs: where mass comes from.'],
+];
+// Screen-right of the camera at (4, 1.5, 5): where the neutrino sits, smaller, to watch the grid.
+const ASIDE = new Vector3(1.7, 0.1, -1.4);
+const ASIDE_SCALE = 0.6;
 const REVEALED = 'Ghost particles. Almost no mass, no charge, three flavors.';
 
 export const createLevel4 = scriptedLevel(4, async (s) => {
@@ -99,7 +109,7 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
 
     if (hopLeft > 0) {
       hopLeft = Math.max(hopLeft - dt, 0);
-      ghost.position.y = Math.sin((1 - hopLeft / HOP) * Math.PI) * 0.5;
+      ghost.position.y = ASIDE.y + Math.sin((1 - hopLeft / HOP) * Math.PI) * 0.5;
     }
   });
 
@@ -110,11 +120,27 @@ export const createLevel4 = scriptedLevel(4, async (s) => {
   await s.b.until(() => p >= 0.4);
   paused = true;
   await s.b.card('Halfway to Earth. Before you arrive, meet the family: every particle matter is made of, on one chart.', ['F-16']);
-  const grid = s.hud.grid(TILES, 6);
+
+  let aside = 0;
+  s.onUpdate((dt) => {
+    if (aside >= 1) return;
+    aside = Math.min(aside + dt / 0.6, 1);
+    const u = aside * aside * (3 - 2 * aside);
+    ghost.position.lerpVectors(new Vector3(0, 0, 0), ASIDE, u);
+    ghost.scale.setScalar(1 - (1 - ASIDE_SCALE) * u);
+  });
+
+  const grid = s.hud.grid(TILES, 6, { reveal: true });
+  let hunting = false;
+  for (const [row, line] of FAMILIES) {
+    grid.show(row);
+    await s.b.card(line, ['F-16']);
+  }
+  hunting = true;
   s.hud.note('This is the Standard Model, the list of everything matter is made of. Find yourself.', ['F-16']);
   let found = false;
   grid.onPick((i) => {
-    if (found) return;
+    if (found || !hunting) return;
     if (!NEUTRINO_TILES.includes(i)) {
       grid.wiggle(i, 2);
       s.hud.note(TILES[i]!.label, ['F-16']);
