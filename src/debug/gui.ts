@@ -15,6 +15,7 @@ export function mountDebug(manager: LevelManager): DebugPanel {
   const state = { level: manager.level };
   const levelDisplay = gui.add(state, 'level').disable();
   gui.add({ next: () => manager.next() }, 'next').name('next beat');
+  gui.add({ skip: () => manager.skip() }, 'skip').name('skip level');
 
   return {
     update() {

@@ -32,6 +32,10 @@ export class LevelManager {
     this.current?.next();
   }
 
+  skip(): void {
+    if (this.current) this.enter(this.index + 1);
+  }
+
   update(dt: number): void {
     this.current?.update(dt);
   }

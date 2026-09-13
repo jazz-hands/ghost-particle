@@ -1,12 +1,11 @@
-import type { Level, LevelContext } from './types.ts';
+import type { Level } from './types.ts';
 
 export function createLevel6(): Level {
-  let ctx: LevelContext | null = null;
   return {
     id: 6,
-    enter(c) { ctx = c; },
+    enter() {},
     update() {},
-    exit() { ctx = null; },
-    next() { ctx?.done(); },
+    exit() {},
+    next() {},
   };
 }

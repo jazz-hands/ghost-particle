@@ -37,11 +37,11 @@ test('mounts a full-window canvas', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('?level=N enters that level and window.ghost.next() advances it', async ({ page }) => {
+test('?level=N enters that level and window.ghost.skip() advances it', async ({ page }) => {
   const errors = collectErrors(page);
   await page.goto('/?level=3');
   await expect.poll(() => page.evaluate(() => window.ghost.level)).toBe(3);
-  await page.evaluate(() => window.ghost.next());
+  await page.evaluate(() => window.ghost.skip());
   await expect.poll(() => page.evaluate(() => window.ghost.level)).toBe(4);
   expect(errors).toEqual([]);
 });
@@ -53,7 +53,7 @@ test('every level renders and the run steps to the end', async ({ page }, testIn
     await expect.poll(() => page.evaluate(() => window.ghost.level)).toBe(n);
     await page.screenshot({ path: testInfo.outputPath(`level-${n}.png`) });
   }
-  await page.evaluate(() => window.ghost.next());
+  await page.evaluate(() => window.ghost.skip());
   await expect.poll(() => page.evaluate(() => window.ghost.finished)).toBe(true);
   expect(errors).toEqual([]);
 });

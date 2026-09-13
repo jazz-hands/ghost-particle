@@ -88,3 +88,30 @@ test('a stale done from an exited level is ignored', () => {
   assert.equal(m.level, 2);
   assert.deepEqual(log, ['enter 1', 'exit 1', 'enter 2']);
 });
+
+test('skip exits the current level and enters the next', () => {
+  const log: string[] = [];
+  const m = new LevelManager([fakeLevel(1, log), fakeLevel(2, log)], base);
+  m.start();
+  m.skip();
+  assert.equal(m.level, 2);
+  assert.deepEqual(log, ['enter 1', 'exit 1', 'enter 2']);
+});
+
+test('skip past the last level finishes the run', () => {
+  const log: string[] = [];
+  const m = new LevelManager([fakeLevel(1, log)], base);
+  m.start();
+  m.skip();
+  assert.equal(m.finished, true);
+  m.skip();
+  assert.deepEqual(log, ['enter 1', 'exit 1']);
+});
+
+test('skip before start does nothing', () => {
+  const log: string[] = [];
+  const m = new LevelManager([fakeLevel(1, log)], base);
+  m.skip();
+  assert.equal(m.level, 0);
+  assert.deepEqual(log, []);
+});

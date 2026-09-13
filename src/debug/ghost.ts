@@ -2,6 +2,7 @@ import type { LevelManager } from '../levels/manager.ts';
 
 export interface GhostHook {
   next(): void;
+  skip(): void;
   readonly level: number;
   readonly finished: boolean;
 }
@@ -13,6 +14,7 @@ declare global {
 export function installGhostHook(manager: LevelManager): void {
   window.ghost = {
     next: () => manager.next(),
+    skip: () => manager.skip(),
     get level() { return manager.level; },
     get finished() { return manager.finished; },
   };
