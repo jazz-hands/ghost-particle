@@ -21,15 +21,19 @@ const CHARACTER_SCALE = 0.5;
 // One warm amber family on the stage's navy (SPEC "Look and feel"). Emissive intensities are
 // set against the stage's existing bloom threshold of 0.71.
 const GLOW_AMBER = '#ffb454';
-const GLOW_OPACITY = 0.28;
-const GLOW_EMISSIVE = 1.1;
+const GLOW_OPACITY = 0.22;
+const GLOW_EMISSIVE = 0.8;
 const GLOW_PULSE = 2.4;
-const PROTON_AMBER = '#ffd9a0';
+// The core tightens as the blobs arrive instead of growing into a third body.
+const GLOW_CHARGE_LIFT = 0.1;
+const GLOW_TIGHTEN = 0.25;
+const PROTON_AMBER = '#ffcf94';
 const BERYLLIUM_AMBER = '#ff9f45';
 const NUCLEUS_AMBER = '#ffb454';
 const SPARK_AMBER = '#ffe6bd';
 const BLOB_OPACITY = 0.82;
-const BLOB_EMISSIVE = 1.3;
+const PROTON_EMISSIVE = 0.95;
+const BERYLLIUM_EMISSIVE = 1.4;
 const NUCLEUS_EMISSIVE = 1.9;
 const SPARK_EMISSIVE = 2.2;
 const FLASH_SECONDS = 0.5;
@@ -46,9 +50,9 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
     pulse += dt;
     const breath = Math.sin(pulse * GLOW_PULSE);
     const material = skinOf(glow);
-    material.opacity = GLOW_OPACITY + 0.1 * breath + 0.3 * charge;
-    material.emissiveIntensity = GLOW_EMISSIVE + 0.35 * breath + 0.9 * charge;
-    glow.scale.setScalar(1 + 0.06 * breath + 0.25 * charge);
+    material.opacity = GLOW_OPACITY + 0.1 * breath + GLOW_CHARGE_LIFT * charge;
+    material.emissiveIntensity = GLOW_EMISSIVE + 0.35 * breath + GLOW_CHARGE_LIFT * charge;
+    glow.scale.setScalar(1 + 0.06 * breath - GLOW_TIGHTEN * charge);
   });
 
   // 1.1
@@ -59,9 +63,9 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
   // 1.2
   s.hud.prompt(null);
   s.hud.counter.start();
-  const proton = blob(0.18, PROTON_AMBER, BLOB_OPACITY, BLOB_EMISSIVE);
+  const proton = blob(0.18, PROTON_AMBER, BLOB_OPACITY, PROTON_EMISSIVE);
   proton.position.x = -APART;
-  const beryllium = blob(0.3, BERYLLIUM_AMBER, BLOB_OPACITY, BLOB_EMISSIVE);
+  const beryllium = blob(0.3, BERYLLIUM_AMBER, BLOB_OPACITY, BERYLLIUM_EMISSIVE);
   beryllium.position.x = APART;
   s.group.add(proton, beryllium);
 
@@ -134,6 +138,8 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
     setCurrentNeutrino(null);
     ghost.dispose();
   });
+  // F-12: the hero is born electron-flavor; config.json's tau is only the tuner's last state.
+  ghost.setFlavor('electron');
   ghost.react('wake');
   s.onUpdate((dt) => ghost.update(dt));
 
