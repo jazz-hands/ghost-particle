@@ -36,18 +36,15 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
   const beryllium = sphere(0.3);
   beryllium.position.x = APART;
   s.group.add(proton, beryllium);
-  s.hud.meter(0);
 
   // 1.3, 1.4
   let charging = true;
   let bounce = 0;
-  let releases = 0;
   s.keys.onPress('Space', () => { if (charging) s.hud.prompt(null); });
   s.keys.onRelease('Space', () => {
     if (!charging || charge >= 1) return;
-    releases += 1;
     bounce = 1;
-    s.hud.prompt(releases >= 2 ? 'Hold Space until the meter is full' : 'Hold Space');
+    s.hud.prompt('Hold Space');
   });
   s.onUpdate((dt) => {
     if (!charging) return;
@@ -58,16 +55,12 @@ export const createLevel1 = scriptedLevel(1, async (s) => {
     const gap = TOGETHER + (APART - TOGETHER) * (1 - charge) + bounce * 0.6;
     proton.position.x = -gap;
     beryllium.position.x = gap;
-    s.hud.meter(charge);
-    s.rig.shake(0.03 * charge);
   });
   await s.b.until(() => charge >= 1);
 
   // 1.5
   charging = false;
   glowing = false;
-  s.rig.shake(0);
-  s.hud.meter(null);
   s.hud.prompt(null);
   s.hud.flash(0.4);
   for (const mesh of [glow, proton, beryllium]) disposeGroup(mesh);

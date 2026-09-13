@@ -73,9 +73,9 @@ Wordless except the key prompt and the title.
 | # | Player sees | Player does | Neutrino | Caption | Facts | Cue |
 |---|---|---|---|---|---|---|
 | 1.1 | Black. A faint warm glow pulses at center. After 2 s a prompt fades in: "Hold Space". | waits | not yet present | none | | silent (audio cannot start before a key press) |
-| 1.2 | On the first hold: audio unlocks, the counter clock starts (F-32), and two soft glowing blobs drift in from the edges: a small one (proton) and a larger one (beryllium-7). Unlabeled. A thin meter appears under them. | holds Space | | none | F-01, F-02 | hum starts, rises in pitch and volume with the meter |
-| 1.3 | While held: blobs move together, meter fills over 2.5 s, gentle screen shake grows. | keeps holding | | none | | hum |
-| 1.4 | If released early: blobs bounce apart, meter drains, glow dims. Prompt returns. After two early releases the prompt reads "Hold Space until the meter is full". | tries again | | none | | hum falls |
+| 1.2 | On the first hold: audio unlocks, the counter clock starts (F-32), and two soft glowing blobs drift in from the edges: a small one (proton) and a larger one (beryllium-7). Unlabeled. The prompt hides while Space is held. | holds Space | | none | F-01, F-02 | hum starts, rises in pitch and volume with the meter |
+| 1.3 | While held: blobs move together over 2.5 s. Nothing else on screen. | keeps holding | | none | | hum |
+| 1.4 | If released early: blobs bounce apart and drift back to the edges, glow dims. "Hold Space" returns. | tries again | | none | | hum falls |
 | 1.5 | Released at full: white flash. A single nucleus remains, jittering and wobbling (boron-8). | watches | | none | F-02 | crackle |
 | 1.6 | After 1 s it pops into sparks. In the sparks, the neutrino fades in at its normal translucency (D-029). | watches | wake | none | | pop, then chime |
 | 1.7 | Title fades in above it: "GHOST PARTICLE". Below: "Press Space". | presses Space | wiggle | none | | blip |
